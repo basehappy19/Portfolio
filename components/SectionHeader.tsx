@@ -7,7 +7,7 @@ const SectionHeader = ({ text }: { text: string | null | undefined }) => {
                     {text}
                 </h1>
             </div>
-            <div className="h-1 w-32 bg-gradient-to-r from-red-400 to-transparent rounded-full"></div>
+            <div className="h-1 w-32 bg-linear-to-r from-red-400 to-transparent rounded-full"></div>
         </div>
     )
 }

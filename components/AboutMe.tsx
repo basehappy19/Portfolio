@@ -37,9 +37,9 @@ const AboutMe = async () => {
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     {/* Image Section */}
                     <div className="relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-red-400 via-pink-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+                        <div className="absolute -inset-1 bg-linear-to-r from-red-400 via-pink-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
                         <div className="relative">
-                            <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl">
+                            <div className="aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-gray-800 to-gray-900 shadow-2xl">
                                 <Image
                                     fill
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
@@ -81,7 +81,7 @@ const AboutMe = async () => {
                     {statuses.map((stat, index) => (
                         <div
                             key={index}
-                            className="flex flex-col items-center justify-center text-center p-6 rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-gray-800 hover:border-red-400/30 transition duration-300"
+                            className="flex flex-col items-center justify-center text-center p-6 rounded-xl bg-linear-to-br from-gray-800/50 to-gray-900/50 border border-gray-800 hover:border-red-400/30 transition duration-300"
                         >
                             <div className="text-3xl font-bold text-red-400 mb-2">{stat.number}</div>
                             <div className="text-sm text-gray-400">{stat.label}</div>
