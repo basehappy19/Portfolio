@@ -1,5 +1,10 @@
 {
-    "IndexPage":{
-        "title":"asfsd"
+    "Index":{
+        "AboutMe":{
+            "Heading_1":"เกี่ยวกับผม"
+        },
+        "Skills":{
+            "Heading_1":"ทักษะ / ความสามารถ"
+        }
     }
 }

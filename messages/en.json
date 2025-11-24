@@ -1,5 +1,10 @@
 {
-    "IndexPage":{
-        "title":"Eng"
+    "Index": {
+        "AboutMe": {
+            "Heading_1": "About"
+        },
+        "Skills": {
+            "Heading_1": "Skills"
+        }
     }
 }
