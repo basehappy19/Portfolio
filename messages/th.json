@@ -159,7 +159,7 @@
             "ContactInfos": [
                 {
                     "icon": "Mail",
-                    "label": "Email",
+                    "label": "อีเมล",
                     "value": "pakpoom.td@gmail.com",
                     "href": "mailto:pakpoom.td@gmail.com",
                     "gradient": "from-blue-500 to-cyan-500",
@@ -167,7 +167,7 @@
                 },
                 {
                     "icon": "Phone",
-                    "label": "Phone",
+                    "label": "โทรศัพท์",
                     "value": "064-303-8963",
                     "href": "tel:064-303-8963",
                     "gradient": "from-green-500 to-emerald-500",
@@ -175,7 +175,7 @@
                 },
                 {
                     "icon": "MapPin",
-                    "label": "Location",
+                    "label": "ตำแหน่ง",
                     "value": "Thailand",
                     "href": null,
                     "gradient": "from-purple-500 to-pink-500",
