@@ -6,7 +6,7 @@
             "Introduce_2": "I am interested in pursuing a degree in Engineering at the university level. I believe this field aligns with both global future needs and my personal aspiration to create innovations, inventions, and technologies that help develop society and support long-term sustainability.",
             "Buttons": {
                 "ContactMe": "Contact Me",
-                "Projects": "Projects"
+                "Achievements": "Achievements"
             },
             "data": {
                 "statuses": [
@@ -27,52 +27,111 @@
             }
         },
         "Skill": {
-            "Heading": "Skills & Abilities",
+            "Heading": "Expertise",
             "Expertise": [
                 {
-                    "Heading": "",
+                    "Heading": "Programming Languages",
                     "Skills": [
                         {
-                            "name": "JAVASCRIPT",
-                            "src": "./icons/js.png"
+                            "name": "Javascript",
+                            "src": "/icons/js.jpg"
                         },
                         {
-                            "name": "PHP",
-                            "src": "./icons/php.png"
-                        },
-                        {
-                            "name": "PYTHON",
-                            "src": "./icons/py.png"
-                        },
-                        {
-                            "name": "GO",
-                            "src": "./icons/go.png"
+                            "name": "Python",
+                            "src": "/icons/py.png"
                         },
                         {
                             "name": "C++",
-                            "src": "./icons/cpp.png"
+                            "src": "/icons/cpp.png"
                         },
                         {
                             "name": "C#",
-                            "src": "./icons/cs.png"
+                            "src": "/icons/cs.png"
+                        },
+                        {
+                            "name": "PHP",
+                            "src": "/icons/php.png"
+                        },
+                        {
+                            "name": "GO",
+                            "src": "/icons/go.png"
                         }
                     ]
                 },
                 {
-                    "Heading": "ฐานข้อมูล",
-                    "Skills": []
+                    "Heading": "Frameworks",
+                    "Skills": [
+                        {
+                            "name": "NextJS",
+                            "src": "/icons/nextjs.png"
+                        },
+                        {
+                            "name": "NestJS",
+                            "src": "/icons/nestjs.png"
+                        },
+                        {
+                            "name": "Fastify",
+                            "src": "/icons/fastify.png"
+                        },
+                        {
+                            "name": "Laravel",
+                            "src": "/icons/laravel.png"
+                        },
+                        {
+                            "name": "Vue",
+                            "src": "/icons/vue.png"
+                        },
+                        {
+                            "name": "Tailwindcss",
+                            "src": "/icons/tailwindcss.png"
+                        }
+                    ]
                 },
                 {
-                    "Heading": "เฟรมเวิร์ก",
-                    "Skills": []
+                    "Heading": "Tools",
+                    "Skills": [
+                        {
+                            "name": "AutoCAD",
+                            "src": "/icons/autocad.png"
+                        },
+                        {
+                            "name": "Figma",
+                            "src": "/icons/figma.png"
+                        },
+                        {
+                            "name": "Photoshop",
+                            "src": "/icons/photoshop.png"
+                        },
+                        {
+                            "name": "Lightroom",
+                            "src": "/icons/lightroom.png"
+                        },
+                        {
+                            "name": "Premiere",
+                            "src": "/icons/premiere.png"
+                        },
+                        {
+                            "name": "QGIS",
+                            "src": "/icons/qgis.png"
+                        }
+                    ]
                 },
                 {
-                    "Heading": "เครื่องมือ",
-                    "Skills": []
-                },
-                {
-                    "Heading": "อื่น ๆ",
-                    "Skills": []
+                    "Heading": "Databases",
+                    "Skills": [
+                        {
+                            "name": "MySQL",
+                            "src": "/icons/mysql.png"
+                        },
+                        {
+                            "name": "PostgreSQL",
+                            "src": "/icons/postgresql.png"
+                        },
+                        {
+                            "name": "Mongodb",
+                            "src": "/icons/mongodb.png"
+                        }
+                    ]
                 }
             ]
         },

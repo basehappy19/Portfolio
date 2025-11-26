@@ -67,12 +67,12 @@ const AboutMe = async () => {
 
                         {/* Call to Action */}
                         <div className="flex gap-4 pt-6">
-                            <button className="px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium rounded-lg transition duration-300 shadow-lg hover:shadow-red-400/50 transform hover:-translate-y-0.5">
+                            <a href='#ContactMe' className="items-center justify-center px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium rounded-lg transition duration-300 shadow-lg hover:shadow-red-400/50 transform hover:-translate-y-0.5">
                                 {t("AboutMe.Buttons.ContactMe")}
-                            </button>
-                            <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-medium rounded-lg border border-gray-700 hover:border-gray-600 transition duration-300">
-                                {t("AboutMe.Buttons.Projects")}
-                            </button>
+                            </a>
+                            <a href='#Achievements' className="items-center justify-center px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-medium rounded-lg border border-gray-700 hover:border-gray-600 transition duration-300">
+                                {t("AboutMe.Buttons.Achievements")}
+                            </a>
                         </div>
                     </div>
                 </div>

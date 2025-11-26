@@ -26,7 +26,7 @@ const CategoryButton = ({ currentCategory, category }: { currentCategory: Catego
         <button
             onClick={handleClick}
             className={`cursor-pointer px-6 py-2.5 rounded-full font-medium transition-all duration-200 ${currentCategory && currentCategory.id === category.id
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
+                ? "bg-red-600 text-white shadow-lg shadow-red-500/30"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md"
                 }`}
         >

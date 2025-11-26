@@ -111,7 +111,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {/* Card */}
             <div onClick={openModal} className="cursor-pointer mt-8 group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
                 {/* Image Section */}
-                <div className="relative h-48 bg-linear-to-br from-blue-50 to-purple-50 overflow-hidden">
+                <div className="relative h-48 bg-linear-to-br from-red-50 to-red-50 overflow-hidden">
                     {mainImage && !imageError ? (
                         <Image
                             src={`/achievements/${mainImage.url}`}
@@ -122,7 +122,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                            <Award className="w-16 h-16 text-blue-300" />
+                            <Award className="w-16 h-16 text-red-300" />
                         </div>
                     )}
 
@@ -132,7 +132,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             {achievement.categories.slice(0, 2).map((c) => (
                                 <span
                                     key={c.category.id}
-                                    className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium text-blue-600 rounded-full shadow-sm"
+                                    className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-medium text-red-600 rounded-full shadow-sm"
                                 >
                                     {tField(c.category.name_th, c.category.name_en, locale)}
                                 </span>
@@ -157,7 +157,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                 {/* Content Section */}
                 <div className="p-5">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
                         {title}
                     </h3>
 
@@ -180,14 +180,14 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         <div
                             className="px-3 py-1.5"
                         >
-                            <span className="text-blue-600 text-xs font-medium  line-clamp-1">
+                            <span className="text-red-600 text-xs font-medium  line-clamp-1">
                                 {locale === "th" ? "คลิกเพื่อดูรายละเอียด ->" : "Click For More Details ->"}
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div className="h-1 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                <div className="h-1 bg-linear-to-r from-yellow-500 via-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </div>
 
             {/* Modal */}
@@ -262,7 +262,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                 {achievement.images.length > 0 && (
                                     <div className="relative">
                                         {/* Main Image */}
-                                        <div className="relative h-96 bg-linear-to-br from-blue-50 to-purple-50">
+                                        <div className="relative h-96 bg-linear-to-br from-orange-50 to-red-50">
                                             <Image
                                                 src={`/Achievements/${achievement.images[currentImageIndex].url}`}
                                                 alt={tField(
@@ -308,8 +308,8 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                             key={index}
                                                             onClick={() => setCurrentImageIndex(index)}
                                                             className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
-                                                                    ? 'border-blue-500 ring-2 ring-blue-200 scale-105'
-                                                                    : 'border-gray-300 hover:border-blue-300 hover:scale-105'
+                                                                    ? 'border-red-500 ring-2 ring-red-200 scale-105'
+                                                                    : 'border-gray-300 hover:border-red-300 hover:scale-105'
                                                                 }`}
                                                         >
                                                             <Image
@@ -319,7 +319,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                                 className="object-cover"
                                                             />
                                                             {currentImageIndex === index && (
-                                                                <div className="absolute inset-0 bg-blue-500/20" />
+                                                                <div className="absolute inset-0 bg-red-500/20" />
                                                             )}
                                                         </button>
                                                     ))}
@@ -341,7 +341,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                         {achievement.categories.map((c) => (
                                             <span
                                                 key={c.category.id}
-                                                className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full"
+                                                className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full"
                                             >
                                                 {tField(c.category.name_th, c.category.name_en, locale)}
                                             </span>
@@ -369,7 +369,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     <div className="flex flex-wrap gap-4 mb-6 text-gray-600">
                                         {achievement.receivedAt && (
                                             <div className="flex items-center gap-2">
-                                                <Calendar className="w-5 h-5 text-blue-500" />
+                                                <Calendar className="w-5 h-5 text-red-500" />
                                                 <span>{formatDate(achievement.receivedAt, locale)}</span>
                                             </div>
                                         )}
@@ -394,7 +394,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                         href={link.url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg"
                                                     >
                                                         <span>{tField(link.label_th, link.label_en, locale)}</span>
                                                         <ExternalLink className="w-4 h-4" />
