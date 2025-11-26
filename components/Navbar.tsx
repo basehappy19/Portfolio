@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Home, User, Briefcase, Mail, Star, LucideIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher';
 
 type NavItem = {
     id: string;
@@ -15,7 +16,7 @@ const navItems: NavItem[] = [
     { id: 'About', label_en: 'About', label_th: 'เกี่ยวกับผม', icon: User },
     { id: 'Skills', label_en: 'Skills', label_th: 'ทักษะ', icon: Star },
     { id: 'Achievements', label_en: 'Achievements', label_th: 'ผลงาน', icon: Briefcase },
-    { id: 'ContactMe', label_en: 'Contact', label_th: 'ติดต่อ', icon: Mail }
+    { id: 'Contact', label_en: 'Contact', label_th: 'ติดต่อ', icon: Mail }
 ];
 
 export const scrollToSection = (sectionId: string) => {
@@ -58,7 +59,7 @@ const Navbar = () => {
         <nav
             className={`hidden md:block fixed top-12 left-0 right-0 z-50 transition-all duration-300`}
         >
-            <div className={`max-w-2xl mx-auto px-6 rounded-4xl transition-all duration-300 ${isScrolled
+            <div className={`max-w-3xl mx-auto px-6 rounded-4xl transition-all duration-300 ${isScrolled
                 ? 'bg-none backdrop-blur-lg shadow-lg'
                 : 'bg-white/30 backdrop-blur-md'
                 }`}>
@@ -89,6 +90,7 @@ const Navbar = () => {
                                 </button>
                             );
                         })}
+                        <LanguageSwitcher />
                     </div>
                 </div>
             </div>

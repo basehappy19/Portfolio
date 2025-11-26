@@ -10,8 +10,8 @@ import {
 import FormContact from './FormContact';
 import { getTranslations } from 'next-intl/server';
 
-const ContactMe = async () => {
-    const t = await getTranslations("Index.ContactMe");
+const Contact = async () => {
+    const t = await getTranslations("Index.Contact");
     const iconMap: Record<string, LucideIcon> = {
         Mail,
         Phone,
@@ -39,7 +39,7 @@ const ContactMe = async () => {
     }>;
 
     return (
-        <section className="md:min-h-screen w-full px-4 md:px-8 lg:px-16" id='ContactMe'>
+        <section className="md:min-h-screen w-full px-4 md:px-8 lg:px-16" id='Contact'>
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
@@ -123,4 +123,4 @@ const ContactMe = async () => {
     );
 };
 
-export default ContactMe;
+export default Contact;
