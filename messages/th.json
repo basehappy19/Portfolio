@@ -8,22 +8,132 @@
                 "ContactMe": "ติดต่อผม",
                 "Projects": "ผลงาน"
             },
-            "data": [
+            "data": {
+                "statuses": [
+                    {
+                        "number": "15,000 ผู้ใช้+",
+                        "label": "ในโปรเจคจริง"
+                    },
+                    {
+                        "number": "20 โปรเจค",
+                        "label": "ที่เสร็จสิ้นไปแล้ว"
+                    },
+                    {
+                        "number": "10 รายการ",
+                        "label": "แฮกกาธอน & การแข่งขัน"
+                    },
+                    { "number": "3 ปี", "label": "ประสบการณ์ด้านเทคโนโลยี" }
+                ]
+            }
+        },
+        "Skill": {
+            "Heading": "ทักษะ & ความสามารถ",
+            "Expertise": [
                 {
-                    "statuses": [
+                    "Heading": "ภาษาโปรแกรมมิ่ง",
+                    "Skills": [
                         {
-                            "number": "15,000 ผู้ใช้+",
-                            "label": "ในโปรเจคจริง"
+                            "name": "Javascript",
+                            "src": "/icons/js.jpg"
                         },
-                        { "number": "20 โปรเจค", "label": "ที่เสร็จสิ้นไปแล้ว" },
-                        { "number": "10 รายการ", "label": "แฮกกาธอน & การแข่งขัน" },
-                        { "number": "3 ปี", "label": "ประสบการณ์ด้านเทคโนโลยี" }
+                        {
+                            "name": "Python",
+                            "src": "/icons/py.png"
+                        },
+                        {
+                            "name": "C++",
+                            "src": "/icons/cpp.png"
+                        },
+                        {
+                            "name": "C#",
+                            "src": "/icons/cs.png"
+                        },
+                        {
+                            "name": "PHP",
+                            "src": "/icons/php.png"
+                        },
+                        {
+                            "name": "GO",
+                            "src": "/icons/go.png"
+                        }
+                    ]
+                },
+                {
+                    "Heading": "เฟรมเวิร์ก",
+                    "Skills": [
+                        {
+                            "name": "NextJS",
+                            "src": "/icons/nextjs.png"
+                        },
+                        {
+                            "name": "NestJS",
+                            "src": "/icons/nestjs.png"
+                        },
+                        {
+                            "name": "Fastify",
+                            "src": "/icons/fastify.png"
+                        },
+                        {
+                            "name": "Laravel",
+                            "src": "/icons/laravel.png"
+                        },
+                        {
+                            "name": "Vue",
+                            "src": "/icons/vue.png"
+                        },
+                        {
+                            "name": "Tailwindcss",
+                            "src": "/icons/tailwindcss.png"
+                        }
+                    ]
+                },
+                {
+                    "Heading": "เครื่องมือ",
+                    "Skills": [
+                        {
+                            "name": "AutoCAD",
+                            "src": "/icons/autocad.png"
+                        },
+                        {
+                            "name": "Figma",
+                            "src": "/icons/figma.png"
+                        },
+                        {
+                            "name": "Photoshop",
+                            "src": "/icons/photoshop.png"
+                        },
+                        {
+                            "name": "Lightroom",
+                            "src": "/icons/lightroom.png"
+                        },
+                        {
+                            "name": "Premiere",
+                            "src": "/icons/premiere.png"
+                        },
+                        {
+                            "name": "QGIS",
+                            "src": "/icons/qgis.png"
+                        }
+                    ]
+                },
+                {
+                    "Heading": "ฐานข้อมูล",
+                    "Skills": [
+                        {
+                            "name": "MySQL",
+                            "src": "/icons/mysql.png"
+                        },
+                        {
+                            "name": "PostgreSQL",
+                            "src": "/icons/postgresql.png"
+                        },
+                        {
+                            "name": "Mongodb",
+                            "src": "/icons/mongodb.png"
+                        }
                     ]
                 }
             ]
-        },
-        "Skills": {
-            "Heading": "ทักษะ & ความสามารถ"
         }
     }
 }

@@ -8,28 +8,73 @@
                 "ContactMe": "Contact Me",
                 "Projects": "Projects"
             },
-            "data": [
+            "data": {
+                "statuses": [
+                    {
+                        "number": "15,000 Users+",
+                        "label": "Projects Used"
+                    },
+                    { "number": "20 Projects", "label": "Completed" },
+                    {
+                        "number": "10 Programs",
+                        "label": "Hackathons & Competitions"
+                    },
+                    {
+                        "number": "3 Years",
+                        "label": "Technology Experience"
+                    }
+                ]
+            }
+        },
+        "Skill": {
+            "Heading": "Skills & Abilities",
+            "Expertise": [
                 {
-                    "statuses": [
+                    "Heading": "",
+                    "Skills": [
                         {
-                            "number": "15,000 Users+",
-                            "label": "Projects Used"
-                        },
-                        { "number": "20 Projects", "label": "Completed" },
-                        {
-                            "number": "10 Programs",
-                            "label": "Hackathons & Competitions"
+                            "name": "JAVASCRIPT",
+                            "src": "./icons/js.png"
                         },
                         {
-                            "number": "3 Years",
-                            "label": "Technology Experience"
+                            "name": "PHP",
+                            "src": "./icons/php.png"
+                        },
+                        {
+                            "name": "PYTHON",
+                            "src": "./icons/py.png"
+                        },
+                        {
+                            "name": "GO",
+                            "src": "./icons/go.png"
+                        },
+                        {
+                            "name": "C++",
+                            "src": "./icons/cpp.png"
+                        },
+                        {
+                            "name": "C#",
+                            "src": "./icons/cs.png"
                         }
                     ]
+                },
+                {
+                    "Heading": "ฐานข้อมูล",
+                    "Skills": []
+                },
+                {
+                    "Heading": "เฟรมเวิร์ก",
+                    "Skills": []
+                },
+                {
+                    "Heading": "เครื่องมือ",
+                    "Skills": []
+                },
+                {
+                    "Heading": "อื่น ๆ",
+                    "Skills": []
                 }
             ]
-        },
-        "Skills": {
-            "Heading": "Skills & Abilities"
         }
     }
 }

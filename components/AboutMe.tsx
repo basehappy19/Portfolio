@@ -11,11 +11,11 @@ const AboutMe = async () => {
     type AboutMeMessages = {
         Index: {
             AboutMe: {
-                data: [
-                    {
-                        statuses: Status[];
-                    }
-                ],
+                data:
+                {
+                    statuses: Status[];
+                }
+                ,
             };
         };
     };
@@ -24,7 +24,7 @@ const AboutMe = async () => {
     const messages = await getMessages();
 
     const statuses =
-        (messages as unknown as AboutMeMessages).Index.AboutMe.data[0].statuses;
+        (messages as unknown as AboutMeMessages).Index.AboutMe.data.statuses;
 
 
     return (
@@ -43,7 +43,7 @@ const AboutMe = async () => {
                                 <Image
                                     fill
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
-                                    src="/profiles/1.png"
+                                    src="/profiles/21.png"
                                     alt="profile"
                                 />
                             </div>
