@@ -1,0 +1,80 @@
+{
+    "Index": {
+        "AboutMe": {
+            "Heading": "About Me",
+            "Introduce_1": "Hello! My name is Pakpoom Teedindam (Base). I'm passionate about creating practical technology solutions that truly benefit and improve our society.\nI have hands-on experience in developing Fullstack web applications for various organizations, ranging from educational institutions to medical facilities. The systems I have built are currently used by thousands of users.\nI am committed to continuously improving my skills—exploring new technologies and transforming them into meaningful solutions that genuinely help people and can be applied in the real world.",
+            "Introduce_2": "I am interested in pursuing a degree in Engineering at the university level. I believe this field aligns with both global future needs and my personal aspiration to create innovations, inventions, and technologies that help develop society and support long-term sustainability.",
+            "Buttons": {
+                "ContactMe": "Contact Me",
+                "Projects": "Projects"
+            },
+            "data": {
+                "statuses": [
+                    {
+                        "number": "15,000 Users+",
+                        "label": "Projects Used"
+                    },
+                    { "number": "20 Projects", "label": "Completed" },
+                    {
+                        "number": "10 Programs",
+                        "label": "Hackathons & Competitions"
+                    },
+                    {
+                        "number": "3 Years",
+                        "label": "Technology Experience"
+                    }
+                ]
+            }
+        },
+        "Skill": {
+            "Heading": "Skills & Abilities",
+            "Expertise": [
+                {
+                    "Heading": "",
+                    "Skills": [
+                        {
+                            "name": "JAVASCRIPT",
+                            "src": "./icons/js.png"
+                        },
+                        {
+                            "name": "PHP",
+                            "src": "./icons/php.png"
+                        },
+                        {
+                            "name": "PYTHON",
+                            "src": "./icons/py.png"
+                        },
+                        {
+                            "name": "GO",
+                            "src": "./icons/go.png"
+                        },
+                        {
+                            "name": "C++",
+                            "src": "./icons/cpp.png"
+                        },
+                        {
+                            "name": "C#",
+                            "src": "./icons/cs.png"
+                        }
+                    ]
+                },
+                {
+                    "Heading": "ฐานข้อมูล",
+                    "Skills": []
+                },
+                {
+                    "Heading": "เฟรมเวิร์ก",
+                    "Skills": []
+                },
+                {
+                    "Heading": "เครื่องมือ",
+                    "Skills": []
+                },
+                {
+                    "Heading": "อื่น ๆ",
+                    "Skills": []
+                }
+            ]
+        }
+    }
+}
