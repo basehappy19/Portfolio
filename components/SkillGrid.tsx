@@ -25,7 +25,7 @@ const SkillGrid = ({ skill }: { skill: Skill }) => {
             </div>
 
             {/* Glow Effect on Hover */}
-            <div className="absolute inset-0 bg-gradient-to-r from-red-600/0 via-red-600/20 to-red-600/0 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-red-600/0 via-red-600/20 to-red-600/0 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
         </div>
     )
 }

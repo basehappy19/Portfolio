@@ -39,7 +39,7 @@ const Skills = async () => {
                         >
                             {/* Category Heading */}
                             <h3 className="text-3xl font-bold text-white mb-8 flex items-center gap-3">
-                                <span className="w-2 h-8 bg-gradient-to-b from-red-400 to-pink-400 rounded-full"></span>
+                                <span className="w-2 h-8 bg-linear-to-b from-red-400 to-pink-400 rounded-full"></span>
                                 {e.Heading}
                             </h3>
 
