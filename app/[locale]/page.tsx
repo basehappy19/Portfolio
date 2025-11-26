@@ -1,4 +1,4 @@
-import AboutMe from '@/components/AboutMe';
+import About from '@/components/About';
 import Achievement from '@/components/Achievement';
 import ContactMe from '@/components/ContactMe';
 import Home from '@/components/Home';
@@ -19,7 +19,7 @@ export default async function IndexPage(props: {
         {/* <ThemeSwitch /> */}
         <Home />
         <Navbar />
-        <AboutMe />
+        <About />
         <Skills />
         <Achievement slug={categorySlug} />
         <ContactMe />

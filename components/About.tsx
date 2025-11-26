@@ -2,15 +2,15 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import SectionHeader from './SectionHeader';
 
-const AboutMe = async () => {
+const About = async () => {
     type Status = {
         number: string;
         label: string;
     };
 
-    type AboutMeMessages = {
+    type AboutMessages = {
         Index: {
-            AboutMe: {
+            About: {
                 data:
                 {
                     statuses: Status[];
@@ -24,14 +24,14 @@ const AboutMe = async () => {
     const messages = await getMessages();
 
     const statuses =
-        (messages as unknown as AboutMeMessages).Index.AboutMe.data.statuses;
+        (messages as unknown as AboutMessages).Index.About.data.statuses;
 
 
     return (
-        <section id='AboutMe' className="min-h-screen w-full px-4 md:px-8 lg:px-16">
+        <section id='About' className="min-h-screen w-full px-4 md:px-8 lg:px-16">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <SectionHeader text={t("AboutMe.Heading")} />
+                <SectionHeader text={t("About.Heading")} />
 
                 {/* Content Grid */}
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -57,10 +57,10 @@ const AboutMe = async () => {
                     <div className="space-y-6">
                         <div className="space-y-4">
                             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                                {t("AboutMe.Introduce_1")}
+                                {t("About.Introduce_1")}
                             </p>
                             <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
-                                {t("AboutMe.Introduce_2")}
+                                {t("About.Introduce_2")}
                             </p>
                         </div>
 
@@ -68,10 +68,10 @@ const AboutMe = async () => {
                         {/* Call to Action */}
                         <div className="flex gap-4 pt-6">
                             <a href='#ContactMe' className="items-center justify-center px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium rounded-lg transition duration-300 shadow-lg hover:shadow-red-400/50 transform hover:-translate-y-0.5">
-                                {t("AboutMe.Buttons.ContactMe")}
+                                {t("About.Buttons.ContactMe")}
                             </a>
                             <a href='#Achievements' className="items-center justify-center px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-medium rounded-lg border border-gray-700 hover:border-gray-600 transition duration-300">
-                                {t("AboutMe.Buttons.Achievements")}
+                                {t("About.Buttons.Achievements")}
                             </a>
                         </div>
                     </div>
@@ -95,4 +95,4 @@ const AboutMe = async () => {
     )
 }
 
-export default AboutMe
+export default About

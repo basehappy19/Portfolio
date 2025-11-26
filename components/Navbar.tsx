@@ -12,7 +12,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     { id: 'Home', label_en: 'Home', label_th: 'หน้าหลัก', icon: Home },
-    { id: 'AboutMe', label_en: 'AboutMe', label_th: 'เกี่ยวกับผม', icon: User },
+    { id: 'About', label_en: 'About', label_th: 'เกี่ยวกับผม', icon: User },
     { id: 'Skills', label_en: 'Skills', label_th: 'ทักษะ', icon: Star },
     { id: 'Achievements', label_en: 'Achievements', label_th: 'ผลงาน', icon: Briefcase },
     { id: 'ContactMe', label_en: 'Contact', label_th: 'ติดต่อ', icon: Mail }
@@ -56,12 +56,12 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                ? 'bg-white/70 backdrop-blur-xl shadow-lg'
-                : 'bg-white/50 backdrop-blur-md'
-                }`}
+            className={`hidden md:block fixed top-12 left-0 right-0 z-50 transition-all duration-300`}
         >
-            <div className="max-w-6xl mx-auto px-6">
+            <div className={`max-w-2xl mx-auto px-6 rounded-4xl transition-all duration-300 ${isScrolled
+                ? 'bg-none backdrop-blur-lg shadow-lg'
+                : 'bg-white/30 backdrop-blur-md'
+                }`}>
                 <div className="flex items-center justify-center h-16">
 
                     {/* Nav Items */}
@@ -75,12 +75,12 @@ const Navbar = () => {
                                     key={item.id}
                                     onClick={() => scrollToSection(item.id)}
                                     className={`relative px-4 py-2 text-nowrap rounded-full flex items-center gap-2 transition-all duration-300 ${isActive
-                                        ? 'bg-linear-to-r from-yellow-500/20 to-orange-500/20 text-red-600'
+                                        ? 'bg-linear-to-r from-yellow-500/20 to-orange-500/20'
                                         : 'text-gray-700 hover:bg-gray-200/50'
                                         }`}
                                 >
-                                    <Icon className="w-4 h-4" />
-                                    <span className="font-medium">{isThai ? item.label_th : item.label_en}</span>
+                                    <Icon className={`w-4 h-4 ${isActive ? "text-red-600" : "text-white"}`} />
+                                    <span className="font-medium text-white">{isThai ? item.label_th : item.label_en}</span>
 
                                     {/* Active Indicator */}
                                     {isActive && (
