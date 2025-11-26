@@ -8,7 +8,7 @@ import AllButton from './AllButton';
 const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Category | null }) => {
     const locale = await getLocale();
     const t = await getTranslations("Index");
-    const AllButtonLabel = t("Achievement.Button.AllButtonLabel");
+    const AllButtonLabel = t("Achievement.Buttons.AllButtonLabel");
 
     const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({ connectionString });

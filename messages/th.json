@@ -1,5 +1,16 @@
 {
     "Index": {
+        "Home": {
+            "Welcome": "ยินดีต้อนรับเข้าสู่เว็บพอร์ตของผม",
+            "Greeting": "สวัสดีครับ ผม",
+            "Name": "ภาคภูมิ ทีดินดำ",
+            "Description": "\"แค่อยากเห็นสังคมที่ดีขึ้น\"",
+            "Roles": ["นักพัฒนาโปรแกรมซอฟต์แวร์", "นักเรียน", "นวัตกร"],
+            "Buttons": {
+                "ViewAchievements": "ดูผลงาน",
+                "CV": "ดู CV"
+            }
+        },
         "AboutMe": {
             "Heading": "เกี่ยวกับผม",
             "Introduce_1": "สวัสดีครับ ผมชื่อนายภาคภูมิ ทีดินดำ (เบท) ผมเป็นคนที่สนใจการสร้างเทคโนโลยีที่สามารถนำไปใช้ได้จริงเพื่อพัฒนาสังคมของเรา\nผมมีประสบการณ์ด้านการพัฒนาเว็บแอปพลิเคชันแบบ Fullstack ให้กับองค์กรหลากหลายประเภท ตั้งแต่สถาบันการศึกษาไปจนถึงสถานพยาบาล ซึ่งระบบที่พัฒนาขึ้นมีผู้ใช้งานรวมหลายพันคนในปัจจุบัน\nผมมุ่งมั่นที่จะพัฒนาทักษะของตัวเองอยู่เสมอ ทั้งการเรียนรู้เทคโนโลยีใหม่ ๆ และการต่อยอดเพื่อนำไปสร้างโซลูชันที่มีความหมายต่อผู้คน และสามารถนำไปใช้ได้จริงในโลกปัจจุบัน",
@@ -137,9 +148,64 @@
         },
         "Achievement": {
             "Heading": "ผลงาน",
-            "Button": {
+            "Buttons": {
                 "AllButtonLabel": "ทั้งหมด"
             }
+        },
+        "ContactMe": {
+            "Heading": "ติดต่อผม",
+            "Description": "มีโปรเจกต์ที่น่าสนใจหรืออยากคุยกัน? ยินดีรับฟังทุกข้อเสนอครับ",
+            "ContactInfo": "ข้อมูลติดต่อ",
+            "ContactInfos": [
+                {
+                    "icon": "Mail",
+                    "label": "Email",
+                    "value": "pakpoom.td@gmail.com",
+                    "href": "mailto:pakpoom.td@gmail.com",
+                    "gradient": "from-blue-500 to-cyan-500",
+                    "type": "email"
+                },
+                {
+                    "icon": "Phone",
+                    "label": "Phone",
+                    "value": "064-303-8963",
+                    "href": "tel:064-303-8963",
+                    "gradient": "from-green-500 to-emerald-500",
+                    "type": "phone"
+                },
+                {
+                    "icon": "MapPin",
+                    "label": "Location",
+                    "value": "Thailand",
+                    "href": null,
+                    "gradient": "from-purple-500 to-pink-500",
+                    "type": "location"
+                }
+            ],
+            "SocialLink": "โซเชียลมีเดีย",
+            "SocialLinks": [
+                {
+                    "name": "Facebook",
+                    "icon": "Facebook",
+                    "href": "http://facebook.com/basehappy19",
+                    "color": "from-blue-600 to-blue-700",
+                    "hoverColor": "hover:from-blue-500 hover:to-blue-600"
+                },
+                {
+                    "name": "GitHub",
+                    "icon": "Github",
+                    "href": "https://github.com/basehappy19",
+                    "color": "from-gray-800 to-gray-900",
+                    "hoverColor": "hover:from-gray-700 hover:to-gray-800"
+                },
+                {
+                    "name": "Instagram",
+                    "icon": "Instagram",
+                    "href": "https://www.instagram.com/base_happy19",
+                    "color": "from-pink-500 via-red-500 to-yellow-500",
+                    "hoverColor": "hover:from-pink-400 hover:via-red-400 hover:to-yellow-400"
+                }
+            ]
         }
     }
 }

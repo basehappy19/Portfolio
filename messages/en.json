@@ -1,5 +1,16 @@
 {
     "Index": {
+        "Home": {
+            "Welcome": "Welcome To My Portfolio",
+            "Greeting": "Hi, I'm",
+            "Name": "Pakpoom Teedindam",
+            "Description": "\"Just Want To See Society Improve\"",
+            "Roles": ["Full Stack Developer", "Student", "Innovator"],
+            "Buttons": {
+                "ViewAchievements": "Achievements",
+                "CV": "View CV"
+            }
+        },
         "AboutMe": {
             "Heading": "About Me",
             "Introduce_1": "Hello! My name is Pakpoom Teedindam (Base). I'm passionate about creating practical technology solutions that truly benefit and improve our society.\nI have hands-on experience in developing Fullstack web applications for various organizations, ranging from educational institutions to medical facilities. The systems I have built are currently used by thousands of users.\nI am committed to continuously improving my skills—exploring new technologies and transforming them into meaningful solutions that genuinely help people and can be applied in the real world.",
@@ -137,9 +148,64 @@
         },
         "Achievement": {
             "Heading": "Achievements",
-            "Button": {
+            "Buttons": {
                 "AllButtonLabel": "All"
             }
+        },
+        "ContactMe": {
+            "Heading": "Contact Me",
+            "Description": "Have an interesting project or something you'd like to discuss? We're open to all suggestions",
+            "ContactInfo": "Contact Info",
+            "ContactInfos": [
+                {
+                    "icon": "Mail",
+                    "label": "Email",
+                    "value": "pakpoom.td@gmail.com",
+                    "href": "mailto:pakpoom.td@gmail.com",
+                    "gradient": "from-blue-500 to-cyan-500",
+                    "type": "email"
+                },
+                {
+                    "icon": "Phone",
+                    "label": "Phone",
+                    "value": "064-303-8963",
+                    "href": "tel:064-303-8963",
+                    "gradient": "from-green-500 to-emerald-500",
+                    "type": "phone"
+                },
+                {
+                    "icon": "MapPin",
+                    "label": "Location",
+                    "value": "Thailand",
+                    "href": null,
+                    "gradient": "from-purple-500 to-pink-500",
+                    "type": "location"
+                }
+            ],
+            "SocialLink": "Social Media",
+            "SocialLinks": [
+                {
+                    "name": "Facebook",
+                    "icon": "Facebook",
+                    "href": "http://facebook.com/basehappy19",
+                    "color": "from-blue-600 to-blue-700",
+                    "hoverColor": "hover:from-blue-500 hover:to-blue-600"
+                },
+                {
+                    "name": "GitHub",
+                    "icon": "Github",
+                    "href": "https://github.com/basehappy19",
+                    "color": "from-gray-800 to-gray-900",
+                    "hoverColor": "hover:from-gray-700 hover:to-gray-800"
+                },
+                {
+                    "name": "Instagram",
+                    "icon": "Instagram",
+                    "href": "https://www.instagram.com/base_happy19",
+                    "color": "from-pink-500 via-red-500 to-yellow-500",
+                    "hoverColor": "hover:from-pink-400 hover:via-red-400 hover:to-yellow-400"
+                }
+            ]
         }
     }
 }

@@ -7,7 +7,7 @@ const SkillGrid = ({ skill }: { skill: Skill }) => {
             className="group relative"
         >
             {/* Skill Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-red-400 transition-all duration-300 hover:scale-110 hover:shadow-xl hover:shadow-red-500/30 cursor-pointer">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-red-400 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 cursor-pointer">
                 {/* Icon Container */}
                 <div className="w-16 h-16 mx-auto mb-3 relative">
                     <Image

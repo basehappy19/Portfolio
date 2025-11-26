@@ -117,7 +117,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             src={`/achievements/${mainImage.url}`}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="object-cover"
                             onError={() => setImageError(true)}
                         />
                     ) : (
@@ -252,7 +252,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             {/* Close Button */}
                             <button
                                 onClick={closeModal}
-                                className="absolute top-4 right-4 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all hover:scale-110"
+                                className="absolute top-4 right-4 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all"
                             >
                                 <X className="w-5 h-5 text-gray-700" />
                             </button>
@@ -280,13 +280,13 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 <>
                                                     <button
                                                         onClick={prevImage}
-                                                        className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all hover:scale-110"
+                                                        className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all"
                                                     >
                                                         <ChevronLeft className="w-6 h-6 text-gray-700" />
                                                     </button>
                                                     <button
                                                         onClick={nextImage}
-                                                        className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all hover:scale-110"
+                                                        className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all"
                                                     >
                                                         <ChevronRight className="w-6 h-6 text-gray-700" />
                                                     </button>

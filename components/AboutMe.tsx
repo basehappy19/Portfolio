@@ -28,7 +28,7 @@ const AboutMe = async () => {
 
 
     return (
-        <section className="min-h-screen w-full px-4 md:px-8 lg:px-16">
+        <section id='AboutMe' className="min-h-screen w-full px-4 md:px-8 lg:px-16">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <SectionHeader text={t("AboutMe.Heading")} />
@@ -42,7 +42,7 @@ const AboutMe = async () => {
                             <div className="aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-gray-800 to-gray-900 shadow-2xl">
                                 <Image
                                     fill
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
+                                    className="w-full h-full object-cover"
                                     src="/profiles/1.png"
                                     alt="profile"
                                 />

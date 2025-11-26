@@ -1,0 +1,99 @@
+'use client'
+import React, { useState, useEffect } from 'react';
+import { Home, User, Briefcase, Mail, Star, LucideIcon } from 'lucide-react';
+import { useLocale } from 'next-intl';
+
+type NavItem = {
+    id: string;
+    label_en: string;
+    label_th: string;
+    icon: LucideIcon;
+};
+
+const navItems: NavItem[] = [
+    { id: 'Home', label_en: 'Home', label_th: 'หน้าหลัก', icon: Home },
+    { id: 'AboutMe', label_en: 'AboutMe', label_th: 'เกี่ยวกับผม', icon: User },
+    { id: 'Skills', label_en: 'Skills', label_th: 'ทักษะ', icon: Star },
+    { id: 'Achievements', label_en: 'Achievements', label_th: 'ผลงาน', icon: Briefcase },
+    { id: 'ContactMe', label_en: 'Contact', label_th: 'ติดต่อ', icon: Mail }
+];
+
+export const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
+
+const Navbar = () => {
+    const [activeSection, setActiveSection] = useState('home');
+    const [isScrolled, setIsScrolled] = useState(false);
+    const locale = useLocale();
+    const isThai = locale === 'th';
+    useEffect(() => {
+        const ACTIVATION_OFFSET = 450;
+
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+
+            const sections = navItems.map(item => document.getElementById(item.id));
+            const scrollPosition = window.scrollY + ACTIVATION_OFFSET;
+
+            for (let i = sections.length - 1; i >= 0; i--) {
+                const section = sections[i];
+                if (section && section.offsetTop <= scrollPosition) {
+                    setActiveSection(navItems[i].id);
+                    break;
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+
+    return (
+        <nav
+            className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                ? 'bg-white/70 backdrop-blur-xl shadow-lg'
+                : 'bg-white/50 backdrop-blur-md'
+                }`}
+        >
+            <div className="max-w-6xl mx-auto px-6">
+                <div className="flex items-center justify-center h-16">
+
+                    {/* Nav Items */}
+                    <div className="flex items-center gap-2">
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = activeSection === item.id;
+
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => scrollToSection(item.id)}
+                                    className={`relative px-4 py-2 text-nowrap rounded-full flex items-center gap-2 transition-all duration-300 ${isActive
+                                        ? 'bg-linear-to-r from-yellow-500/20 to-orange-500/20 text-red-600'
+                                        : 'text-gray-700 hover:bg-gray-200/50'
+                                        }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    <span className="font-medium">{isThai ? item.label_th : item.label_en}</span>
+
+                                    {/* Active Indicator */}
+                                    {isActive && (
+                                        <div className="absolute inset-0 rounded-full border-2 border-red-500/30 animate-pulse" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
+};
+
+export default Navbar;

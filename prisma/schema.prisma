@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Achievement {
-  id          Int       @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   title_th       String
   description_th String?
   awardLevel_th  String?
@@ -25,7 +25,7 @@ model Achievement {
   awardLevel_en  String?
   location_en    String?
 
-  receivedAt  DateTime?
+  receivedAt DateTime?
 
   categories AchievementsOnCategories[]
   images     AchievementImage[]
@@ -36,10 +36,10 @@ model Achievement {
 }
 
 model Category {
-  id   Int    @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   name_th String
   name_en String
-  slug String @unique
+  slug    String @unique
 
   achievements AchievementsOnCategories[]
 
@@ -64,10 +64,10 @@ model AchievementImage {
   achievement   Achievement @relation(fields: [achievementId], references: [id])
   achievementId Int
 
-  url       String
-  altText_th   String?
-  altText_en   String?
-  sortOrder Int     @default(0)
+  url        String
+  altText_th String?
+  altText_en String?
+  sortOrder  Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -80,9 +80,20 @@ model AchievementLink {
 
   label_th String
   label_en String
-  url   String
+  url      String
 
   sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  name    String
+  email   String
+  message String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

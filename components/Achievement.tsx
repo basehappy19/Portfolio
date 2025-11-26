@@ -137,7 +137,7 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
     const t = await getTranslations("Index");
 
     return (
-        <section className="w-full px-4 md:px-8 lg:px-16" id="Achievements">
+        <section className="min-h-screen w-full px-4 md:px-8 lg:px-16" id="Achievements">
             <div className="max-w-7xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab currentCategory={currentCategory} />

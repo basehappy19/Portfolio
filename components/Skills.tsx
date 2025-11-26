@@ -27,7 +27,7 @@ const Skills = async () => {
         (messages as unknown as ExpertiseMessage).Index.Skill.Expertise;
 
     return (
-        <section className="min-h-screen w-full px-4 md:px-8 lg:px-16">
+        <section id='Skills' className="min-h-screen w-full px-4 md:px-8 lg:px-16">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <SectionHeader text={t("Skill.Heading")} />
