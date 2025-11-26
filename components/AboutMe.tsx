@@ -43,7 +43,7 @@ const AboutMe = async () => {
                                 <Image
                                     fill
                                     className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
-                                    src="/profiles/21.png"
+                                    src="/profiles/1.png"
                                     alt="profile"
                                 />
                             </div>

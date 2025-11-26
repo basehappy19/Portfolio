@@ -134,6 +134,12 @@
                     ]
                 }
             ]
+        },
+        "Achievement": {
+            "Heading": "ผลงาน",
+            "Button": {
+                "AllButtonLabel": "ทั้งหมด"
+            }
         }
     }
 }

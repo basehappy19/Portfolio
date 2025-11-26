@@ -75,6 +75,12 @@
                     "Skills": []
                 }
             ]
+        },
+        "Achievement": {
+            "Heading": "Achievements",
+            "Button": {
+                "AllButtonLabel": "All"
+            }
         }
     }
 }

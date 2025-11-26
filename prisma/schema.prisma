@@ -14,67 +14,76 @@ datasource db {
 }
 
 model Achievement {
-  id          Int                  @id @default(autoincrement())
-  title       String               
-  description String?              
-  awardLevel  String?              
-  receivedAt  DateTime?            
-  location    String?              
+  id          Int       @id @default(autoincrement())
+  title_th       String
+  description_th String?
+  awardLevel_th  String?
+  location_th    String?
 
-  categories  AchievementsOnCategories[]
-  images      AchievementImage[]
-  links       AchievementLink[]
+  title_en       String
+  description_en String?
+  awardLevel_en  String?
+  location_en    String?
 
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  receivedAt  DateTime?
+
+  categories AchievementsOnCategories[]
+  images     AchievementImage[]
+  links      AchievementLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id          Int                      @id @default(autoincrement())
-  name        String                   
-  slug        String                   @unique 
+  id   Int    @id @default(autoincrement())
+  name_th String
+  name_en String
+  slug String @unique
 
   achievements AchievementsOnCategories[]
 
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AchievementsOnCategories {
   achievement   Achievement @relation(fields: [achievementId], references: [id])
   achievementId Int
 
-  category      Category    @relation(fields: [categoryId], references: [id])
-  categoryId    Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
 
-  sortOrder     Int          @default(0)
+  sortOrder Int @default(0)
 
   @@id([achievementId, categoryId])
 }
 
 model AchievementImage {
-  id            Int          @id @default(autoincrement())
-  achievement   Achievement  @relation(fields: [achievementId], references: [id])
+  id            Int         @id @default(autoincrement())
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
   achievementId Int
 
-  url           String       
-  altText       String?      
-  sortOrder     Int          @default(0)
+  url       String
+  altText_th   String?
+  altText_en   String?
+  sortOrder Int     @default(0)
 
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AchievementLink {
-  id            Int          @id @default(autoincrement())
-  achievement   Achievement  @relation(fields: [achievementId], references: [id])
+  id            Int         @id @default(autoincrement())
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
   achievementId Int
 
-  label         String       
-  url           String       
+  label_th String
+  label_en String
+  url   String
 
-  sortOrder     Int          @default(0) 
+  sortOrder Int @default(0)
 
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
