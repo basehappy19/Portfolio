@@ -1,11 +1,11 @@
-import About from '@/components/About';
-import Achievement from '@/components/Achievement';
-import Contact from '@/components/Contact';
-import Footer from '@/components/Footer';
-import Home from '@/components/Home';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import Navbar from '@/components/Navbar';
-import Skills from '@/components/Skills';
+import Footer from '@/components/Layout/Footer';
+import Navbar from '@/components/Layout/Navbar';
+import About from '@/components/Section/About';
+import Achievement from '@/components/Section/Achievement';
+import Contact from '@/components/Section/Contact';
+import Home from '@/components/Section/Home';
+import Skills from '@/components/Section/Skills';
 
 export default async function IndexPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>

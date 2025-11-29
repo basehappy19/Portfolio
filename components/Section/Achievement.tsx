@@ -1,9 +1,9 @@
 import { getTranslations, getLocale } from "next-intl/server";
-import SectionHeader from "./SectionHeader";
+import SectionHeader from "../SectionHeader";
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import CategoryFilterTab from "./CategoryFilterTab";
-import AchievementCard from "./AchievementCard";
+import CategoryFilterTab from "../CategoryFilterTab";
+import AchievementCard from "../AchievementCard";
 
 export type Category = {
     id: number,
@@ -58,28 +58,17 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                 awardLevel_en: true,
                 location_en: true,
 
+                status: true,
+                sortOrder: true,
                 receivedAt: true,
                 createdAt: true,
                 updatedAt: true,
                 categories: {
                     select: {
-                        category: {
-                            select: {
-                                id: true,
-                                name_en: true,
-                                name_th: true,
-                                slug: true
-                            }
-                        }
+                        category: true
                     }
                 },
-                images: {
-                    select: {
-                        url: true,
-                        altText_th: true,
-                        altText_en: true,
-                    }
-                },
+                images: true,
                 links: true
             },
             where: {
@@ -107,6 +96,8 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                 awardLevel_en: true,
                 location_en: true,
 
+                status: true,
+                sortOrder: true,
                 receivedAt: true,
                 createdAt: true,
                 updatedAt: true,
@@ -122,13 +113,7 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                         }
                     }
                 },
-                images: {
-                    select: {
-                        url: true,
-                        altText_th: true,
-                        altText_en: true,
-                    }
-                },
+                images: true,
                 links: true
             },
             orderBy: { receivedAt: "desc" }

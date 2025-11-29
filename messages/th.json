@@ -176,7 +176,7 @@
                 {
                     "icon": "MapPin",
                     "label": "ตำแหน่ง",
-                    "value": "Thailand",
+                    "value": "ประเทศไทย",
                     "href": null,
                     "gradient": "from-purple-500 to-pink-500",
                     "type": "location"

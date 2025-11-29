@@ -26,13 +26,19 @@ model Achievement {
   location_en    String?
 
   receivedAt DateTime?
-
+  sortOrder  Int                        @default(0)
   categories AchievementsOnCategories[]
   images     AchievementImage[]
   links      AchievementLink[]
+  status     Status                     @default(DRAFT)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Status {
+  DRAFT
+  PUBLIC
 }
 
 model Category {

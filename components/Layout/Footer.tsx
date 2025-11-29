@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import { headers } from "next/headers";
-import { SignOutButton } from "./SignOutButton";
-import { SignInButton } from "./SignInButton";
+import { SignOutButton } from "../Button/SignOutButton";
+import { SignInButton } from "../Button/SignInButton";
 
-export default async function PortfolioFooter() {
+export default async function Footer() {
     const session = await auth.api.getSession({
         headers: await headers(),
     })

@@ -1,6 +1,6 @@
-import SectionHeader from './SectionHeader'
+import SectionHeader from '../SectionHeader'
 import { getMessages, getTranslations } from 'next-intl/server';
-import SkillGrid from './SkillGrid';
+import SkillGrid from '../SkillGrid';
 
 export type Skill = {
     name: string;

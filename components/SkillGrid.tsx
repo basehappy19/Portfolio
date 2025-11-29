@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Skill } from './Skills'
+import { Skill } from './Section/Skills'
 
 const SkillGrid = ({ skill }: { skill: Skill }) => {
     return (

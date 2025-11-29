@@ -3,42 +3,7 @@
 import Image from "next/image";
 import { Calendar, MapPin, Award, ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-
-interface Achievement {
-    id: number;
-    title_th: string;
-    description_th: string | null;
-    awardLevel_th: string | null;
-    location_th: string | null;
-
-    title_en: string;
-    description_en: string | null;
-    awardLevel_en: string | null;
-    location_en: string | null;
-
-    receivedAt: Date | null;
-
-    categories: Array<{
-        category: {
-            id: number;
-            name_th: string;
-            name_en: string;
-            slug: string;
-        }
-    }>;
-
-    images: Array<{
-        url: string;
-        altText_th: string | null;
-        altText_en: string | null;
-    }>;
-
-    links: Array<{
-        label_th: string;
-        label_en: string;
-        url: string;
-    }>;
-}
+import { Achievement } from "@/types/Achievements";
 
 interface AchievementCardProps {
     achievement: Achievement;
