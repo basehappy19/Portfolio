@@ -1,6 +1,6 @@
 import { getMessages, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
-import SectionHeader from './SectionHeader';
+import SectionHeader from '../SectionHeader';
 
 const About = async () => {
     type Status = {

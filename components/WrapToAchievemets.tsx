@@ -1,6 +1,6 @@
 "use client"
-import { scrollToSection } from './Navbar'
 import { ArrowDown } from 'lucide-react'
+import { scrollToSection } from './Layout/Navbar'
 
 const WrapToAchievemets = ({ text }: { text: string }) => {
     return (

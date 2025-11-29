@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Home, User, Briefcase, Mail, Star, LucideIcon } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import LanguageSwitcher from './LanguageSwitcher';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 type NavItem = {
     id: string;

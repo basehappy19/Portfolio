@@ -1,8 +1,8 @@
 import { getTranslations } from 'next-intl/server';
-import AnimatedRole from './AnimatedRole';
-import WrapToAchievemets from './WrapToAchievemets';
 import { Sparkles } from 'lucide-react';
-import ViewCV from './ViewCV';
+import WrapToAchievemets from '../WrapToAchievemets';
+import AnimatedRole from '../AnimatedRole';
+import ViewCV from '../Button/ViewCV';
 
 const Home = async () => {
     const t = await getTranslations("Index");

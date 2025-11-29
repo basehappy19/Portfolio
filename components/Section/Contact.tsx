@@ -7,8 +7,8 @@ import {
     Instagram,
     LucideIcon
 } from "lucide-react";
-import FormContact from './FormContact';
 import { getTranslations } from 'next-intl/server';
+import FormContact from "../FormContact";
 
 const Contact = async () => {
     const t = await getTranslations("Index.Contact");
