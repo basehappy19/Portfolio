@@ -1,5 +1,5 @@
 export type AchievementImage = {
-    id: number;
+    id: string;
     url: string;
     altText_th: string | null;
     altText_en: string | null;
@@ -9,8 +9,8 @@ export type AchievementImage = {
 };
 
 export type AchievementLink = {
-    id: number;
-    achievementId: number;
+    id: string;
+    achievementId: string;
     label_th: string;
     label_en: string;
     url: string;
@@ -33,7 +33,7 @@ export type AchievementsOnCategories = {
 export type Status = "DRAFT" | "PUBLIC";
 
 export type Achievement = {
-    id: number;
+    id: string;
     title_th: string;
     description_th: string | null;
     awardLevel_th: string | null;
@@ -57,10 +57,20 @@ export type Achievement = {
 };
 
 export type Message = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     message: string;
     createdAt: Date;
     updatedAt: Date;
+};
+
+export type EditData = Partial<Achievement> & { id: string };
+
+export type AchievementModalContextType = {
+    isOpen: boolean;
+    editData: EditData | null;
+    open: (data?: EditData) => void;
+    close: () => void;
+    toggle: () => void;
 };

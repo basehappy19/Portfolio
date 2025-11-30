@@ -6,42 +6,10 @@ import React, {
 } from 'react';
 import { X, Plus, Trash2, GripVertical } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
-import { EditData, useAchievementModal } from '@/app/contexts/AchievementModalContext';
+import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import Image from 'next/image';
-
-type LinkForm = {
-    id?: number;
-    label_th: string;
-    label_en: string;
-    url: string;
-    sortOrder: number;
-};
-
-
-type ImagePreview = {
-    id?: number;
-    file?: File;
-    preview: string;
-    altText_th: string;
-    altText_en: string;
-    sortOrder: number;
-};
-
-type FormState = {
-    title_th: string;
-    title_en: string;
-    description_th: string;
-    description_en: string;
-    categorySlugs: string[];
-    sortOrder: number;
-    isPublished: boolean;
-};
-
-type SubmitData = FormState & {
-    images: ImagePreview[];
-    links: LinkForm[];
-    id?: number;
-};
+import { EditData } from '@/types/Achievements';
+import { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
 
 
 // ---------- outer component: ใช้ context + เลือก inner ----------
@@ -68,25 +36,36 @@ const AchievementModalInner = ({
     close: () => void;
 }) => {
     const categories = useCategories();
+    const receivedAt =
+        editData?.receivedAt instanceof Date
+            ? editData.receivedAt.toISOString().slice(0, 10) // "YYYY-MM-DD"
+            : editData?.receivedAt ?? "";
 
     const [formData, setFormData] = useState<FormState>(() => ({
         title_th: editData?.title_th ?? '',
         title_en: editData?.title_en ?? '',
         description_th: editData?.description_th ?? '',
         description_en: editData?.description_en ?? '',
-        categorySlugs:
-            editData?.categories?.map((c) => c.category.slug) ?? [],
-        sortOrder: editData?.sortOrder ?? 0,
+        awardLevel_th: editData?.awardLevel_th ?? '',
+        awardLevel_en: editData?.awardLevel_en ?? '',
+        location_th: editData?.location_th ?? '',
+        location_en: editData?.location_en ?? '',
+        receivedAt: receivedAt,
+        categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
+        sortOrder: Number(editData?.sortOrder ?? 0),
         isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
+
+
+    const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
         editData?.images?.map((img, idx) => ({
             id: img.id,
             file: undefined,
-            preview: `/achievements/${img.url}`,
-            altText_th: img.altText_th ?? '',
-            altText_en: img.altText_en ?? '',
+            preview: `${publicBase}/${editData.id}/${img.url}`,
+            altText_th: img.altText_th ?? "",
+            altText_en: img.altText_en ?? "",
             sortOrder: img.sortOrder ?? idx,
         })) ?? []
     );
@@ -105,32 +84,94 @@ const AchievementModalInner = ({
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
 
+    const uploadImage = async (file: File) => {
+        const formDataUpload = new FormData();
+        formDataUpload.append("file", file);
+
+        const achievementIdForUpload = editData?.id ?? "_temp";
+
+        const res = await fetch(
+            `/api/uploads?achievementId=${achievementIdForUpload}`,
+            {
+                method: "POST",
+                body: formDataUpload,
+            }
+        );
+
+        if (!res.ok) {
+            throw new Error("Upload image failed");
+        }
+
+        const json = (await res.json()) as { fileName: string; url: string };
+
+        return json;
+    };
+
+
     const handleAchievementSubmit = async (data: SubmitData) => {
+        const status = data.isPublished ? "PUBLIC" : "DRAFT";
+
+        const uploadedImages = await Promise.all(
+            (data.images ?? []).map(async (img) => {
+                if (img.file instanceof File) {
+                    const { fileName } = await uploadImage(img.file);
+                    return {
+                        id: img.id,
+                        preview: fileName,
+                        altText_th: img.altText_th ?? null,
+                        altText_en: img.altText_en ?? null,
+                        sortOrder: img.sortOrder ?? 0,
+                    };
+                }
+
+                return {
+                    id: img.id,
+                    preview: img.preview,
+                    altText_th: img.altText_th ?? null,
+                    altText_en: img.altText_en ?? null,
+                    sortOrder: img.sortOrder ?? 0,
+                };
+            })
+        );
+
+        const normalizedLinks = (data.links ?? []).map((link) => ({
+            id: link.id,
+            label_th: link.label_th,
+            label_en: link.label_en,
+            url: link.url,
+            sortOrder: link.sortOrder ?? 0,
+        }));
+
         const payload = {
             ...data,
-            status: data.isPublished ? 'PUBLIC' : 'DRAFT',
+            status,
+            images: uploadedImages,
+            links: normalizedLinks,
+            receivedAt: formData.receivedAt
+                ? new Date(formData.receivedAt)
+                : null,
         };
 
         if (data.id) {
-            // await fetch(`/api/admin/achievements/${data.id}`, {
-            //     method: 'PUT',
-            //     body: JSON.stringify(payload),
-            // });
+            await fetch(`/api/admin/achievements/${data.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
             console.log(payload);
-            
+
         } else {
-            // await fetch(`/api/admin/achievements`, {
-            //     method: 'POST',
-            //     body: JSON.stringify(payload),
-            // });
+            await fetch(`/api/admin/achievements`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
         }
-        // TODO: ถ้าอยาก refresh หน้า ใช้ router.refresh() จาก parent หรือ context
     };
 
+
     const handleInputChange = (
-        e: ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         const target = e.target;
         const name = target.name;
@@ -141,11 +182,16 @@ const AchievementModalInner = ({
             value = target.checked;
         }
 
+        if (target instanceof HTMLInputElement && target.type === 'number') {
+            value = Number(target.value);
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
+
 
     const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
@@ -287,7 +333,7 @@ const AchievementModalInner = ({
 
 
         void handleAchievementSubmit(submitData);
-        close();
+        // close();
     };
 
     return (
@@ -365,6 +411,87 @@ const AchievementModalInner = ({
                             rows={4}
                             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                             placeholder="Describe your project..."
+                        />
+                    </div>
+
+                    {/* ระดับรางวัล */}
+                    <div className="flex gap-2">
+                        {/* ระดับรางวัล (TH) */}
+                        <div className='w-full md:w-1/2'>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                ระดับรางวัล (ไทย)
+                            </label>
+                            <input
+                                type="text"
+                                name="awardLevel_th"
+                                value={formData.awardLevel_th}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                placeholder="ประเทศ | จังหวัด | เขต"
+                            />
+                        </div>
+
+                        {/* ระดับรางวัล (EN) */}
+                        <div className='w-full md:w-1/2'>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                ระดับรางวัล (English) <span className="text-red-500"></span>
+                            </label>
+                            <input
+                                type="text"
+                                name="awardLevel_en"
+                                value={formData.awardLevel_en}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                placeholder="Country | Province | District"
+                            />
+                        </div>
+                    </div>
+
+                    {/* สถานที่ */}
+                    <div className="flex gap-2">
+                        {/* สถานที่ (TH) */}
+                        <div className='w-full md:w-1/2'>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                สถานที่ (ไทย) <span className="text-red-500"></span>
+                            </label>
+                            <input
+                                type="text"
+                                name="location_th"
+                                value={formData.location_th}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                placeholder="สถานที่"
+                            />
+                        </div>
+
+                        {/* สถานที่ (EN) */}
+                        <div className='w-full md:w-1/2'>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                สถานที่ (English) <span className="text-red-500"></span>
+                            </label>
+                            <input
+                                type="text"
+                                name="location_en"
+                                value={formData.location_en}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                placeholder="Location"
+                            />
+                        </div>
+                    </div>
+
+                    {/* ได้รับเมื่อ */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            ได้รับเมื่อ
+                        </label>
+                        <input
+                            type="date"
+                            name="receivedAt"
+                            value={formData.receivedAt ?? ""}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                            placeholder="2025-11-30"
                         />
                     </div>
 
@@ -453,8 +580,8 @@ const AchievementModalInner = ({
                                         onDragOver={(e) => handleLinkDragOver(e, index)}
                                         onDragEnd={handleLinkDragEnd}
                                         className={`p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2 ${draggedLinkIndex === index
-                                                ? 'border-blue-500'
-                                                : 'border-gray-200 dark:border-gray-700'
+                                            ? 'border-blue-500'
+                                            : 'border-gray-200 dark:border-gray-700'
                                             }`}
                                     >
                                         <div className="flex justify-between items-center">

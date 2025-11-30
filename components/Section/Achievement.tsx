@@ -5,13 +5,6 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import CategoryFilterTab from "../CategoryFilterTab";
 import AchievementCard from "../AchievementCard";
 
-export type Category = {
-    id: number,
-    name: string,
-    slug: string,
-    totalAchievements?: number
-}
-
 const Achievement = async ({ slug }: { slug: string | undefined }) => {
     const locale = await getLocale();
 
@@ -78,9 +71,10 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                             slug: currentCategory.slug
                         }
                     }
-                }
+                },
+                status: "PUBLIC"
             },
-            orderBy: { receivedAt: "desc" }
+            orderBy: { receivedAt: "desc" },
         });
     } else {
         achievements = await prisma.achievement.findMany({
@@ -116,7 +110,10 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                 images: true,
                 links: true
             },
-            orderBy: { receivedAt: "desc" }
+            orderBy: { receivedAt: "desc" },
+            where: {
+                status: "PUBLIC"
+            }
         });
     }
     const t = await getTranslations("Index");
@@ -127,13 +124,37 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab currentCategory={currentCategory} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                    {achievements.map((achievement, idx) => (
-                        <AchievementCard
-                            key={idx}
-                            achievement={achievement}
-                            locale={locale}
-                        />
-                    ))}
+                    {(!achievements || achievements.length === 0) ? (
+                        <div className="flex flex-col items-center justify-center p-10 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                            <div className="w-16 h-16 mb-4 text-gray-400">
+                                {/* ไอคอนว่าง */}
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                                    stroke="currentColor" className="w-full h-full">
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                        d="M9 12h3.75M9 15h3.75M9 9h3.75m3 6.75H18a2.25 2.25 0 002.25-2.25V6.108
+                       c0-.393-.154-.77-.427-1.05l-2.672-2.708A1.5 1.5 0 0015.879 2.25H6A2.25 
+                       2.25 0 003.75 4.5v12A2.25 2.25 0 006 18.75h9" />
+                                </svg>
+                            </div>
+
+                            <h3 className="text-lg font-semibold text-gray-700">
+                                ไม่พบผลงาน
+                            </h3>
+                            <p className="text-gray-500 mt-1">
+                                กรุณาค้นหา หรือ เลือกหมวดหมู่ใหม่ !
+                            </p>
+
+                        </div>
+                    ) : (
+                        achievements.map((achievement, idx) => (
+                            <AchievementCard
+                                key={idx}
+                                achievement={achievement}
+                                locale={locale}
+                            />
+                        ))
+                    )}
                 </div>
             </div>
         </section>

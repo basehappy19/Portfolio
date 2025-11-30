@@ -1,17 +1,7 @@
 "use client";
 
+import { AchievementModalContextType, EditData } from "@/types/Achievements";
 import { createContext, useContext, useState } from "react";
-import type { Achievement } from "@/types/Achievements";
-
-export type EditData = Partial<Achievement> & { id: number }; // แก้ไขได้บาง field แต่ต้องมี id
-
-type AchievementModalContextType = {
-    isOpen: boolean;
-    editData: EditData | null;
-    open: (data?: EditData) => void;
-    close: () => void;
-    toggle: () => void;
-};
 
 const AchievementModalContext = createContext<AchievementModalContextType | undefined>(undefined);
 

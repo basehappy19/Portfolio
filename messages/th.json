@@ -206,6 +206,12 @@
                     "hoverColor": "hover:from-pink-400 hover:via-red-400 hover:to-yellow-400"
                 }
             ]
+        },
+        "Footer": {
+            "Heading": "พอร์ตฟอลิโอของผม",
+            "copyright": "นายภาคภูมิ ทีดินดำ. สงวนลิขสิทธิ์.",
+            "privacy": "นโยบายความเป็นส่วนตัว",
+            "terms": "เงื่อนไขการให้บริการ"
         }
     }
 }

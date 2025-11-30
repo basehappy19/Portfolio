@@ -70,7 +70,8 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             prev === 0 ? achievement.images.length - 1 : prev - 1
         );
     };
-
+    const ACHIEVEMENTS_BASE =
+        process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
     return (
         <>
             {/* Card */}
@@ -79,7 +80,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                 <div className="relative h-48 bg-linear-to-br from-red-50 to-red-50 overflow-hidden">
                     {mainImage && !imageError ? (
                         <Image
-                            src={`/achievements/${mainImage.url}`}
+                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${mainImage.url}`}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
                             className="object-cover"
@@ -229,7 +230,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                         {/* Main Image */}
                                         <div className="relative h-96 bg-linear-to-br from-orange-50 to-red-50">
                                             <Image
-                                                src={`/Achievements/${achievement.images[currentImageIndex].url}`}
+                                                src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${achievement.images[0].url}`}
                                                 alt={tField(
                                                     achievement.images[currentImageIndex].altText_th,
                                                     achievement.images[currentImageIndex].altText_en,
@@ -273,12 +274,12 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                             key={index}
                                                             onClick={() => setCurrentImageIndex(index)}
                                                             className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
-                                                                    ? 'border-red-500 ring-2 ring-red-200 scale-105'
-                                                                    : 'border-gray-300 hover:border-red-300 hover:scale-105'
+                                                                ? 'border-red-500 ring-2 ring-red-200 scale-105'
+                                                                : 'border-gray-300 hover:border-red-300 hover:scale-105'
                                                                 }`}
                                                         >
                                                             <Image
-                                                                src={`/Achievements/${image.url}`}
+                                                                src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${image.url}`}
                                                                 alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
                                                                 fill
                                                                 className="object-cover"

@@ -206,6 +206,12 @@
                     "hoverColor": "hover:from-pink-400 hover:via-red-400 hover:to-yellow-400"
                 }
             ]
+        },
+        "Footer": {
+            "Heading": "My Portfolio",
+            "copyright": "Pakpoom Teedindam. สงวนลิขสิทธิ์.",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service"
         }
     }
 }

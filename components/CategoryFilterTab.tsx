@@ -22,11 +22,18 @@ const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Categor
             slug: true,
             _count: {
                 select: {
-                    achievements: true
+                    achievements: {
+                        where: {
+                            achievement: {
+                                status: "PUBLIC"
+                            }
+                        }
+                    }
                 }
             }
-        }
+        },
     });
+
 
     const categories = categoriesRaw.map(cat => ({
         id: cat.id,
@@ -35,7 +42,11 @@ const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Categor
         totalAchievements: cat._count.achievements
     }));
 
-    const totalAchievements = await prisma.achievement.count();
+    const totalAchievements = await prisma.achievement.count({
+        where: {
+            status: "PUBLIC"
+        }
+    });
 
     return (
         <div className="flex flex-wrap gap-3">

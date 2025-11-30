@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Achievement {
-  id             Int     @id @default(autoincrement())
+  id             String  @id @default(cuid())
   title_th       String
   description_th String?
   awardLevel_th  String?
@@ -55,7 +55,7 @@ model Category {
 
 model AchievementsOnCategories {
   achievement   Achievement @relation(fields: [achievementId], references: [id])
-  achievementId Int
+  achievementId String
 
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
@@ -66,9 +66,9 @@ model AchievementsOnCategories {
 }
 
 model AchievementImage {
-  id            Int         @id @default(autoincrement())
+  id            String      @id @default(cuid())
   achievement   Achievement @relation(fields: [achievementId], references: [id])
-  achievementId Int
+  achievementId String
 
   url        String
   altText_th String?
@@ -80,9 +80,9 @@ model AchievementImage {
 }
 
 model AchievementLink {
-  id            Int         @id @default(autoincrement())
+  id            String      @id @default(cuid())
   achievement   Achievement @relation(fields: [achievementId], references: [id])
-  achievementId Int
+  achievementId String
 
   label_th String
   label_en String
@@ -95,7 +95,7 @@ model AchievementLink {
 }
 
 model Message {
-  id Int @id @default(autoincrement())
+  id String @id @default(cuid())
 
   name    String
   email   String

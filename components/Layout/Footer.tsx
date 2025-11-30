@@ -2,93 +2,70 @@ import { auth } from "@/auth";
 import { headers } from "next/headers";
 import { SignOutButton } from "../Button/SignOutButton";
 import { SignInButton } from "../Button/SignInButton";
+import { getTranslations } from "next-intl/server";
+import Copyright from "./Copyright";
+import Link from "next/link";
 
 export default async function Footer() {
     const session = await auth.api.getSession({
         headers: await headers(),
     })
-    
+    const t = await getTranslations("Index.Footer");
     return (
         <footer className="relative bg-gray-800 text-white">
             {/* Decorative top border */}
             <div className="h-1 bg-linear-to-r from-transparent via-red-600 to-transparent"></div>
 
-            <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="max-w-7xl mx-auto px-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     {/* About Section */}
                     <div className="md:col-span-2">
                         <h3 className="text-2xl font-bold mb-4 bg-linear-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
-                            My Portfolio
+                            {t("Heading")}
                         </h3>
-                        <p className="text-gray-400 mb-6 leading-relaxed">
-                            สร้างสรรค์ผลงานด้านเทคโนโลยีและการออกแบบที่มีคุณภาพ
-                            พร้อมนำเสนอประสบการณ์ที่น่าประทับใจให้กับทุกโปรเจค
-                        </p>
                         {session ? (
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                    <span className="text-gray-300 text-sm">{session.user.email}</span>
+                            <div className="flex items-center gap-4 px-4 py-2 bg-gray-800/60 rounded-lg backdrop-blur-sm">
+                                {/* Left: Online + Email + Link */}
+                                <div className="flex items-center gap-3">
+                                    {/* Online Dot */}
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-500/30"></span>
+
+                                        {/* User Email */}
+                                        <span className="text-gray-200 text-sm font-medium">
+                                            {session.user.email}
+                                        </span>
+                                    </div>
+
+                                    {/* Admin Link */}
+                                    <Link
+                                        href="/admin"
+                                        className="text-xs px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 font-medium border border-blue-500/30 hover:bg-blue-600/30 transition"
+                                    >
+                                        หน้าแอดมิน
+                                    </Link>
                                 </div>
-                                <SignOutButton />
+
+                                {/* Right: Logout */}
+                                <div>
+                                    <SignOutButton />
+                                </div>
                             </div>
                         ) : (
                             <SignInButton />
                         )}
                     </div>
-
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4 text-red-400">Quick Links</h4>
-                        <ul className="space-y-3">
-                            {['Home', 'About', 'Projects', 'Contact'].map((link) => (
-                                <li key={link}>
-                                    <a
-                                        href="#"
-                                        className="text-gray-400 hover:text-red-400 transition-colors duration-300 flex items-center gap-2 group"
-                                    >
-                                        <span className="w-0 h-0.5 bg-red-400 group-hover:w-4 transition-all duration-300"></span>
-                                        {link}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Social Links */}
-                    <div>
-                        <h4 className="text-lg font-semibold mb-4 text-red-400">Connect</h4>
-                        <div className="flex gap-4">
-                            {[
-                                { icon: '𝕏', label: 'Twitter' },
-                                { icon: 'in', label: 'LinkedIn' },
-                                { icon: 'git', label: 'GitHub' },
-                                { icon: '✉', label: 'Email' }
-                            ].map((social) => (
-                                <a
-                                    key={social.label}
-                                    href="#"
-                                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-800 text-gray-400 hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-600/50"
-                                    aria-label={social.label}
-                                >
-                                    <span className="text-sm font-bold">{social.icon}</span>
-                                </a>
-                            ))}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-gray-500 text-sm">
-                        © 2025 My Portfolio. All rights reserved.
-                    </p>
+                <div className="border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <Copyright copyright_text={t("copyright")} />
                     <div className="flex gap-6 text-sm">
                         <a href="#" className="text-gray-500 hover:text-red-400 transition-colors duration-300">
-                            Privacy Policy
+                            {t("privacy")}
                         </a>
                         <a href="#" className="text-gray-500 hover:text-red-400 transition-colors duration-300">
-                            Terms of Service
+                            {t("terms")}
                         </a>
                     </div>
                 </div>
