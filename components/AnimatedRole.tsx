@@ -3,13 +3,16 @@ import { useEffect, useState } from 'react'
 
 const AnimatedRole = ({ roles }: { roles: string[] }) => {
     const [currentRole, setCurrentRole] = useState(0);
+    const roleCount = roles.length;
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentRole((prev) => (prev + 1) % roles.length);
+            setCurrentRole((prev) => (prev + 1) % roleCount);
         }, 3000);
+
         return () => clearInterval(interval);
-    }, []);
+    }, [roleCount]);
+
     return (
         <div className="h-16 md:h-20">
             <p className="text-2xl md:text-4xl text-white/80 font-medium transition-all duration-500">
