@@ -26,7 +26,7 @@ import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
 const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
 
-export const AchievementModal = () => {
+export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
 
     if (!isOpen) return null;
@@ -37,6 +37,7 @@ export const AchievementModal = () => {
             editData={editData ?? null}
             close={close}
             isAnimating={isAnimating}
+            defaultSortOrder={defaultSortOrder}
         />
     );
 };
@@ -45,11 +46,13 @@ export const AchievementModal = () => {
 const AchievementModalInner = ({
     editData,
     close,
-    isAnimating
+    isAnimating,
+    defaultSortOrder
 }: {
     editData: EditData | null;
     close: () => void;
     isAnimating: boolean
+    defaultSortOrder: number;
 }) => {
     const router = useRouter();
     const categories = useCategories();
@@ -69,8 +72,11 @@ const AchievementModalInner = ({
         location_en: editData?.location_en ?? '',
         receivedAt,
         categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
-        sortOrder: Number(editData?.sortOrder ?? 0),
-        isPublished: editData ? editData.status === 'PUBLIC' : true,
+        sortOrder: Number(
+            editData?.sortOrder != null
+                ? editData.sortOrder          
+                : defaultSortOrder            
+        ), isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -252,7 +258,7 @@ const AchievementModalInner = ({
 
                         return {
                             ...img,
-                            preview: url,  
+                            preview: url,
                             sortOrder: idx,
                         };
                     }
@@ -499,7 +505,7 @@ const AchievementModalInner = ({
                                         name="sortOrder"
                                         value={formData.sortOrder}
                                         onChange={handleInputChange}
-                                        min={0}
+                                        min={1}
                                         className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white transition-all"
                                     />
                                 </div>

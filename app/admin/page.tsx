@@ -124,7 +124,14 @@ export default async function AdminPage(props: {
     const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
     const draftCount = achievements.filter(a => a.status === 'DRAFT').length;
     const totalImages = achievements.reduce((sum, a) => sum + a.images.length, 0);
+    const sortOrderAgg = await prisma.achievement.aggregate({
+        _max: {
+            sortOrder: true,
+        },
+    });
 
+    const nextSortOrder = (sortOrderAgg._max.sortOrder ?? 0) + 1;
+    
     return (
         <CategoriesProvider categories={categories}>
             <AchievementModalProvider>
@@ -186,7 +193,7 @@ export default async function AdminPage(props: {
                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                         <div className="text-white">
                                             <div className="flex items-center gap-3 mb-2">
-                
+
                                                 <div>
                                                     <h1 className="text-3xl md:text-4xl font-bold">
                                                         จัดการผลงาน
@@ -301,7 +308,7 @@ export default async function AdminPage(props: {
                         />
                     </div>
 
-                    <AchievementModal />
+                    <AchievementModal defaultSortOrder={nextSortOrder} />
                 </div>
             </AchievementModalProvider>
         </CategoriesProvider>
