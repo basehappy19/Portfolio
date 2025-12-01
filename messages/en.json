@@ -148,6 +148,8 @@
         },
         "Achievement": {
             "Heading": "Achievements",
+            "NoItemsTitle": "No achievements found",
+            "NoItemsDescription": "Please search again or choose another category!",
             "Buttons": {
                 "AllButtonLabel": "All"
             }
@@ -209,7 +211,7 @@
         },
         "Footer": {
             "Heading": "My Portfolio",
-            "copyright": "Pakpoom Teedindam. สงวนลิขสิทธิ์.",
+            "copyright": "Pakpoom Teedindam. All rights reserved.",
             "privacy": "Privacy Policy",
             "terms": "Terms of Service"
         }

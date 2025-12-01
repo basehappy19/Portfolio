@@ -148,6 +148,8 @@
         },
         "Achievement": {
             "Heading": "ผลงาน",
+            "NoItemsTitle": "ไม่พบผลงาน",
+            "NoItemsDescription": "กรุณาค้นหา หรือ เลือกหมวดหมู่ใหม่ !",
             "Buttons": {
                 "AllButtonLabel": "ทั้งหมด"
             }

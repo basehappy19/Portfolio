@@ -141,10 +141,10 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                             </div>
 
                             <h3 className="text-xl font-bold text-white mb-2">
-                                ไม่พบผลงาน
+                                {t("Achievement.NoItemsTitle")}
                             </h3>
                             <p className="text-white/50 text-sm">
-                                กรุณาค้นหา หรือ เลือกหมวดหมู่ใหม่ !
+                                {t("Achievement.NoItemsDescription")}
                             </p>
                         </div>
                     ) : (
