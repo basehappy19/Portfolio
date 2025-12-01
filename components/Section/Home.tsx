@@ -12,7 +12,7 @@ const Home = async () => {
     const roles = t.raw("Home.Roles") as string[];
 
     return (
-        <section id='Home' className="min-h-screen w-full px-4 md:px-8 lg:px-16 pt-[-4] relative">
+        <section id='Home' className="min-h-screen w-full px-4 md:px-8 lg:px-16 md:pt-8 relative">
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="flex flex-col items-center justify-center min-h-screen text-center">
                     {/* Main Content */}
