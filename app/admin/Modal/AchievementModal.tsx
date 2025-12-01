@@ -270,7 +270,8 @@ const AchievementModalInner = ({
 
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-sm" onClick={close}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-sm bg-black/20"
+            onClick={close}
             style={{
                 animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
             }}>
@@ -279,252 +280,290 @@ const AchievementModalInner = ({
                     animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white dark:bg-[#282c33] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                {/* Header */}
-                <div className="sticky top-0 bg-white dark:bg-[#282c33] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
-                    </h2>
-                    <button
-                        onClick={close}
-                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
+                className="bg-white dark:bg-[#1e222a] rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
 
-                {/* Body */}
-                <div className="p-6 space-y-6">
-                    {/* ชื่อ (ไทย) */}
-                    <AchievementTextField
-                        label="ชื่อผลงาน (ไทย)"
-                        name="title_th"
-                        value={formData.title_th}
-                        onChange={handleInputChange}
-                        onBlur={() => handleBlur('title_th')}
-                        placeholder="เช่น ระบบจัดการคลังสินค้าอัจฉริยะ"
-                        required
-                        size="lg"
-                        error={errors.title_th}
-                        touched={touched.title_th}
-                    />
-
-                    {/* ชื่อ (EN) */}
-                    <AchievementTextField
-                        label="ชื่อผลงาน (English)"
-                        name="title_en"
-                        value={formData.title_en}
-                        onChange={handleInputChange}
-                        onBlur={() => handleBlur('title_en')}
-                        placeholder="Inventory Management System"
-                        required
-                        size="md"
-                        error={errors.title_en}
-                        touched={touched.title_en}
-                    />
-
-                    {/* รายละเอียด (ไทย) */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            รายละเอียด (ไทย)
-                        </label>
-                        <textarea
-                            name="description_th"
-                            value={formData.description_th}
-                            onChange={handleInputChange}
-                            rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            placeholder="อธิบายรายละเอียดผลงาน..."
-                        />
-                    </div>
-
-                    {/* รายละเอียด (EN) */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            รายละเอียด (English)
-                        </label>
-                        <textarea
-                            name="description_en"
-                            value={formData.description_en}
-                            onChange={handleInputChange}
-                            rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            placeholder="Describe your project..."
-                        />
-                    </div>
-
-                    {/* ระดับรางวัล */}
-                    <div className="flex gap-2">
-                        {/* ระดับรางวัล (TH) */}
-                        <div className="w-full md:w-1/2">
-                            <AchievementTextField
-                                label="ระดับรางวัล (ไทย)"
-                                name="awardLevel_th"
-                                value={formData.awardLevel_th}
-                                onChange={handleInputChange}
-                                placeholder="ประเทศ | จังหวัด | เขต"
-                                size="md"
-                            />
-                        </div>
-
-                        {/* ระดับรางวัล (EN) */}
-                        <div className="w-full md:w-1/2">
-                            <AchievementTextField
-                                label="ระดับรางวัล (English)"
-                                name="awardLevel_en"
-                                value={formData.awardLevel_en}
-                                onChange={handleInputChange}
-                                placeholder="Country | Province | District"
-                                size="md"
-                            />
-                        </div>
-                    </div>
-
-                    {/* สถานที่ */}
-                    <div className="flex gap-2">
-                        {/* สถานที่ (TH) */}
-                        <div className="w-full md:w-1/2">
-                            <AchievementTextField
-                                label="สถานที่ (ไทย)"
-                                name="location_th"
-                                value={formData.location_th}
-                                onChange={handleInputChange}
-                                placeholder="สถานที่"
-                                size="md"
-                            />
-                        </div>
-
-                        {/* สถานที่ (EN) */}
-                        <div className="w-full md:w-1/2">
-                            <AchievementTextField
-                                label="สถานที่ (English)"
-                                name="location_en"
-                                value={formData.location_en}
-                                onChange={handleInputChange}
-                                placeholder="Location"
-                                size="md"
-                            />
-                        </div>
-                    </div>
-
-                    {/* ได้รับเมื่อ */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            ได้รับเมื่อ
-                        </label>
-                        <input
-                            type="date"
-                            name="receivedAt"
-                            value={formData.receivedAt ?? ""}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            placeholder="2025-11-30"
-                        />
-                    </div>
-
-                    {/* หมวดหมู่ + Sort order */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className={errors.categorySlugs && touched.categorySlugs ? 'error-field' : ''}>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                หมวดหมู่ <span className="text-red-500">*</span>
-                                <span className="ml-1 text-xs text-gray-500">
-                                    (เลือกได้หลายหมวดหมู่)
-                                </span>
-                            </label>
-
-                            <select
-                                multiple
-                                name="categorySlugs"
-                                value={formData.categorySlugs}
-                                onChange={handleCategoryChange}
-                                onBlur={() => handleBlur('categorySlugs')}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white ${errors.categorySlugs && touched.categorySlugs
-                                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
-                                    : 'border-gray-300 dark:border-gray-600'
-                                    }`}
-                            >
-                                {categories.map((cat) => (
-                                    <option key={cat.id} value={cat.slug}>
-                                        {cat.name_th} - {cat.name_en}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายหมวดหมู่
-                            </p>
-
-                            {errors.categorySlugs && touched.categorySlugs && (
-                                <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
-                                    <AlertCircle size={16} />
-                                    <span>{errors.categorySlugs}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* อีกฝั่งคือ sortOrder ตามเดิม */}
+                {/* Header - Minimal & Clean */}
+                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center justify-between">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                ลำดับการแสดงผล
-                            </label>
-                            <input
-                                type="number"
-                                name="sortOrder"
-                                value={formData.sortOrder}
-                                onChange={handleInputChange}
-                                min={0}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            />
+                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
+                            </h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                กรอกข้อมูลผลงานของคุณ
+                            </p>
                         </div>
-                    </div>
-
-
-                    {/* สถานะเผยแพร่ */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="isPublished"
-                            checked={formData.isPublished}
-                            onChange={handleInputChange}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <label className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            เผยแพร่ผลงานนี้
-                        </label>
-                    </div>
-                    <AchievementLinksSection
-                        links={links}
-                        draggedLinkIndex={draggedLinkIndex}
-                        addLink={addLink}
-                        removeLink={removeLink}
-                        handleLinkChange={handleLinkChange}
-                        handleLinkDragStart={handleLinkDragStart}
-                        handleLinkDragOver={handleLinkDragOver}
-                        handleLinkDragEnd={handleLinkDragEnd}
-                    />
-
-                    <AchievementImagesSection
-                        imagePreview={imagePreview}
-                        draggedIndex={draggedIndex}
-                        handleImageUpload={handleImageUpload}
-                        handleImageAltChange={handleImageAltChange}
-                        handleRemoveImage={handleRemoveImage}
-                        handleDragStart={handleDragStart}
-                        handleDragOver={handleDragOver}
-                        handleDragEnd={handleDragEnd}
-                    />
-
-                    {/* Footer Buttons */}
-                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button
                             onClick={close}
-                            className="cursor-pointer px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Body - Scrollable */}
+                <div className="overflow-y-auto flex-1 px-8 py-6">
+                    <div className="max-w-3xl mx-auto space-y-8">
+
+                        {/* Section: ข้อมูลหลัก */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    ข้อมูลหลัก
+                                </h3>
+                            </div>
+
+                            <AchievementTextField
+                                label="ชื่อผลงาน (ไทย)"
+                                name="title_th"
+                                value={formData.title_th}
+                                onChange={handleInputChange}
+                                onBlur={() => handleBlur('title_th')}
+                                placeholder="เช่น ระบบจัดการคลังสินค้าอัจฉริยะ"
+                                required
+                                size="lg"
+                                error={errors.title_th}
+                                touched={touched.title_th}
+                            />
+
+                            <AchievementTextField
+                                label="ชื่อผลงาน (English)"
+                                name="title_en"
+                                value={formData.title_en}
+                                onChange={handleInputChange}
+                                onBlur={() => handleBlur('title_en')}
+                                placeholder="Inventory Management System"
+                                required
+                                size="md"
+                                error={errors.title_en}
+                                touched={touched.title_en}
+                            />
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    รายละเอียด (ไทย)
+                                </label>
+                                <textarea
+                                    name="description_th"
+                                    value={formData.description_th}
+                                    onChange={handleInputChange}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white resize-none transition-all"
+                                    placeholder="อธิบายรายละเอียดผลงาน..."
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    รายละเอียด (English)
+                                </label>
+                                <textarea
+                                    name="description_en"
+                                    value={formData.description_en}
+                                    onChange={handleInputChange}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white resize-none transition-all"
+                                    placeholder="Describe your project..."
+                                />
+                            </div>
+                        </div>
+
+                        {/* Section: ข้อมูลรางวัล */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1 h-6 bg-amber-500 rounded-full"></div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    ข้อมูลรางวัล
+                                </h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <AchievementTextField
+                                    label="ระดับรางวัล (ไทย)"
+                                    name="awardLevel_th"
+                                    value={formData.awardLevel_th}
+                                    onChange={handleInputChange}
+                                    placeholder="ประเทศ | จังหวัด | เขต"
+                                    size="md"
+                                />
+
+                                <AchievementTextField
+                                    label="ระดับรางวัล (English)"
+                                    name="awardLevel_en"
+                                    value={formData.awardLevel_en}
+                                    onChange={handleInputChange}
+                                    placeholder="Country | Province | District"
+                                    size="md"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <AchievementTextField
+                                    label="สถานที่ (ไทย)"
+                                    name="location_th"
+                                    value={formData.location_th}
+                                    onChange={handleInputChange}
+                                    placeholder="สถานที่"
+                                    size="md"
+                                />
+
+                                <AchievementTextField
+                                    label="สถานที่ (English)"
+                                    name="location_en"
+                                    value={formData.location_en}
+                                    onChange={handleInputChange}
+                                    placeholder="Location"
+                                    size="md"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    ได้รับเมื่อ
+                                </label>
+                                <input
+                                    type="date"
+                                    name="receivedAt"
+                                    value={formData.receivedAt ?? ""}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white transition-all"
+                                    placeholder="2025-11-30"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Section: การจัดการ */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    การจัดการ
+                                </h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className={errors.categorySlugs && touched.categorySlugs ? 'error-field' : ''}>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        หมวดหมู่ <span className="text-red-500">*</span>
+                                    </label>
+
+                                    <select
+                                        multiple
+                                        name="categorySlugs"
+                                        value={formData.categorySlugs}
+                                        onChange={handleCategoryChange}
+                                        onBlur={() => handleBlur('categorySlugs')}
+                                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800/50 dark:text-white transition-all ${errors.categorySlugs && touched.categorySlugs
+                                                ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
+                                                : 'border-gray-200 dark:border-gray-700 focus:border-blue-500'
+                                            }`}
+                                    >
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.slug}>
+                                                {cat.name_th} - {cat.name_en}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                        💡 กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายหมวดหมู่
+                                    </p>
+
+                                    {errors.categorySlugs && touched.categorySlugs && (
+                                        <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
+                                            <AlertCircle size={16} />
+                                            <span>{errors.categorySlugs}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        ลำดับการแสดงผล
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="sortOrder"
+                                        value={formData.sortOrder}
+                                        onChange={handleInputChange}
+                                        min={0}
+                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white transition-all"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800">
+                                <input
+                                    type="checkbox"
+                                    name="isPublished"
+                                    checked={formData.isPublished}
+                                    onChange={handleInputChange}
+                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                />
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                                    เผยแพร่ผลงานนี้ทันทีหลังบันทึก
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Links Section */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1 h-6 bg-violet-500 rounded-full"></div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    ลิงก์ที่เกี่ยวข้อง
+                                </h3>
+                            </div>
+
+                            <AchievementLinksSection
+                                links={links}
+                                draggedLinkIndex={draggedLinkIndex}
+                                addLink={addLink}
+                                removeLink={removeLink}
+                                handleLinkChange={handleLinkChange}
+                                handleLinkDragStart={handleLinkDragStart}
+                                handleLinkDragOver={handleLinkDragOver}
+                                handleLinkDragEnd={handleLinkDragEnd}
+                            />
+                        </div>
+
+                        {/* Images Section */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-1 h-6 bg-pink-500 rounded-full"></div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    รูปภาพผลงาน
+                                </h3>
+                            </div>
+
+                            <AchievementImagesSection
+                                imagePreview={imagePreview}
+                                draggedIndex={draggedIndex}
+                                handleImageUpload={handleImageUpload}
+                                handleImageAltChange={handleImageAltChange}
+                                handleRemoveImage={handleRemoveImage}
+                                handleDragStart={handleDragStart}
+                                handleDragOver={handleDragOver}
+                                handleDragEnd={handleDragEnd}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer - Fixed at Bottom */}
+                <div className="px-8 py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
+                    <div className="max-w-3xl mx-auto flex justify-end gap-3">
+                        <button
+                            onClick={close}
+                            className="cursor-pointer px-6 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 font-medium transition-all"
                         >
                             ยกเลิก
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="cursor-pointer px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                            className="cursor-pointer px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-sm shadow-blue-600/20 hover:shadow-md hover:shadow-blue-600/30 transition-all"
                         >
                             {editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}
                         </button>
