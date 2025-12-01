@@ -15,6 +15,7 @@ type Props = {
     handleLinkDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragOver: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragEnd: () => void;
+    handleLinkThaiBlur: (index: number) => void;    
 };
 
 export const AchievementLinksSection: React.FC<Props> = ({
@@ -26,6 +27,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
     handleLinkDragStart,
     handleLinkDragOver,
     handleLinkDragEnd,
+    handleLinkThaiBlur,
 }) => {
     return (
         <div>
@@ -83,6 +85,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                     onChange={(e) =>
                                         handleLinkChange(index, 'label_th', e.target.value)
                                     }
+                                    onBlur={() => handleLinkThaiBlur(index)}
                                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                                 />
                                 <input

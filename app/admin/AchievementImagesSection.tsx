@@ -18,6 +18,7 @@ type Props = {
     handleDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleDragOver: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleDragEnd: () => void;
+    handleImageAltThaiBlur: (index: number) => void;
 };
 
 export const AchievementImagesSection: React.FC<Props> = ({
@@ -29,6 +30,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    handleImageAltThaiBlur
 }) => {
     return (
         <div>
@@ -89,6 +91,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                     onChange={(e) =>
                                         handleImageAltChange(index, 'altText_th', e.target.value)
                                     }
+                                    onBlur={() => handleImageAltThaiBlur(index)}
                                     className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                                 />
                                 <input

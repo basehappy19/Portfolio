@@ -52,6 +52,7 @@ const AchievementModalInner = ({
 }) => {
     const router = useRouter();
     const categories = useCategories();
+    const isEditMode = !!editData;
     const receivedAt =
         editData?.receivedAt instanceof Date
             ? editData.receivedAt.toISOString().slice(0, 10)
@@ -85,6 +86,29 @@ const AchievementModalInner = ({
         { th: 'location_th', en: 'location_en' },
     ];
 
+    const translateText = async (text: string): Promise<string> => {
+        if (!text) return '';
+
+        try {
+            const res = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+
+            if (!res.ok) {
+                return '';
+            }
+
+            const data = await res.json();
+            return data.translated || '';
+        } catch (e) {
+            console.error('translate error', e);
+            return '';
+        }
+    };
+
+
     const translateField = async (source: keyof FormState, target: keyof FormState) => {
         const text = formData[source];
         if (!text) return;
@@ -111,17 +135,58 @@ const AchievementModalInner = ({
         }
     };
 
-
-
     const isTouchedKey = (field: keyof FormState): field is keyof TouchedState => {
         return ['title_th', 'title_en', 'categorySlugs'].includes(field as string);
     };
 
+    const handleLinkThaiBlur = async (index: number) => {
+        if (isEditMode) return;
+
+        const current = links[index];
+        if (!current?.label_th?.trim()) return;
+
+        const translated = await translateText(current.label_th.trim());
+        if (!translated) return;
+
+        setLinks(prev => {
+            const updated = [...prev];
+            if (!updated[index]) return prev;
+            updated[index] = {
+                ...updated[index],
+                label_en: translated,
+            };
+            return updated;
+        });
+    };
+
+    const handleImageAltThaiBlur = async (index: number) => {
+        if (isEditMode) return;
+
+        const current = imagePreview[index];
+        if (!current?.altText_th?.trim()) return;
+
+        const translated = await translateText(current.altText_th.trim());
+        if (!translated) return;
+
+        setImagePreview(prev => {
+            const updated = [...prev];
+            if (!updated[index]) return prev;
+            updated[index] = {
+                ...updated[index],
+                altText_en: translated,
+            };
+            return updated;
+        });
+    };
+
+
+
     const handleThaiBlur = (field: keyof FormState) => {
-        // validate ฟิลด์ที่อยู่ใน TouchedState ตามเดิม
         if (isTouchedKey(field)) {
             handleBlur(field);
         }
+
+        if (isEditMode) return;
 
         const pair = FIELD_PAIRS.find(p => p.th === field);
         if (!pair) return;
@@ -149,11 +214,8 @@ const AchievementModalInner = ({
                 ...prev,
                 [sourceKey]: currentSource,
             }));
-        }, 700);
+        }, 1500);
     };
-
-
-
 
 
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -616,6 +678,7 @@ const AchievementModalInner = ({
                                 handleLinkDragStart={handleLinkDragStart}
                                 handleLinkDragOver={handleLinkDragOver}
                                 handleLinkDragEnd={handleLinkDragEnd}
+                                handleLinkThaiBlur={handleLinkThaiBlur}
                             />
                         </div>
 
@@ -637,6 +700,7 @@ const AchievementModalInner = ({
                                 handleDragStart={handleDragStart}
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
+                                handleImageAltThaiBlur={handleImageAltThaiBlur}
                             />
                         </div>
                     </div>
