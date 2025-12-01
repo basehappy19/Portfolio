@@ -170,7 +170,7 @@
                     "label": "Phone",
                     "value": "064-303-8963",
                     "href": "tel:064-303-8963",
-                    "gradient": "bg-green-50",
+                    "gradient": "bg-green-500",
                     "type": "phone"
                 },
                 {
