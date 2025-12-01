@@ -2,6 +2,7 @@
 import React, {
     useState,
     DragEvent,
+    useRef,
 } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
@@ -23,6 +24,8 @@ const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achieve
 
 
 export const AchievementModal = () => {
+
+
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
 
     if (!isOpen) return null;
@@ -68,6 +71,90 @@ const AchievementModalInner = ({
         sortOrder: Number(editData?.sortOrder ?? 0),
         isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
+    const [lastTranslatedSource, setLastTranslatedSource] = useState<
+        Partial<Record<keyof FormState, string>>
+    >({});
+
+    const translateTimers = useRef<
+        Partial<Record<keyof FormState, number>>
+    >({});
+    const FIELD_PAIRS: { th: keyof FormState; en: keyof FormState }[] = [
+        { th: 'title_th', en: 'title_en' },
+        { th: 'description_th', en: 'description_en' },
+        { th: 'awardLevel_th', en: 'awardLevel_en' },
+        { th: 'location_th', en: 'location_en' },
+    ];
+
+    const translateField = async (source: keyof FormState, target: keyof FormState) => {
+        const text = formData[source];
+        if (!text) return;
+
+        try {
+            const res = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+
+            if (!res.ok) {
+                return;
+            }
+
+            const data = await res.json();
+
+            setFormData(prev => ({
+                ...prev,
+                [target]: data.translated || '',
+            }));
+        } catch (e) {
+            console.error('translate error', e);
+        }
+    };
+
+
+
+    const isTouchedKey = (field: keyof FormState): field is keyof TouchedState => {
+        return ['title_th', 'title_en', 'categorySlugs'].includes(field as string);
+    };
+
+    const handleThaiBlur = (field: keyof FormState) => {
+        // validate ฟิลด์ที่อยู่ใน TouchedState ตามเดิม
+        if (isTouchedKey(field)) {
+            handleBlur(field);
+        }
+
+        const pair = FIELD_PAIRS.find(p => p.th === field);
+        if (!pair) return;
+
+        const sourceKey = pair.th;
+        const targetKey = pair.en;
+
+        const currentSource = formData[sourceKey];
+        if (!currentSource) {
+            return;
+        }
+
+        if (lastTranslatedSource[sourceKey] === currentSource) {
+            return;
+        }
+
+        if (translateTimers.current[field]) {
+            clearTimeout(translateTimers.current[field]!);
+        }
+
+        translateTimers.current[field] = window.setTimeout(async () => {
+            await translateField(sourceKey, targetKey);
+
+            setLastTranslatedSource(prev => ({
+                ...prev,
+                [sourceKey]: currentSource,
+            }));
+        }, 700);
+    };
+
+
+
+
 
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -320,7 +407,7 @@ const AchievementModalInner = ({
                                 name="title_th"
                                 value={formData.title_th}
                                 onChange={handleInputChange}
-                                onBlur={() => handleBlur('title_th')}
+                                onBlur={() => handleThaiBlur('title_th')}
                                 placeholder="เช่น ระบบจัดการคลังสินค้าอัจฉริยะ"
                                 required
                                 size="lg"
@@ -349,6 +436,7 @@ const AchievementModalInner = ({
                                     name="description_th"
                                     value={formData.description_th}
                                     onChange={handleInputChange}
+                                    onBlur={() => handleThaiBlur('description_th')}
                                     rows={4}
                                     className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white resize-none transition-all"
                                     placeholder="อธิบายรายละเอียดผลงาน..."
@@ -385,6 +473,7 @@ const AchievementModalInner = ({
                                     name="awardLevel_th"
                                     value={formData.awardLevel_th}
                                     onChange={handleInputChange}
+                                    onBlur={() => handleThaiBlur('awardLevel_th')}
                                     placeholder="ประเทศ | จังหวัด | เขต"
                                     size="md"
                                 />
@@ -405,6 +494,7 @@ const AchievementModalInner = ({
                                     name="location_th"
                                     value={formData.location_th}
                                     onChange={handleInputChange}
+                                    onBlur={() => handleThaiBlur('location_th')}
                                     placeholder="สถานที่"
                                     size="md"
                                 />
@@ -456,8 +546,8 @@ const AchievementModalInner = ({
                                         onChange={handleCategoryChange}
                                         onBlur={() => handleBlur('categorySlugs')}
                                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800/50 dark:text-white transition-all ${errors.categorySlugs && touched.categorySlugs
-                                                ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
-                                                : 'border-gray-200 dark:border-gray-700 focus:border-blue-500'
+                                            ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
+                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-500'
                                             }`}
                                     >
                                         {categories.map((cat) => (
