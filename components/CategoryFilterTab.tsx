@@ -5,10 +5,24 @@ import CategoryButton from './Button/CategoryButton';
 import AllButton from './Button/AllButton';
 import { Category } from '@/types/Achievements';
 
-const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Category | null }) => {
+
+export type UiCategory = {
+    id: number;
+    name: string;              
+    slug: string;
+    totalAchievements: number;
+};
+
+export type CurrentCategory = Category | null
+
+const CategoryFilterTab = async ({
+    currentCategory,
+}: {
+    currentCategory: CurrentCategory;
+}) => {
     const locale = await getLocale();
-    const t = await getTranslations("Index");
-    const AllButtonLabel = t("Achievement.Buttons.AllButtonLabel");
+    const t = await getTranslations('Index');
+    const AllButtonLabel = t('Achievement.Buttons.AllButtonLabel');
 
     const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({ connectionString });
@@ -25,37 +39,45 @@ const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Categor
                     achievements: {
                         where: {
                             achievement: {
-                                status: "PUBLIC"
-                            }
-                        }
-                    }
-                }
-            }
+                                status: 'PUBLIC',
+                            },
+                        },
+                    },
+                },
+            },
         },
     });
 
-    const categories = categoriesRaw.map(cat => ({
+    const categories: UiCategory[] = categoriesRaw.map((cat) => ({
         id: cat.id,
-        name: locale === "th" ? cat.name_th : cat.name_en,
+        name: locale === 'th' ? cat.name_th : cat.name_en,
         slug: cat.slug,
-        totalAchievements: cat._count.achievements
+        totalAchievements: cat._count.achievements,
     }));
 
     const totalAchievements = await prisma.achievement.count({
         where: {
-            status: "PUBLIC"
-        }
+            status: 'PUBLIC',
+        },
     });
 
     return (
         <div className="flex flex-wrap gap-3">
-            <AllButton TotalAchievements={totalAchievements} AllButtonLabel={AllButtonLabel} CurrentCategory={currentCategory} />
+            <AllButton
+                TotalAchievements={totalAchievements}
+                AllButtonLabel={AllButtonLabel}
+                CurrentCategory={currentCategory}
+            />
 
             {categories.map((category, idx) => (
-                <CategoryButton key={idx} currentCategory={currentCategory} category={category} />
+                <CategoryButton
+                    key={idx}
+                    currentCategory={currentCategory}
+                    category={category}
+                />
             ))}
         </div>
-    )
-}
+    );
+};
 
-export default CategoryFilterTab
+export default CategoryFilterTab;
