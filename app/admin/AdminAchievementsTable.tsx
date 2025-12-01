@@ -6,6 +6,7 @@ import { Award, Calendar, ExternalLink, Eye, EyeOff, ImagePlus, Link2, MapPin, T
 import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';
 import EditAchievement from './Button/EditAchievement';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     achievements: Achievement[];
@@ -21,7 +22,7 @@ export const AdminAchievementsTable = ({
     const [isDeleteAnimating, setIsDeleteAnimating] = useState(false);
     const [deletingItem, setDeletingItem] = useState<{ id: string; title: string } | null>(null);
     const [isPending, startTransition] = useTransition();
-
+    const router = useRouter();
     const toggleRow = (id: string) => {
         const newExpanded = new Set(expandedRows);
         if (newExpanded.has(id)) {
@@ -58,6 +59,7 @@ export const AdminAchievementsTable = ({
                 await fetch(`/api/admin/achievements/${deletingItem.id}`, {
                     method: 'DELETE',
                 });
+                router.refresh()
             } catch (e) {
                 console.error(e);
             } finally {
@@ -344,10 +346,11 @@ export const AdminAchievementsTable = ({
                                                                             <Image
                                                                                 src={`${achievementsBase}/${achievement.id}/${image.url}`}
                                                                                 alt={image.altText_th ?? achievement.title_th}
-                                                                                fill
+                                                                                width={100}
+                                                                                height={32}
                                                                                 className="w-full h-32 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
                                                                             ></Image>
-                                                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition-all flex items-end p-2">
+                                                                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-75 rounded-lg transition-all flex items-end p-2">
                                                                                 <p className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                                                                                     {image.altText_th || 'No description'}
                                                                                 </p>

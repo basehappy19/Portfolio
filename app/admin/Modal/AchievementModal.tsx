@@ -15,6 +15,7 @@ import { AchievementLinksSection } from '../AchievementLinksSection';
 import { AchievementImagesSection } from '../AchievementImagesSection';
 import { TouchedState, ValidationErrors } from '../types/achievementValidation';
 import { AchievementTextField } from '../AchievementTextField';
+import { useRouter } from 'next/navigation';
 
 const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
@@ -44,6 +45,7 @@ const AchievementModalInner = ({
     close: () => void;
     isAnimating: boolean
 }) => {
+    const router = useRouter();
     const categories = useCategories();
     const receivedAt =
         editData?.receivedAt instanceof Date
@@ -110,8 +112,6 @@ const AchievementModalInner = ({
         setDraggedIndex,
     });
 
-
-
     const [links, setLinks] = useState<LinkForm[]>(() =>
         editData?.links?.map((link, idx) => ({
             id: link.id,
@@ -151,7 +151,6 @@ const AchievementModalInner = ({
             }))
         );
     };
-
 
     const handleLinkChange = (
         index: number,
@@ -262,7 +261,7 @@ const AchievementModalInner = ({
                 body: JSON.stringify(payload),
             });
         }
-
+        router.refresh();
         close();
     };
 
