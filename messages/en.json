@@ -8,7 +8,7 @@
             "Roles": ["Full Stack Developer", "Student", "Innovator"],
             "Buttons": {
                 "ViewAchievements": "Achievements",
-                "CV": "View CV"
+                "Resume": "View Resume"
             }
         },
         "About": {

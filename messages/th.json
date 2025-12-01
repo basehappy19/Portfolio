@@ -8,7 +8,7 @@
             "Roles": ["นักพัฒนาโปรแกรมซอฟต์แวร์", "นักเรียน", "นวัตกร"],
             "Buttons": {
                 "ViewAchievements": "ดูผลงาน",
-                "CV": "ดู CV"
+                "Resume": "ดู Resume"
             }
         },
         "About": {

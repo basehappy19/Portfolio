@@ -1,14 +1,12 @@
 import { getTranslations } from 'next-intl/server';
 import { Sparkles } from 'lucide-react';
 import AnimatedRole from '../AnimatedRole';
-import ViewCV from '../Button/ViewCV';
 import WrapToAchievement from '../WrapToAchievement';
 
 const Home = async () => {
     const t = await getTranslations("Index");
-                
+
     const viewAchievementsText = await t("Home.Buttons.ViewAchievements")
-    const viewCVText = await t("Home.Buttons.CV")
     const roles = t.raw("Home.Roles") as string[];
 
     return (
@@ -45,7 +43,9 @@ const Home = async () => {
                         {/* CTA Buttons */}
                         <div className="flex flex-wrap gap-4 justify-center mb-12">
                             <WrapToAchievement text={viewAchievementsText} />
-                            <ViewCV text={viewCVText} />
+                            <a href="https://drive.google.com/file/d/1OgnztJxGqy76u6Za3BI1nZAgVOe71vcP/view?usp=sharing" target='_blank' className="cursor-pointer px-8 py-4 bg-white/10 backdrop-blur-md rounded-full text-white font-semibold border border-white/20 hover:bg-white/20 transition-all duration-300">
+                                {t("Home.Buttons.Resume")}
+                            </a>
                         </div>
                     </div>
 
