@@ -196,7 +196,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         {/* Close Button */}
                         <button
                             onClick={closeModal}
-                            className="absolute top-6 right-6 z-20 p-3 bg-white/95 dark:bg-gray-800/95 hover:bg-white dark:hover:bg-gray-800 rounded-full shadow-xl transition-all hover:scale-110 backdrop-blur-sm border border-gray-100 dark:border-gray-700"
+                            className="cursor-pointer absolute top-6 right-6 z-20 p-3 bg-white/95 dark:bg-gray-800/95 hover:bg-white dark:hover:bg-gray-800 rounded-full shadow-xl transition-all hover:scale-110 backdrop-blur-sm border border-gray-100 dark:border-gray-700"
                         >
                             <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                         </button>

@@ -315,7 +315,7 @@ const AchievementModalInner = ({
                         </div>
                         <button
                             onClick={close}
-                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+                            className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
                         >
                             <X size={20} />
                         </button>

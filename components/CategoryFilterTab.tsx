@@ -1,9 +1,9 @@
 import { PrismaClient } from '@/app/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { Category } from './Section/Achievement';
 import CategoryButton from './Button/CategoryButton';
 import AllButton from './Button/AllButton';
+import { Category } from '@/types/Achievements';
 
 const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Category | null }) => {
     const locale = await getLocale();
@@ -33,7 +33,6 @@ const CategoryFilterTab = async ({ currentCategory }: { currentCategory: Categor
             }
         },
     });
-
 
     const categories = categoriesRaw.map(cat => ({
         id: cat.id,
