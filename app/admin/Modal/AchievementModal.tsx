@@ -1,8 +1,7 @@
 'use client';
-import React, {
+import {
     useState,
     DragEvent,
-    useRef,
 } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
@@ -19,13 +18,15 @@ import { AchievementTextField } from '../AchievementTextField';
 import { useRouter } from 'next/navigation';
 import { createAchievement, updateAchievement } from '../services/achievements';
 import toast from 'react-hot-toast';
+import { AchievementTextarea } from '../AchievementTextarea';
+import { useAchievementTextTranslation } from '../hooks/useAchievementTextTranslation';
+import { useLinkTranslation } from '../hooks/useLinkTranslation';
+import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
 
 const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
 
 export const AchievementModal = () => {
-
-
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
 
     if (!isOpen) return null;
@@ -52,12 +53,11 @@ const AchievementModalInner = ({
 }) => {
     const router = useRouter();
     const categories = useCategories();
-    const isEditMode = !!editData;
     const receivedAt =
         editData?.receivedAt instanceof Date
-            ? editData.receivedAt.toISOString().slice(0, 10)
+            ? editData.receivedAt.toISOString().slice(0, 10) // -> "2025-12-01"
             : editData?.receivedAt ?? "";
-
+            
     const [formData, setFormData] = useState<FormState>(() => ({
         title_th: editData?.title_th ?? '',
         title_en: editData?.title_en ?? '',
@@ -67,157 +67,11 @@ const AchievementModalInner = ({
         awardLevel_en: editData?.awardLevel_en ?? '',
         location_th: editData?.location_th ?? '',
         location_en: editData?.location_en ?? '',
-        receivedAt: receivedAt,
+        receivedAt,
         categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
         sortOrder: Number(editData?.sortOrder ?? 0),
         isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
-    const [lastTranslatedSource, setLastTranslatedSource] = useState<
-        Partial<Record<keyof FormState, string>>
-    >({});
-
-    const translateTimers = useRef<
-        Partial<Record<keyof FormState, number>>
-    >({});
-    const FIELD_PAIRS: { th: keyof FormState; en: keyof FormState }[] = [
-        { th: 'title_th', en: 'title_en' },
-        { th: 'description_th', en: 'description_en' },
-        { th: 'awardLevel_th', en: 'awardLevel_en' },
-        { th: 'location_th', en: 'location_en' },
-    ];
-
-    const translateText = async (text: string): Promise<string> => {
-        if (!text) return '';
-
-        try {
-            const res = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text }),
-            });
-
-            if (!res.ok) {
-                return '';
-            }
-
-            const data = await res.json();
-            return data.translated || '';
-        } catch (e) {
-            console.error('translate error', e);
-            return '';
-        }
-    };
-
-
-    const translateField = async (source: keyof FormState, target: keyof FormState) => {
-        const text = formData[source];
-        if (!text) return;
-
-        try {
-            const res = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text }),
-            });
-
-            if (!res.ok) {
-                return;
-            }
-
-            const data = await res.json();
-
-            setFormData(prev => ({
-                ...prev,
-                [target]: data.translated || '',
-            }));
-        } catch (e) {
-            console.error('translate error', e);
-        }
-    };
-
-    const isTouchedKey = (field: keyof FormState): field is keyof TouchedState => {
-        return ['title_th', 'title_en', 'categorySlugs'].includes(field as string);
-    };
-
-    const handleLinkThaiBlur = async (index: number) => {
-        if (isEditMode) return;
-
-        const current = links[index];
-        if (!current?.label_th?.trim()) return;
-
-        const translated = await translateText(current.label_th.trim());
-        if (!translated) return;
-
-        setLinks(prev => {
-            const updated = [...prev];
-            if (!updated[index]) return prev;
-            updated[index] = {
-                ...updated[index],
-                label_en: translated,
-            };
-            return updated;
-        });
-    };
-
-    const handleImageAltThaiBlur = async (index: number) => {
-        if (isEditMode) return;
-
-        const current = imagePreview[index];
-        if (!current?.altText_th?.trim()) return;
-
-        const translated = await translateText(current.altText_th.trim());
-        if (!translated) return;
-
-        setImagePreview(prev => {
-            const updated = [...prev];
-            if (!updated[index]) return prev;
-            updated[index] = {
-                ...updated[index],
-                altText_en: translated,
-            };
-            return updated;
-        });
-    };
-
-
-
-    const handleThaiBlur = (field: keyof FormState) => {
-        if (isTouchedKey(field)) {
-            handleBlur(field);
-        }
-
-        if (isEditMode) return;
-
-        const pair = FIELD_PAIRS.find(p => p.th === field);
-        if (!pair) return;
-
-        const sourceKey = pair.th;
-        const targetKey = pair.en;
-
-        const currentSource = formData[sourceKey];
-        if (!currentSource) {
-            return;
-        }
-
-        if (lastTranslatedSource[sourceKey] === currentSource) {
-            return;
-        }
-
-        if (translateTimers.current[field]) {
-            clearTimeout(translateTimers.current[field]!);
-        }
-
-        translateTimers.current[field] = window.setTimeout(async () => {
-            await translateField(sourceKey, targetKey);
-
-            setLastTranslatedSource(prev => ({
-                ...prev,
-                [sourceKey]: currentSource,
-            }));
-        }, 1500);
-    };
-
-
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
         title_th: false,
@@ -236,6 +90,7 @@ const AchievementModalInner = ({
         setErrors,
         setTouched,
     });
+
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
@@ -272,6 +127,25 @@ const AchievementModalInner = ({
             sortOrder: link.sortOrder ?? idx,
         })) ?? []
     );
+
+    const { translating, handleThaiBlur } = useAchievementTextTranslation({
+        editData,
+        formData,
+        setFormData,
+        handleBlur,
+    });
+
+    const { translatingLink, handleLinkThaiBlur } = useLinkTranslation({
+        editData,
+        links,
+        setLinks,
+    });
+
+    const { translatingImageAlt, handleImageAltThaiBlur } = useImageAltTranslation({
+        editData,
+        imagePreview,
+        setImagePreview,
+    });
 
     const handleLinkDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
         setDraggedLinkIndex(index);
@@ -396,7 +270,9 @@ const AchievementModalInner = ({
             ...submitData,
             images: uploadedImages,
             links: normalizedLinks,
-            receivedAt: formData.receivedAt ?? '',
+            receivedAt: formData.receivedAt
+                ? new Date(formData.receivedAt).toISOString()
+                : undefined,
         };
 
 
@@ -470,11 +346,12 @@ const AchievementModalInner = ({
                                 value={formData.title_th}
                                 onChange={handleInputChange}
                                 onBlur={() => handleThaiBlur('title_th')}
-                                placeholder="เช่น ระบบจัดการคลังสินค้าอัจฉริยะ"
+                                placeholder="ชื่อผลงาน"
                                 required
                                 size="lg"
                                 error={errors.title_th}
                                 touched={touched.title_th}
+                                isTranslating={!!translating.title_th}
                             />
 
                             <AchievementTextField
@@ -483,41 +360,32 @@ const AchievementModalInner = ({
                                 value={formData.title_en}
                                 onChange={handleInputChange}
                                 onBlur={() => handleBlur('title_en')}
-                                placeholder="Inventory Management System"
+                                placeholder="Title"
                                 required
                                 size="md"
                                 error={errors.title_en}
                                 touched={touched.title_en}
                             />
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    รายละเอียด (ไทย)
-                                </label>
-                                <textarea
-                                    name="description_th"
-                                    value={formData.description_th}
-                                    onChange={handleInputChange}
-                                    onBlur={() => handleThaiBlur('description_th')}
-                                    rows={4}
-                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white resize-none transition-all"
-                                    placeholder="อธิบายรายละเอียดผลงาน..."
-                                />
-                            </div>
+                            <AchievementTextarea
+                                label="รายละเอียด (ไทย)"
+                                name="description_th"
+                                value={formData.description_th}
+                                onChange={handleInputChange}
+                                onBlur={() => handleThaiBlur('description_th')}
+                                placeholder="อธิบายรายละเอียดผลงาน..."
+                                rows={4}
+                                isTranslating={!!translating.description_th}
+                            />
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    รายละเอียด (English)
-                                </label>
-                                <textarea
-                                    name="description_en"
-                                    value={formData.description_en}
-                                    onChange={handleInputChange}
-                                    rows={4}
-                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white resize-none transition-all"
-                                    placeholder="Describe your project..."
-                                />
-                            </div>
+                            <AchievementTextarea
+                                label="รายละเอียด (English)"
+                                name="description_en"
+                                value={formData.description_en}
+                                onChange={handleInputChange}
+                                placeholder="Describe your project..."
+                                rows={4}
+                            />
                         </div>
 
                         {/* Section: ข้อมูลรางวัล */}
@@ -538,6 +406,7 @@ const AchievementModalInner = ({
                                     onBlur={() => handleThaiBlur('awardLevel_th')}
                                     placeholder="ประเทศ | จังหวัด | เขต"
                                     size="md"
+                                    isTranslating={!!translating.awardLevel_th}
                                 />
 
                                 <AchievementTextField
@@ -559,6 +428,7 @@ const AchievementModalInner = ({
                                     onBlur={() => handleThaiBlur('location_th')}
                                     placeholder="สถานที่"
                                     size="md"
+                                    isTranslating={!!translating.location_th}
                                 />
 
                                 <AchievementTextField
@@ -679,6 +549,7 @@ const AchievementModalInner = ({
                                 handleLinkDragOver={handleLinkDragOver}
                                 handleLinkDragEnd={handleLinkDragEnd}
                                 handleLinkThaiBlur={handleLinkThaiBlur}
+                                translatingLink={translatingLink}
                             />
                         </div>
 
@@ -701,6 +572,7 @@ const AchievementModalInner = ({
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
                                 handleImageAltThaiBlur={handleImageAltThaiBlur}
+                                translatingImageAlt={translatingImageAlt}
                             />
                         </div>
                     </div>

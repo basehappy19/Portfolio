@@ -24,7 +24,7 @@ export type FormState = {
     awardLevel_en: string;
     location_th: string;
     location_en: string;
-    receivedAt: string;
+    receivedAt?: string;
     categorySlugs: string[];
     sortOrder: number;
     isPublished: boolean;

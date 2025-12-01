@@ -17,6 +17,7 @@ type Props = {
     size?: 'md' | 'lg';
     /** ถ้าอยาก override class ของ container */
     containerClassName?: string;
+    isTranslating?: boolean;
 };
 
 export const AchievementTextField: React.FC<Props> = ({
@@ -31,6 +32,7 @@ export const AchievementTextField: React.FC<Props> = ({
     touched,
     size = 'md',
     containerClassName = '',
+    isTranslating = false,
 }) => {
     const hasError = Boolean(error && touched);
 
@@ -46,6 +48,10 @@ export const AchievementTextField: React.FC<Props> = ({
         ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
         : 'border-gray-300 dark:border-gray-600 hover:border-gray-400';
 
+    const translatingClass = isTranslating && !hasError
+        ? 'animate-pulse border-blue-400 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]'
+        : '';
+
     return (
         <div className={`${hasError ? 'error-field' : ''} ${containerClassName}`}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -60,13 +66,20 @@ export const AchievementTextField: React.FC<Props> = ({
                 onChange={onChange}
                 onBlur={onBlur}
                 placeholder={placeholder}
-                className={`${baseInputClass} ${sizeClass} ${borderClass}`}
+                className={`${baseInputClass} ${sizeClass} ${borderClass} ${translatingClass}`}
             />
 
             {hasError && (
                 <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-slideDown">
                     <AlertCircle size={16} />
                     <span>{error}</span>
+                </div>
+            )}
+
+            {!hasError && isTranslating && (
+                <div className="flex items-center gap-2 mt-2 text-xs text-blue-600 dark:text-blue-400">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                    <span>AI กำลังแปล...</span>
                 </div>
             )}
         </div>
