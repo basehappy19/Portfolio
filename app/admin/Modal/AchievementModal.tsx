@@ -16,6 +16,8 @@ import { AchievementImagesSection } from '../AchievementImagesSection';
 import { TouchedState, ValidationErrors } from '../types/achievementValidation';
 import { AchievementTextField } from '../AchievementTextField';
 import { useRouter } from 'next/navigation';
+import { createAchievement, updateAchievement } from '../services/achievements';
+import toast from 'react-hot-toast';
 
 const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
@@ -191,6 +193,7 @@ const AchievementModalInner = ({
                 ...link,
                 sortOrder: idx,
             })),
+            status: formData.isPublished ? 'PUBLIC' : 'DRAFT',
             id: editData?.id,
         };
 
@@ -236,31 +239,28 @@ const AchievementModalInner = ({
             sortOrder: link.sortOrder ?? 0,
         }));
 
-        const status = submitData.isPublished ? 'PUBLIC' : 'DRAFT';
 
-        const payload = {
+        const payload: SubmitData = {
             ...submitData,
-            status,
             images: uploadedImages,
             links: normalizedLinks,
-            receivedAt: formData.receivedAt
-                ? new Date(formData.receivedAt)
-                : null,
+            receivedAt: formData.receivedAt ?? '',
         };
 
-        if (submitData.id) {
-            await fetch(`/api/admin/achievements/${submitData.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-        } else {
-            await fetch(`/api/admin/achievements`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+
+        try {
+            if (submitData.id) {
+                await updateAchievement(submitData.id, payload);
+                toast.success('แก้ไขผลงานเรียบร้อย');
+            } else {
+                await createAchievement(payload);
+                toast.success('เพิ่มผลงานเรียบร้อย');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
         }
+
         router.refresh();
         close();
     };

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -22,6 +23,7 @@ export default async function RootLayout({
                     disableTransitionOnChange
                 >
                     {children}
+                    <Toaster position="top-right" />
                 </ThemeProvider>
             </body>
         </html>

@@ -6,7 +6,6 @@ export type LinkForm = {
     sortOrder: number;
 };
 
-
 export type ImagePreview = {
     id?: string;
     file?: File;
@@ -35,4 +34,5 @@ export type SubmitData = FormState & {
     images: ImagePreview[];
     links: LinkForm[];
     id?: string;
+    status: "PUBLIC" | "DRAFT";
 };
