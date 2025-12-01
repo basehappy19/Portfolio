@@ -19,6 +19,8 @@ export const AdminAchievementsTable = ({
 }: Props) => {
     const router = useRouter();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleteAnimating, setIsDeleteAnimating] = useState(false); // 👈 ตัวใหม่
+
     const [deletingItem, setDeletingItem] = useState<{
         id: string;
         title: string;
@@ -30,8 +32,22 @@ export const AdminAchievementsTable = ({
             id: achievement.id,
             title: achievement.title_th || achievement.title_en,
         });
+
+        setIsDeleteAnimating(true);
         setIsDeleteModalOpen(true);
+
+        document.body.style.overflow = 'hidden';
     };
+    const closeDeleteModal = () => {
+        setIsDeleteAnimating(false);
+
+        setTimeout(() => {
+            setIsDeleteModalOpen(false);
+            setDeletingItem(null);
+            document.body.style.overflow = 'unset';
+        }, 200);
+    };
+
 
     const confirmDelete = () => {
         if (!deletingItem) return;
@@ -41,13 +57,11 @@ export const AdminAchievementsTable = ({
                 await fetch(`/api/admin/achievements/${deletingItem.id}`, {
                     method: 'DELETE',
                 });
-                // refresh หน้าให้ข้อมูลหายไปจาก table
                 router.refresh();
             } catch (e) {
                 console.error(e);
             } finally {
-                setIsDeleteModalOpen(false);
-                setDeletingItem(null);
+                closeDeleteModal();
             }
         });
     };
@@ -137,8 +151,8 @@ export const AdminAchievementsTable = ({
                                         <td className="px-6 py-4">
                                             <button
                                                 className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full ${achievement.status === 'PUBLIC'
-                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
+                                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                                                     }`}
                                             >
                                                 {achievement.status === 'PUBLIC' ? (
@@ -176,14 +190,13 @@ export const AdminAchievementsTable = ({
 
             <DeleteModal
                 isOpen={isDeleteModalOpen}
-                onClose={() => {
-                    setIsDeleteModalOpen(false);
-                    setDeletingItem(null);
-                }}
+                isAnimating={isDeleteAnimating}
+                onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
                 itemName={deletingItem?.title}
                 isLoading={isPending}
             />
+
         </>
     );
 };

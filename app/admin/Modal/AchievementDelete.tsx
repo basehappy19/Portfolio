@@ -6,6 +6,7 @@ type DeleteModalProps = {
     onConfirm: () => void;
     itemName?: string;
     isLoading?: boolean;
+    isAnimating: boolean
 };
 
 const DeleteModal = ({
@@ -14,12 +15,19 @@ const DeleteModal = ({
     onConfirm,
     itemName,
     isLoading = false,
+    isAnimating = false
 }: DeleteModalProps) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-[#282c33] rounded-lg shadow-xl max-w-sm w-full p-6">
+        <div onClick={onClose}
+            style={{
+                animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
+            }} className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer backdrop-blur-sm">
+            <div onClick={(e) => e.stopPropagation()}
+                style={{
+                    animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
+                }} className="bg-white dark:bg-[#282c33] rounded-lg shadow-xl max-w-sm w-full p-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                     ยืนยันการลบ
                 </h2>
