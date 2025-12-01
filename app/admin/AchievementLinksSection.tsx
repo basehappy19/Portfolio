@@ -36,7 +36,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
                 <button
                     type="button"
                     onClick={addLink}
-                    className="text-sm px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="cursor-pointer text-sm px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                     + เพิ่มลิงก์
                 </button>
@@ -68,7 +68,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                 <button
                                     type="button"
                                     onClick={() => removeLink(index)}
-                                    className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
+                                    className="cursor-pointer text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
                                 >
                                     <Trash2 size={14} />
                                     ลบลิงก์นี้
