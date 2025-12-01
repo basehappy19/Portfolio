@@ -3,9 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { SubmitData } from "@/types/Form";
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+
 export const updateAchievement = async (id: string, payload: SubmitData) => {
     try {
-        const res = await fetch(`/api/admin/achievements/${id}`, {
+        const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -28,7 +31,7 @@ export const updateAchievement = async (id: string, payload: SubmitData) => {
 
 export const createAchievement = async (payload: SubmitData) => {
     try {
-        const res = await fetch(`/api/admin/achievements`, {
+        const res = await fetch(`${baseUrl}/api/admin/achievements`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
@@ -50,7 +53,7 @@ export const createAchievement = async (payload: SubmitData) => {
 };
 
 export const deleteAchievement = async (id: string): Promise<void> => {
-    const res = await fetch(`/api/admin/achievements/${id}`, {
+    const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
         method: "DELETE",
     });
 
