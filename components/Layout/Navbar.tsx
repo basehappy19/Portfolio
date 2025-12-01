@@ -75,7 +75,7 @@ const Navbar = () => {
                                 <button
                                     key={item.id}
                                     onClick={() => scrollToSection(item.id)}
-                                    className={`relative px-4 py-2 text-nowrap rounded-full flex items-center gap-2 transition-all duration-300 ${isActive
+                                    className={`cursor-pointer relative px-4 py-2 text-nowrap rounded-full flex items-center gap-2 transition-all duration-300 ${isActive
                                         ? 'bg-linear-to-r from-yellow-500/20 to-orange-500/20'
                                         : 'text-gray-700 hover:bg-gray-200/50'
                                         }`}
