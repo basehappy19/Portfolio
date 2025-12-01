@@ -7,6 +7,8 @@ import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';
 import EditAchievement from './Button/EditAchievement';
 import { useRouter } from 'next/navigation';
+import { deleteAchievement } from './services/achievements';
+import toast from 'react-hot-toast';
 
 type Props = {
     achievements: Achievement[];
@@ -54,14 +56,16 @@ export const AdminAchievementsTable = ({
 
     const confirmDelete = () => {
         if (!deletingItem) return;
+
         startTransition(async () => {
             try {
-                await fetch(`/api/admin/achievements/${deletingItem.id}`, {
-                    method: 'DELETE',
-                });
-                router.refresh()
-            } catch (e) {
-                console.error(e);
+                await deleteAchievement(deletingItem.id);
+
+                toast.success(`ลบผลงาน "${deletingItem.title}" เรียบร้อยแล้ว`);
+                router.refresh();
+            } catch (error) {
+                console.error("Delete error:", error);
+                toast.error("ไม่สามารถลบผลงานได้ กรุณาลองใหม่อีกครั้ง");
             } finally {
                 closeDeleteModal();
             }

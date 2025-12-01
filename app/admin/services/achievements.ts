@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { SubmitData } from "@/types/Form";
@@ -47,4 +47,16 @@ export const createAchievement = async (payload: SubmitData) => {
         console.error("❌ createAchievement Error:", error);
         throw error;
     }
+};
+
+export const deleteAchievement = async (id: string): Promise<void> => {
+    const res = await fetch(`/api/admin/achievements/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!res.ok) {
+        const message = await res.text().catch(() => "");
+        throw new Error(message || "Failed to delete achievement");
+    }
+    revalidatePath("/admin");
 };
