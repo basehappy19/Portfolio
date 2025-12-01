@@ -51,7 +51,7 @@ const Home = async () => {
 
                     {/* Scroll Indicator */}
                     <button
-                        className="mt-6 animate-bounce cursor-pointer"
+                        className="mt-6 animate-bounce"
                     >
                         <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
                             <div className="w-1 h-2 bg-white/50 rounded-full animate-scroll" />
