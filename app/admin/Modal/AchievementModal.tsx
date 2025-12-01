@@ -198,8 +198,11 @@ const AchievementModalInner = ({
         };
 
         if (!validateForm()) {
+            toast.error("กรุณากรอกข้อมูลให้ครบถ้วน");
+
             const firstError = document.querySelector('.error-field');
             firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
             return;
         }
 

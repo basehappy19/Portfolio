@@ -42,13 +42,10 @@ export const useAchievementFormHandlers = ({
             [name]: value,
         }));
 
-        // เคลียร์ error ของ field นั้นเมื่อพิมพ์ใหม่
         setErrors((prev) => {
-            // ถ้า key นั้นไม่มี error อยู่แล้ว ก็ไม่ต้องเปลี่ยน state
             if (!(name in prev)) return prev;
 
             const newErrors = { ...prev };
-            // ลบเฉพาะ key นั้นออกจาก errors
             delete newErrors[name];
             return newErrors;
         });
