@@ -18,7 +18,7 @@ export const SignInButton = () => {
         try {
             await authClient.signIn.social({
                 provider: 'google',
-                callbackURL: '/',
+                callbackURL: '/admin',
             });
         } catch (e) {
             console.error(e);
