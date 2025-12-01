@@ -15,7 +15,7 @@ export const SignOutButton = () => {
     return (
         <button
             onClick={handleSignOut}
-            className="text-red-300 hover:text-red-200 transition-all duration-300 font-medium hover:underline underline-offset-4"
+            className="cursor-pointer text-red-300 hover:text-red-200 transition-all duration-300 font-medium hover:underline underline-offset-4"
         >
             {locale === "th" ? "ออกจากระบบ" : "Sign Out"}
         </button>

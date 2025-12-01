@@ -31,7 +31,7 @@ export const SignInButton = () => {
         <button
             onClick={handleLoginWithGoogle}
             disabled={isLoading}
-            className="group relative overflow-hidden rounded-lg bg-linear-to-r from-red-600 to-red-700 px-8 py-3 text-white font-medium shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer group relative overflow-hidden rounded-lg bg-linear-to-r from-red-600 to-red-700 px-8 py-3 text-white font-medium shadow-lg hover:shadow-red-500/50 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
         >
             <span className="relative z-10">
                 {isLoading ? text.loading : text.signIn}
