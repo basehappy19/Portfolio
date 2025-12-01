@@ -17,6 +17,7 @@ const LanguageSwitcher = () => {
             <Link
                 href={normalizedPath}
                 locale="th"
+                scroll={false}
                 className={`px-3 py-1 text-xs font-medium rounded-full transition ${locale === 'th'
                         ? 'bg-white text-black'
                         : 'text-gray-300 hover:text-white'
@@ -28,6 +29,7 @@ const LanguageSwitcher = () => {
             <Link
                 href={normalizedPath}
                 locale="en"
+                scroll={false}
                 className={`px-3 py-1 text-xs font-medium rounded-full transition ${locale === 'en'
                         ? 'bg-white text-black'
                         : 'text-gray-300 hover:text-white'
