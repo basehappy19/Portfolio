@@ -1,27 +1,13 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
+import { ApiLink } from "@/types/Api";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { NextRequest, NextResponse } from "next/server";
-
-type ApiImage = {
-    id?: number;
-    preview: string;
-    altText_th?: string | null;
-    altText_en?: string | null;
-    sortOrder?: number;
-};
-
-type ApiLink = {
-    id?: number;
-    label_th: string;
-    label_en: string;
-    url: string;
-    sortOrder?: number;
-};
 
 export async function POST(req: NextRequest) {
     const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({ connectionString });
     const prisma = new PrismaClient({ adapter });
+
     try {
         const body = await req.json();
 
@@ -38,7 +24,6 @@ export async function POST(req: NextRequest) {
             sortOrder = 0,
             status = "DRAFT",
             categorySlugs = [],
-            images = [],
             links = [],
         }: {
             title_th: string;
@@ -53,7 +38,6 @@ export async function POST(req: NextRequest) {
             sortOrder?: number;
             status?: "PUBLIC" | "DRAFT";
             categorySlugs?: string[];
-            images?: ApiImage[];
             links?: ApiLink[];
         } = body;
 
@@ -90,24 +74,6 @@ export async function POST(req: NextRequest) {
                         categoryId: cat.id,
                         sortOrder: index,
                     })),
-                },
-
-                images: {
-                    create: (images as ApiImage[])
-                        .filter((img) => typeof img.preview === "string")
-                        .map((img) => {
-                            let url = img.preview;
-                            if (url.startsWith("/achievements/")) {
-                                url = url.replace("/achievements/", "");
-                            }
-
-                            return {
-                                url,
-                                altText_th: img.altText_th ?? null,
-                                altText_en: img.altText_en ?? null,
-                                sortOrder: img.sortOrder ?? 0,
-                            };
-                        }),
                 },
 
                 links: {

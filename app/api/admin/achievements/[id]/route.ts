@@ -3,22 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { unlink } from "fs/promises";
-
-type ApiImage = {
-    id?: string;
-    preview: string;
-    altText_th?: string | null;
-    altText_en?: string | null;
-    sortOrder?: number;
-};
-
-type ApiLink = {
-    id?: string;
-    label_th: string;
-    label_en: string;
-    url: string;
-    sortOrder?: number;
-};
+import { ApiImage, ApiLink } from "@/types/Api";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
