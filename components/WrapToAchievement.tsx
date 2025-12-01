@@ -2,7 +2,7 @@
 import { ArrowDown } from 'lucide-react'
 import { scrollToSection } from './Layout/Navbar'
 
-const WrapToAchievemets = ({ text }: { text: string }) => {
+const WrapToAchievement = ({ text }: { text: string }) => {
     return (
         <button onClick={() => scrollToSection("Achievements")}
             className="cursor-pointer group px-8 py-4 bg-red-500 rounded-full text-white font-semibold hover:shadow-2xl hover:shadow-red-500/50 transition-all duration-300">
@@ -14,4 +14,4 @@ const WrapToAchievemets = ({ text }: { text: string }) => {
     )
 }
 
-export default WrapToAchievemets
+export default WrapToAchievement

@@ -2,6 +2,7 @@
 import { Send } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const FormContact = () => {
     const locale = useLocale();
@@ -26,13 +27,12 @@ const FormContact = () => {
             if (!res.ok) {
                 throw new Error('Failed to send');
             }
+            toast.success(isThai ? 'ข้อความถูกส่งแล้ว!' : 'Message sent!');
 
-            console.log('Form submitted:', formData);
-            alert(isThai ? 'ข้อความถูกส่งแล้ว!' : 'Message sent!');
             setFormData({ name: '', email: '', message: '' });
         } catch (error) {
             console.error(error);
-            alert(isThai ? 'ส่งข้อความไม่สำเร็จ ลองใหม่อีกครั้ง' : 'Failed to send message, please try again.');
+            toast.success(isThai ? 'ส่งข้อความไม่สำเร็จ ลองใหม่อีกครั้ง' : 'Failed to send message, please try again.');
         }
     };
 
@@ -61,7 +61,7 @@ const FormContact = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                         placeholder={isThai ? 'ใส่ชื่อของคุณ' : 'Enter Your Name'}
                     />
                 </div>
@@ -75,7 +75,7 @@ const FormContact = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                         placeholder="your.email@example.com"
                     />
                 </div>
@@ -89,14 +89,14 @@ const FormContact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         rows={5}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
                         placeholder={isThai ? 'เขียนข้อความของคุณที่นี่' : 'Write Your Message Here'}
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="w-full py-4 bg-linear-to-r from-purple-500 to-blue-500 rounded-xl text-white font-semibold hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 group"
+                    className="w-full py-4 bg-red-500 rounded-xl text-white font-semibold hover:shadow-2xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
                 >
                     <span>{isThai ? 'ส่งข้อความ' : 'Send Message'}</span>
                     <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

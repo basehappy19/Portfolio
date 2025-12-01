@@ -1,8 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import { Sparkles } from 'lucide-react';
-import WrapToAchievemets from '../WrapToAchievemets';
 import AnimatedRole from '../AnimatedRole';
 import ViewCV from '../Button/ViewCV';
+import WrapToAchievement from '../WrapToAchievement';
 
 const Home = async () => {
     const t = await getTranslations("Index");
@@ -44,7 +44,7 @@ const Home = async () => {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-wrap gap-4 justify-center mb-12">
-                            <WrapToAchievemets text={viewAchievementsText} />
+                            <WrapToAchievement text={viewAchievementsText} />
                             <ViewCV text={viewCVText} />
                         </div>
                     </div>

@@ -162,7 +162,7 @@
                     "label": "อีเมล",
                     "value": "pakpoom.td@gmail.com",
                     "href": "mailto:pakpoom.td@gmail.com",
-                    "gradient": "from-blue-500 to-cyan-500",
+                    "gradient": "bg-blue-500",
                     "type": "email"
                 },
                 {
@@ -170,7 +170,7 @@
                     "label": "โทรศัพท์",
                     "value": "064-303-8963",
                     "href": "tel:064-303-8963",
-                    "gradient": "from-green-500 to-emerald-500",
+                    "gradient": "bg-green-500",
                     "type": "phone"
                 },
                 {
@@ -178,7 +178,7 @@
                     "label": "ตำแหน่ง",
                     "value": "ประเทศไทย",
                     "href": null,
-                    "gradient": "from-purple-500 to-pink-500",
+                    "gradient": "bg-purple-500",
                     "type": "location"
                 }
             ],
@@ -202,8 +202,8 @@
                     "name": "Instagram",
                     "icon": "Instagram",
                     "href": "https://www.instagram.com/base_happy19",
-                    "color": "from-pink-500 via-red-500 to-yellow-500",
-                    "hoverColor": "hover:from-pink-400 hover:via-red-400 hover:to-yellow-400"
+                    "color": "bg-pink-500",
+                    "hoverColor": "hover:bg-pink-400"
                 }
             ]
         },

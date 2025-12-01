@@ -1,6 +1,8 @@
 import { getMessages, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import SectionHeader from '../SectionHeader';
+import WarpToAchievement from '../Button/WarpToAchievement';
+import WarpToContact from '../Button/WarpToContact';
 
 const About = async () => {
     type Status = {
@@ -67,19 +69,11 @@ const About = async () => {
 
                         {/* Call to Action */}
                         <div className="flex gap-4 pt-6">
-                            <a
-                                href="#Contact"
-                                className="flex-1 block text-center px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium rounded-lg transition duration-300 shadow-lg hover:shadow-red-400/50 transform hover:-translate-y-0.5"
-                            >
-                                {t("About.Buttons.Contact")}
-                            </a>
 
-                            <a
-                                href="#Achievements"
-                                className="flex-1 block text-center px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-medium rounded-lg border border-gray-700 hover:border-gray-600 transition duration-300"
-                            >
-                                {t("About.Buttons.Achievements")}
-                            </a>
+                            <WarpToContact text={t("About.Buttons.Contact")} />
+
+                            <WarpToAchievement text={t("About.Buttons.Achievements")} />
+
                         </div>
                     </div>
                 </div>
