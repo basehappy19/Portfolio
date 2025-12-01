@@ -28,7 +28,6 @@ export async function POST(req: Request) {
             },
             { role: "user", content: text },
         ],
-        temperature: 0,
     });
 
     const translated = completion.choices[0].message.content;
