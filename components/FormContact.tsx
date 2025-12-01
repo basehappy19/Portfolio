@@ -96,7 +96,7 @@ const FormContact = () => {
 
                 <button
                     type="submit"
-                    className="w-full py-4 bg-red-500 rounded-xl text-white font-semibold hover:shadow-2xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
+                    className="cursor-pointer w-full py-4 bg-red-500 rounded-xl text-white font-semibold hover:shadow-2xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
                 >
                     <span>{isThai ? 'ส่งข้อความ' : 'Send Message'}</span>
                     <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
