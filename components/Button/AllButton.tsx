@@ -1,6 +1,6 @@
 'use client'
+import { Category } from '@/types/Achievements';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Category } from './Achievement';
 
 const AllButton = ({ TotalAchievements, CurrentCategory, AllButtonLabel }: { TotalAchievements: number, CurrentCategory: Category | null, AllButtonLabel: string }) => {
 
