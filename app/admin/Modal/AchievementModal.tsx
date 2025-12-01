@@ -1,20 +1,26 @@
 'use client';
 import React, {
     useState,
-    ChangeEvent,
     DragEvent,
 } from 'react';
-import { X, Plus, Trash2, GripVertical } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
-import Image from 'next/image';
 import { EditData } from '@/types/Achievements';
 import { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
+import { uploadAchievementImage } from '../lib/uploadAchievementImage';
+import { useAchievementFormHandlers } from '../hooks/useAchievementFormHandlers';
+import { useImageHandlers } from '../hooks/useImageHandlers';
+import { AchievementLinksSection } from '../AchievementLinksSection';
+import { AchievementImagesSection } from '../AchievementImagesSection';
+import { TouchedState, ValidationErrors } from '../types/achievementValidation';
+import { AchievementTextField } from '../AchievementTextField';
+
+const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
 
-// ---------- outer component: ใช้ context + เลือก inner ----------
 export const AchievementModal = () => {
-    const { isOpen, close, editData } = useAchievementModal();
+    const { isOpen, close, editData, isAnimating } = useAchievementModal();
 
     if (!isOpen) return null;
 
@@ -23,22 +29,25 @@ export const AchievementModal = () => {
             key={editData?.id ?? 'new'}
             editData={editData ?? null}
             close={close}
+            isAnimating={isAnimating}
         />
     );
 };
 
-// ---------- inner component: มี state ฟอร์ม ----------
+
 const AchievementModalInner = ({
     editData,
     close,
+    isAnimating
 }: {
     editData: EditData | null;
     close: () => void;
+    isAnimating: boolean
 }) => {
     const categories = useCategories();
     const receivedAt =
         editData?.receivedAt instanceof Date
-            ? editData.receivedAt.toISOString().slice(0, 10) // "YYYY-MM-DD"
+            ? editData.receivedAt.toISOString().slice(0, 10)
             : editData?.receivedAt ?? "";
 
     const [formData, setFormData] = useState<FormState>(() => ({
@@ -56,9 +65,26 @@ const AchievementModalInner = ({
         isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
 
+    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [touched, setTouched] = useState<TouchedState>({
+        title_th: false,
+        title_en: false,
+        categorySlugs: false,
+    });
 
-    const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
-
+    const {
+        handleBlur,
+        handleInputChange,
+        handleCategoryChange,
+        validateForm,
+    } = useAchievementFormHandlers({
+        formData,
+        setFormData,
+        setErrors,
+        setTouched,
+    });
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
         editData?.images?.map((img, idx) => ({
             id: img.id,
@@ -70,6 +96,22 @@ const AchievementModalInner = ({
         })) ?? []
     );
 
+    const {
+        handleImageUpload,
+        handleImageAltChange,
+        handleRemoveImage,
+        handleDragStart,
+        handleDragOver,
+        handleDragEnd,
+    } = useImageHandlers({
+        imagePreview,
+        setImagePreview,
+        draggedIndex,
+        setDraggedIndex,
+    });
+
+
+
     const [links, setLinks] = useState<LinkForm[]>(() =>
         editData?.links?.map((link, idx) => ({
             id: link.id,
@@ -79,184 +121,6 @@ const AchievementModalInner = ({
             sortOrder: link.sortOrder ?? idx,
         })) ?? []
     );
-
-
-    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-    const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
-
-    const uploadImage = async (file: File) => {
-        const formDataUpload = new FormData();
-        formDataUpload.append("file", file);
-
-        const achievementIdForUpload = editData?.id ?? "_temp";
-
-        const res = await fetch(
-            `/api/uploads?achievementId=${achievementIdForUpload}`,
-            {
-                method: "POST",
-                body: formDataUpload,
-            }
-        );
-
-        if (!res.ok) {
-            throw new Error("Upload image failed");
-        }
-
-        const json = (await res.json()) as { fileName: string; url: string };
-
-        return json;
-    };
-
-
-    const handleAchievementSubmit = async (data: SubmitData) => {
-        const status = data.isPublished ? "PUBLIC" : "DRAFT";
-
-        const uploadedImages = await Promise.all(
-            (data.images ?? []).map(async (img) => {
-                if (img.file instanceof File) {
-                    const { fileName } = await uploadImage(img.file);
-                    return {
-                        id: img.id,
-                        preview: fileName,
-                        altText_th: img.altText_th ?? null,
-                        altText_en: img.altText_en ?? null,
-                        sortOrder: img.sortOrder ?? 0,
-                    };
-                }
-
-                return {
-                    id: img.id,
-                    preview: img.preview,
-                    altText_th: img.altText_th ?? null,
-                    altText_en: img.altText_en ?? null,
-                    sortOrder: img.sortOrder ?? 0,
-                };
-            })
-        );
-
-        const normalizedLinks = (data.links ?? []).map((link) => ({
-            id: link.id,
-            label_th: link.label_th,
-            label_en: link.label_en,
-            url: link.url,
-            sortOrder: link.sortOrder ?? 0,
-        }));
-
-        const payload = {
-            ...data,
-            status,
-            images: uploadedImages,
-            links: normalizedLinks,
-            receivedAt: formData.receivedAt
-                ? new Date(formData.receivedAt)
-                : null,
-        };
-
-        if (data.id) {
-            await fetch(`/api/admin/achievements/${data.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            console.log(payload);
-
-        } else {
-            await fetch(`/api/admin/achievements`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-        }
-    };
-
-
-    const handleInputChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const target = e.target;
-        const name = target.name;
-
-        let value: string | number | boolean = target.value;
-
-        if (target instanceof HTMLInputElement && target.type === 'checkbox') {
-            value = target.checked;
-        }
-
-        if (target instanceof HTMLInputElement && target.type === 'number') {
-            value = Number(target.value);
-        }
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-
-    const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const values = Array.from(e.target.selectedOptions, (opt) => opt.value);
-        setFormData((prev) => ({
-            ...prev,
-            categorySlugs: values,
-        }));
-    };
-
-    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files ?? []);
-        const newImages: ImagePreview[] = files.map((file, index) => ({
-            file,
-            preview: URL.createObjectURL(file),
-            altText_th: '',
-            altText_en: '',
-            sortOrder: imagePreview.length + index,
-        }));
-
-        setImagePreview((prev) => [...prev, ...newImages]);
-    };
-
-    const handleImageAltChange = (
-        index: number,
-        field: 'altText_th' | 'altText_en',
-        value: string
-    ) => {
-        setImagePreview((prev) => {
-            const updated = [...prev];
-            updated[index] = { ...updated[index], [field]: value };
-            return updated;
-        });
-    };
-
-    const handleRemoveImage = (index: number) => {
-        setImagePreview((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
-        setDraggedIndex(index);
-        e.dataTransfer.effectAllowed = 'move';
-    };
-
-    const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
-        e.preventDefault();
-        if (draggedIndex === null || draggedIndex === index) return;
-
-        const newImages = [...imagePreview];
-        const draggedItem = newImages[draggedIndex];
-        newImages.splice(draggedIndex, 1);
-        newImages.splice(index, 0, draggedItem);
-
-        setImagePreview(newImages);
-        setDraggedIndex(index);
-    };
-
-    const handleDragEnd = () => {
-        setDraggedIndex(null);
-        setImagePreview((prev) =>
-            prev.map((img, idx) => ({
-                ...img,
-                sortOrder: idx,
-            }))
-        );
-    };
 
     const handleLinkDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
         setDraggedLinkIndex(index);
@@ -317,7 +181,7 @@ const AchievementModalInner = ({
         setLinks(prev => prev.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const submitData: SubmitData = {
             ...formData,
             images: imagePreview.map((img, idx) => ({
@@ -331,14 +195,89 @@ const AchievementModalInner = ({
             id: editData?.id,
         };
 
+        if (!validateForm()) {
+            const firstError = document.querySelector('.error-field');
+            firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
 
-        void handleAchievementSubmit(submitData);
-        // close();
+        const { id: achievementId } = editData ?? {};
+
+        const uploadedImages = await Promise.all(
+            (submitData.images ?? []).map(async (img) => {
+                if (img.file instanceof File) {
+                    const { fileName } = await uploadAchievementImage(
+                        img.file,
+                        achievementId ?? null
+                    );
+                    return {
+                        id: img.id,
+                        preview: fileName,
+                        altText_th: img.altText_th ?? null,
+                        altText_en: img.altText_en ?? null,
+                        sortOrder: img.sortOrder ?? 0,
+                    };
+                }
+
+                return {
+                    id: img.id,
+                    preview: img.preview,
+                    altText_th: img.altText_th ?? null,
+                    altText_en: img.altText_en ?? null,
+                    sortOrder: img.sortOrder ?? 0,
+                };
+            })
+        );
+
+        const normalizedLinks = (submitData.links ?? []).map((link) => ({
+            id: link.id,
+            label_th: link.label_th,
+            label_en: link.label_en,
+            url: link.url,
+            sortOrder: link.sortOrder ?? 0,
+        }));
+
+        const status = submitData.isPublished ? 'PUBLIC' : 'DRAFT';
+
+        const payload = {
+            ...submitData,
+            status,
+            images: uploadedImages,
+            links: normalizedLinks,
+            receivedAt: formData.receivedAt
+                ? new Date(formData.receivedAt)
+                : null,
+        };
+
+        if (submitData.id) {
+            await fetch(`/api/admin/achievements/${submitData.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+        } else {
+            await fetch(`/api/admin/achievements`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+        }
+
+        close();
     };
 
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="bg-white dark:bg-[#282c33] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-sm" onClick={close}
+            style={{
+                animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
+            }}>
+            <div
+                style={{
+                    animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white dark:bg-[#282c33] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="sticky top-0 bg-white dark:bg-[#282c33] border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -355,34 +294,32 @@ const AchievementModalInner = ({
                 {/* Body */}
                 <div className="p-6 space-y-6">
                     {/* ชื่อ (ไทย) */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            ชื่อผลงาน (ไทย) <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="title_th"
-                            value={formData.title_th}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            placeholder="ระบบจัดการคลังสินค้า"
-                        />
-                    </div>
+                    <AchievementTextField
+                        label="ชื่อผลงาน (ไทย)"
+                        name="title_th"
+                        value={formData.title_th}
+                        onChange={handleInputChange}
+                        onBlur={() => handleBlur('title_th')}
+                        placeholder="เช่น ระบบจัดการคลังสินค้าอัจฉริยะ"
+                        required
+                        size="lg"
+                        error={errors.title_th}
+                        touched={touched.title_th}
+                    />
 
                     {/* ชื่อ (EN) */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            ชื่อผลงาน (English) <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="title_en"
-                            value={formData.title_en}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                            placeholder="Inventory Management System"
-                        />
-                    </div>
+                    <AchievementTextField
+                        label="ชื่อผลงาน (English)"
+                        name="title_en"
+                        value={formData.title_en}
+                        onChange={handleInputChange}
+                        onBlur={() => handleBlur('title_en')}
+                        placeholder="Inventory Management System"
+                        required
+                        size="md"
+                        error={errors.title_en}
+                        touched={touched.title_en}
+                    />
 
                     {/* รายละเอียด (ไทย) */}
                     <div>
@@ -417,32 +354,26 @@ const AchievementModalInner = ({
                     {/* ระดับรางวัล */}
                     <div className="flex gap-2">
                         {/* ระดับรางวัล (TH) */}
-                        <div className='w-full md:w-1/2'>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                ระดับรางวัล (ไทย)
-                            </label>
-                            <input
-                                type="text"
+                        <div className="w-full md:w-1/2">
+                            <AchievementTextField
+                                label="ระดับรางวัล (ไทย)"
                                 name="awardLevel_th"
                                 value={formData.awardLevel_th}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                 placeholder="ประเทศ | จังหวัด | เขต"
+                                size="md"
                             />
                         </div>
 
                         {/* ระดับรางวัล (EN) */}
-                        <div className='w-full md:w-1/2'>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                ระดับรางวัล (English) <span className="text-red-500"></span>
-                            </label>
-                            <input
-                                type="text"
+                        <div className="w-full md:w-1/2">
+                            <AchievementTextField
+                                label="ระดับรางวัล (English)"
                                 name="awardLevel_en"
                                 value={formData.awardLevel_en}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                 placeholder="Country | Province | District"
+                                size="md"
                             />
                         </div>
                     </div>
@@ -450,32 +381,26 @@ const AchievementModalInner = ({
                     {/* สถานที่ */}
                     <div className="flex gap-2">
                         {/* สถานที่ (TH) */}
-                        <div className='w-full md:w-1/2'>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                สถานที่ (ไทย) <span className="text-red-500"></span>
-                            </label>
-                            <input
-                                type="text"
+                        <div className="w-full md:w-1/2">
+                            <AchievementTextField
+                                label="สถานที่ (ไทย)"
                                 name="location_th"
                                 value={formData.location_th}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                 placeholder="สถานที่"
+                                size="md"
                             />
                         </div>
 
                         {/* สถานที่ (EN) */}
-                        <div className='w-full md:w-1/2'>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                สถานที่ (English) <span className="text-red-500"></span>
-                            </label>
-                            <input
-                                type="text"
+                        <div className="w-full md:w-1/2">
+                            <AchievementTextField
+                                label="สถานที่ (English)"
                                 name="location_en"
                                 value={formData.location_en}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                 placeholder="Location"
+                                size="md"
                             />
                         </div>
                     </div>
@@ -497,7 +422,7 @@ const AchievementModalInner = ({
 
                     {/* หมวดหมู่ + Sort order */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                        <div className={errors.categorySlugs && touched.categorySlugs ? 'error-field' : ''}>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 หมวดหมู่ <span className="text-red-500">*</span>
                                 <span className="ml-1 text-xs text-gray-500">
@@ -510,7 +435,11 @@ const AchievementModalInner = ({
                                 name="categorySlugs"
                                 value={formData.categorySlugs}
                                 onChange={handleCategoryChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                onBlur={() => handleBlur('categorySlugs')}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white ${errors.categorySlugs && touched.categorySlugs
+                                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
+                                    : 'border-gray-300 dark:border-gray-600'
+                                    }`}
                             >
                                 {categories.map((cat) => (
                                     <option key={cat.id} value={cat.slug}>
@@ -522,8 +451,16 @@ const AchievementModalInner = ({
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                 กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายหมวดหมู่
                             </p>
+
+                            {errors.categorySlugs && touched.categorySlugs && (
+                                <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
+                                    <AlertCircle size={16} />
+                                    <span>{errors.categorySlugs}</span>
+                                </div>
+                            )}
                         </div>
 
+                        {/* อีกฝั่งคือ sortOrder ตามเดิม */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 ลำดับการแสดงผล
@@ -539,6 +476,7 @@ const AchievementModalInner = ({
                         </div>
                     </div>
 
+
                     {/* สถานะเผยแพร่ */}
                     <div className="flex items-center">
                         <input
@@ -552,181 +490,27 @@ const AchievementModalInner = ({
                             เผยแพร่ผลงานนี้
                         </label>
                     </div>
-                    <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                ลิงก์ที่เกี่ยวข้อง
-                            </label>
-                            <button
-                                type="button"
-                                onClick={addLink}
-                                className="text-sm px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                                + เพิ่มลิงก์
-                            </button>
-                        </div>
+                    <AchievementLinksSection
+                        links={links}
+                        draggedLinkIndex={draggedLinkIndex}
+                        addLink={addLink}
+                        removeLink={removeLink}
+                        handleLinkChange={handleLinkChange}
+                        handleLinkDragStart={handleLinkDragStart}
+                        handleLinkDragOver={handleLinkDragOver}
+                        handleLinkDragEnd={handleLinkDragEnd}
+                    />
 
-                        {links.length === 0 ? (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                ยังไม่มีลิงก์ที่เกี่ยวข้อง กดปุ่ม &quot;เพิ่มลิงก์&quot; เพื่อเพิ่ม
-                            </p>
-                        ) : (
-                            <div className="space-y-3">
-                                {links.map((link, index) => (
-                                    <div
-                                        key={`${link.id ?? 'new'}-${index}`}
-                                        draggable
-                                        onDragStart={(e) => handleLinkDragStart(e, index)}
-                                        onDragOver={(e) => handleLinkDragOver(e, index)}
-                                        onDragEnd={handleLinkDragEnd}
-                                        className={`p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2 ${draggedLinkIndex === index
-                                            ? 'border-blue-500'
-                                            : 'border-gray-200 dark:border-gray-700'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                                <GripVertical className="text-gray-400" size={14} />
-                                                ลิงก์ที่ {index + 1}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLink(index)}
-                                                className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1"
-                                            >
-                                                <Trash2 size={14} />
-                                                ลบลิงก์นี้
-                                            </button>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="ชื่อปุ่ม (ไทย)"
-                                                value={link.label_th}
-                                                onChange={(e) =>
-                                                    handleLinkChange(index, 'label_th', e.target.value)
-                                                }
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder="ชื่อปุ่ม (English)"
-                                                value={link.label_en}
-                                                onChange={(e) =>
-                                                    handleLinkChange(index, 'label_en', e.target.value)
-                                                }
-                                                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                            />
-                                        </div>
-
-                                        <input
-                                            type="text"
-                                            placeholder="URL (เช่น https://...)"
-                                            value={link.url}
-                                            onChange={(e) =>
-                                                handleLinkChange(index, 'url', e.target.value)
-                                            }
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    {/* ส่วนจัดการรูปภาพ */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            รูปภาพ (ลากเพื่อเรียงลำดับ)
-                        </label>
-                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={handleImageUpload}
-                                className="hidden"
-                                id="image-upload"
-                            />
-                            <label
-                                htmlFor="image-upload"
-                                className="flex flex-col items-center justify-center cursor-pointer py-4"
-                            >
-                                <Plus size={32} className="text-gray-400 mb-2" />
-                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                    คลิกเพื่อเลือกรูปภาพ (สามารถเลือกได้หลายรูป)
-                                </span>
-                            </label>
-                        </div>
-
-                        {imagePreview.length > 0 && (
-                            <div className="mt-4 space-y-3">
-                                {imagePreview.map((img, index) => (
-                                    <div
-                                        key={index}
-                                        draggable
-                                        onDragStart={(e) => handleDragStart(e, index)}
-                                        onDragOver={(e) => handleDragOver(e, index)}
-                                        onDragEnd={handleDragEnd}
-                                        className={`flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border ${draggedIndex === index
-                                            ? 'border-blue-500'
-                                            : 'border-gray-200 dark:border-gray-700'
-                                            } cursor-move`}
-                                    >
-                                        <GripVertical
-                                            size={20}
-                                            className="text-gray-400 mt-2 shrink-0"
-                                        />
-                                        <Image
-                                            src={img.preview}
-                                            alt={img.altText_th || img.altText_en}
-                                            className="w-24 h-24 object-cover rounded shrink-0"
-                                            width={96}
-                                            height={96}
-                                        />
-                                        <div className="flex-1 space-y-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Alt text (ไทย)"
-                                                value={img.altText_th}
-                                                onChange={(e) =>
-                                                    handleImageAltChange(
-                                                        index,
-                                                        'altText_th',
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder="Alt text (English)"
-                                                value={img.altText_en}
-                                                onChange={(e) =>
-                                                    handleImageAltChange(
-                                                        index,
-                                                        'altText_en',
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
-                                            />
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                ลำดับ: {index + 1}
-                                            </div>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveImage(index)}
-                                            className="text-red-500 hover:text-red-700 shrink-0"
-                                        >
-                                            <Trash2 size={20} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <AchievementImagesSection
+                        imagePreview={imagePreview}
+                        draggedIndex={draggedIndex}
+                        handleImageUpload={handleImageUpload}
+                        handleImageAltChange={handleImageAltChange}
+                        handleRemoveImage={handleRemoveImage}
+                        handleDragStart={handleDragStart}
+                        handleDragOver={handleDragOver}
+                        handleDragEnd={handleDragEnd}
+                    />
 
                     {/* Footer Buttons */}
                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">

@@ -14,7 +14,7 @@ export type AchievementLink = {
     label_th: string;
     label_en: string;
     url: string;
-    sortOrder: number
+    sortOrder: number;
     createdAt: Date;
     updatedAt: Date;
 };
@@ -69,6 +69,7 @@ export type EditData = Partial<Achievement> & { id: string };
 
 export type AchievementModalContextType = {
     isOpen: boolean;
+    isAnimating: boolean; 
     editData: EditData | null;
     open: (data?: EditData) => void;
     close: () => void;
