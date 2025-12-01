@@ -57,7 +57,7 @@ const AchievementModalInner = ({
         editData?.receivedAt instanceof Date
             ? editData.receivedAt.toISOString().slice(0, 10) // -> "2025-12-01"
             : editData?.receivedAt ?? "";
-            
+
     const [formData, setFormData] = useState<FormState>(() => ({
         title_th: editData?.title_th ?? '',
         title_en: editData?.title_en ?? '',
@@ -206,20 +206,6 @@ const AchievementModalInner = ({
     };
 
     const handleSubmit = async () => {
-        const submitData: SubmitData = {
-            ...formData,
-            images: imagePreview.map((img, idx) => ({
-                ...img,
-                sortOrder: idx,
-            })),
-            links: links.map((link, idx) => ({
-                ...link,
-                sortOrder: idx,
-            })),
-            status: formData.isPublished ? 'PUBLIC' : 'DRAFT',
-            id: editData?.id,
-        };
-
         if (!validateForm()) {
             toast.error("กรุณากรอกข้อมูลให้ครบถ้วน");
 
@@ -229,69 +215,72 @@ const AchievementModalInner = ({
             return;
         }
 
-        const { id: achievementId } = editData ?? {};
-
-        const uploadedImages = await Promise.all(
-            (submitData.images ?? []).map(async (img) => {
-                if (img.file instanceof File) {
-                    const { fileName } = await uploadAchievementImage(
-                        img.file,
-                        achievementId ?? null
-                    );
-                    return {
-                        id: img.id,
-                        preview: fileName,
-                        altText_th: img.altText_th ?? null,
-                        altText_en: img.altText_en ?? null,
-                        sortOrder: img.sortOrder ?? 0,
-                    };
-                }
-
-                return {
-                    id: img.id,
-                    preview: img.preview,
-                    altText_th: img.altText_th ?? null,
-                    altText_en: img.altText_en ?? null,
-                    sortOrder: img.sortOrder ?? 0,
-                };
-            })
-        );
-
-        const normalizedLinks = (submitData.links ?? []).map((link) => ({
-            id: link.id,
-            label_th: link.label_th,
-            label_en: link.label_en,
-            url: link.url,
-            sortOrder: link.sortOrder ?? 0,
+        // เตรียม links ให้มี sortOrder ที่แน่นอน
+        const normalizedLinks = links.map((link, idx) => ({
+            ...link,
+            sortOrder: idx,
         }));
 
+        // id เริ่มต้น (ถ้าเป็น edit mode)
+        let achievementId: string | null = editData?.id ?? null;
 
-        const payload: SubmitData = {
-            ...submitData,
-            images: uploadedImages,
+        // payload พื้นฐาน (ยังไม่ใส่ images)
+        const basePayload: SubmitData = {
+            ...formData,
+            images: [], // จะ override ทีหลัง
             links: normalizedLinks,
+            status: formData.isPublished ? 'PUBLIC' : 'DRAFT',
+            id: achievementId ?? undefined,
             receivedAt: formData.receivedAt
                 ? new Date(formData.receivedAt).toISOString()
                 : undefined,
         };
 
-
         try {
-            if (submitData.id) {
-                await updateAchievement(submitData.id, payload);
-                toast.success('แก้ไขผลงานเรียบร้อย');
-            } else {
-                await createAchievement(payload);
-                toast.success('เพิ่มผลงานเรียบร้อย');
+            if (!achievementId) {
+                const created = await createAchievement(basePayload);
+                achievementId = created.id;
             }
+
+            const uploadedImages: ImagePreview[] = await Promise.all(
+                imagePreview.map(async (img, idx) => {
+                    if (img.file instanceof File && achievementId) {
+                        const { url } = await uploadAchievementImage(
+                            img.file,
+                            achievementId
+                        );
+
+                        return {
+                            ...img,
+                            preview: url,  
+                            sortOrder: idx,
+                        };
+                    }
+
+                    return {
+                        ...img,
+                        sortOrder: idx,
+                    };
+                })
+            );
+
+            const finalPayload: SubmitData = {
+                ...basePayload,
+                id: achievementId ?? undefined,
+                images: uploadedImages,
+            };
+
+            await updateAchievement(achievementId!, finalPayload);
+
+            toast.success(editData ? 'แก้ไขผลงานเรียบร้อย' : 'เพิ่มผลงานเรียบร้อย');
+            router.refresh();
+            close();
         } catch (error) {
             console.error(error);
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
         }
-
-        router.refresh();
-        close();
     };
+
 
 
     return (
