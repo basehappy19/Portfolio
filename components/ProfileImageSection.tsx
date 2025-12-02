@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 const ProfileImageSection = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(1);
-    const totalImages = 5;
+    const totalImages = 3;
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -22,12 +22,11 @@ const ProfileImageSection = () => {
                     <Image
                         fill
                         className="w-full h-full object-cover transition-all duration-700 ease-in-out transform group-hover:scale-105"
-                        src={`/profiles/${currentImageIndex}.png`}
+                        src={`/profiles/${currentImageIndex}.jpg`}
                         alt="profile"
                         key={currentImageIndex}
                     />
                 </div>
-                {/* Decorative Elements */}
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-red-400/10 rounded-full blur-2xl transition-all duration-700"></div>
                 <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-400/10 rounded-full blur-2xl transition-all duration-700"></div>
             </div>
