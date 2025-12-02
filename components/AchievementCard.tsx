@@ -219,7 +219,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                             key={currentImageIndex}
                                         />
 
-                                        {/* linear Overlays for Better Button Visibility */}
                                         <div className="absolute inset-0 bg-linear-to-r from-black/10 via-transparent to-black/10 pointer-events-none" />
 
                                         {/* Navigation Buttons */}
