@@ -15,9 +15,16 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Home, Award, Filter } from 'lucide-react';
 
+
 export default async function AdminPage(props: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    })
+    if (!session) {
+        redirect("/");
+    }
     const searchParams = await props.searchParams;
     const categorySlug = typeof searchParams.category === "string"
         ? searchParams.category
@@ -113,14 +120,7 @@ export default async function AdminPage(props: {
 
     const ACHIEVEMENTS_BASE =
         process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    })
-    if (!session) {
-        redirect("/");
-    }
-
-    // Calculate statistics
+    
     const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
     const draftCount = achievements.filter(a => a.status === 'DRAFT').length;
     const totalImages = achievements.reduce((sum, a) => sum + a.images.length, 0);
