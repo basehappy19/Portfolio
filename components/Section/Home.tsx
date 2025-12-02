@@ -18,17 +18,17 @@ const Home = async () => {
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-8 animate-fade-in">
                             <Sparkles className="w-4 h-4 text-yellow-300" />
-                            <span className="text-sm text-white/90 font-medium">{t("Home.Welcome")}
+                            <span className="text-sm md:text-xl text-white/90 font-medium">{t("Home.Welcome")}
                             </span>
                         </div>
 
                         {/* Greeting */}
-                        <h2 className="text-xl md:text-2xl text-red-300 mb-4 font-light">
+                        <h2 className="text-xl md:text-6xl text-red-300 mb-4 font-light">
                             {t("Home.Greeting")}
                         </h2>
 
                         {/* Name */}
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 bg-linear-to-r from-white via-orange-200 to-red-200 bg-clip-text text-transparent">
+                        <h1 className="text-3xl md:text-7xl lg:text-8xl font-bold mb-6 bg-linear-to-r from-white via-orange-200 to-red-200 bg-clip-text text-transparent">
                             {t("Home.Name")}
                         </h1>
 
@@ -36,8 +36,12 @@ const Home = async () => {
                         <AnimatedRole roles={roles} />
 
                         {/* Description */}
-                        <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12 leading-relaxed">
+                        <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
                             {t("Home.Description")}
+                        </p>
+
+                        <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12 leading-relaxed">
+                            {t("Home.Description_2")}
                         </p>
 
                         {/* CTA Buttons */}

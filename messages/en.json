@@ -4,7 +4,8 @@
             "Welcome": "Welcome To My Portfolio",
             "Greeting": "Hi, I'm",
             "Name": "Pakpoom Teedindam",
-            "Description": "\"Just Want To See Society Improve\"",
+            "Description": "\"I want to use my skills and knowledge to make this society better.\"",
+            "Description_2": "\"This website is a collection of my work in pursuing higher education.\"",
             "Roles": ["Full Stack Developer", "Student", "Innovator"],
             "Buttons": {
                 "ViewAchievements": "Achievements",
