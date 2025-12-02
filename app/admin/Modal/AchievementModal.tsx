@@ -221,19 +221,16 @@ const AchievementModalInner = ({
             return;
         }
 
-        // เตรียม links ให้มี sortOrder ที่แน่นอน
         const normalizedLinks = links.map((link, idx) => ({
             ...link,
             sortOrder: idx,
         }));
 
-        // id เริ่มต้น (ถ้าเป็น edit mode)
         let achievementId: string | null = editData?.id ?? null;
 
-        // payload พื้นฐาน (ยังไม่ใส่ images)
         const basePayload: SubmitData = {
             ...formData,
-            images: [], // จะ override ทีหลัง
+            images: [],
             links: normalizedLinks,
             status: formData.isPublished ? 'PUBLIC' : 'DRAFT',
             id: achievementId ?? undefined,

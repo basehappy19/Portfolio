@@ -20,13 +20,17 @@ export const useAchievementTextTranslation = ({
 }: Props) => {
     const isEditMode = !!editData;
 
+    // ใช้ track การแปลของแต่ละฟิลด์
     const [translating, setTranslating] = useState<
         Partial<Record<keyof FormState, boolean>>
     >({});
+
+    // ใช้ป้องกันแปลซ้ำถ้าข้อความเดียวกัน
     const [lastTranslatedSource, setLastTranslatedSource] = useState<
         Partial<Record<keyof FormState, string>>
     >({});
 
+    // debounce แยก field
     const translateTimers = useRef<Partial<Record<keyof FormState, number>>>(
         {}
     );
@@ -46,40 +50,54 @@ export const useAchievementTextTranslation = ({
         );
     };
 
+    /** 🔥 translate เพียงฟิลด์เดียว — independent — แปลพร้อมกันได้ */
     const translateField = async (
         source: keyof FormState,
-        target: keyof FormState
+        target: keyof FormState,
+        value: string
     ) => {
-        const text = formData[source];
-        if (!text) return;
-
         try {
+            setTranslating((prev) => ({
+                ...prev,
+                [source]: true,
+            }));
+
             const res = await fetch("/api/translate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text }),
+                body: JSON.stringify({ text: value }),
             });
 
-            if (!res.ok) return;
+            if (!res.ok) throw new Error("Translate failed");
 
             const data = await res.json();
+            const translated = data.translated || "";
 
             setFormData((prev) => ({
                 ...prev,
-                [target]: data.translated || "",
+                [target]: translated,
+            }));
+
+            setLastTranslatedSource((prev) => ({
+                ...prev,
+                [source]: value,
             }));
         } catch (e) {
-            console.error("translate error", e);
+            console.error("translate error:", e);
+        } finally {
+            setTranslating((prev) => ({
+                ...prev,
+                [source]: false,
+            }));
         }
     };
 
+    /** 🔥 blur แต่ละฟิลด์ → debounce → translate (ไม่ต้องรอฟิลด์อื่น) */
     const handleThaiBlur = (field: keyof FormState) => {
-        // validate ตามเดิม
         if (isTouchedKey(field)) {
             handleBlur(field);
         }
 
-        // โหมดแก้ไข ไม่ต้องแปล
         if (isEditMode) return;
 
         const pair = FIELD_PAIRS.find((p) => p.th === field);
@@ -88,34 +106,21 @@ export const useAchievementTextTranslation = ({
         const sourceKey = pair.th;
         const targetKey = pair.en;
 
-        const currentSource = formData[sourceKey];
-        if (!currentSource) return;
+        const raw = formData[sourceKey];
 
-        if (lastTranslatedSource[sourceKey] === currentSource) return;
+        if (typeof raw !== "string" || !raw.trim()) return;
 
-        // clear timer เดิม
+        const value = raw;
+
+        if (lastTranslatedSource[sourceKey] === value) return;
+
         if (translateTimers.current[field]) {
             clearTimeout(translateTimers.current[field]!);
         }
 
-        translateTimers.current[field] = window.setTimeout(async () => {
-            setTranslating((prev) => ({
-                ...prev,
-                [sourceKey]: true,
-            }));
-
-            await translateField(sourceKey, targetKey);
-
-            setLastTranslatedSource((prev) => ({
-                ...prev,
-                [sourceKey]: currentSource,
-            }));
-
-            setTranslating((prev) => ({
-                ...prev,
-                [sourceKey]: false,
-            }));
-        }, 700);
+        translateTimers.current[field] = window.setTimeout(() => {
+            translateField(sourceKey, targetKey, value);
+        }, 250);
     };
 
     return {
