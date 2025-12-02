@@ -208,11 +208,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     {/* Main Image */}
                                     <div className="relative h-[500px] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                                         <Image
-                                            src={
-                                                achievement.images?.[currentImageIndex]?.url
-                                                    ? `${ACHIEVEMENTS_BASE}/${achievement.id}/${achievement.images[currentImageIndex].url}`
-                                                    : "/images/default-achievement.jpg"
-                                            }
+                                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${achievement.images[currentImageIndex].url}`}
                                             alt={tField(
                                                 achievement.images[currentImageIndex].altText_th,
                                                 achievement.images[currentImageIndex].altText_en,
@@ -259,16 +255,12 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                         key={index}
                                                         onClick={() => setCurrentImageIndex(index)}
                                                         className={`cursor-pointer relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
-                                                            ? 'border-red-500 ring-2 ring-red-200 dark:ring-red-800 scale-105'
-                                                            : 'border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 hover:scale-105'
+                                                                ? 'border-red-500 ring-2 ring-red-200 dark:ring-red-800 scale-105'
+                                                                : 'border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 hover:scale-105'
                                                             }`}
                                                     >
                                                         <Image
-                                                            src={
-                                                                image?.url
-                                                                    ? `${ACHIEVEMENTS_BASE}/${achievement.id}/${image.url}`
-                                                                    : "/images/default-achievement.jpg"
-                                                            }
+                                                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${image.url}`}
                                                             alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
                                                             fill
                                                             className="object-cover"
