@@ -27,10 +27,9 @@ const About = async () => {
         (messages as unknown as AboutMessages).Index.About.data.statuses;
 
     return (
-        <section
-            id='About'
+        <div
             className="
-                min-h-screen w-full px-4 md:px-8 lg:px-16
+                min-h-screen w-full
                 text-gray-900
                 dark:text-white
             "
@@ -70,7 +69,7 @@ const About = async () => {
                             key={index}
                             className="
                                 flex flex-col items-center justify-center text-center p-6 rounded-xl
-                                bg-white/80
+                                bg-white
                                 dark:bg-transparent border border-gray-200
                                 hover:border-red-400/40
                                 shadow-sm
@@ -89,7 +88,7 @@ const About = async () => {
                     ))}
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

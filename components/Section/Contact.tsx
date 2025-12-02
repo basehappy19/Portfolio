@@ -39,13 +39,12 @@ const Contact = async () => {
     }>;
 
     return (
-        <section
+        <div
             className="
-                md:min-h-screen w-full px-4 md:px-8 lg:px-16
+                md:min-h-screen w-full
                 text-gray-900
                 dark:text-white
             "
-            id='Contact'
         >
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Header */}
@@ -84,7 +83,7 @@ const Contact = async () => {
                                     key={index}
                                     className="
                                         group rounded-2xl p-6 transition-all duration-300
-                                        bg-gray-50 border border-gray-200
+                                        bg-white border border-gray-200
                                         hover:bg-gray-100
 
                                         dark:bg-white/5 dark:border-white/10
@@ -164,7 +163,7 @@ const Contact = async () => {
                     <FormContact />
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

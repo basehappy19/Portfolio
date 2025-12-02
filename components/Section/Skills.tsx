@@ -28,9 +28,8 @@ const Skills = async () => {
 
     return (
         <section
-            id='Skills'
             className="
-                min-h-screen w-full px-4 md:px-8 lg:px-16 py-16
+                min-h-screen w-full
                 text-gray-900
                 dark:text-white
             "
@@ -45,9 +44,8 @@ const Skills = async () => {
                             key={i}
                             className="
                                 rounded-xl p-6 md:p-8 transition-all duration-300
-                                bg-gray-50 border border-gray-200
+                                bg-white border border-gray-200
                                 hover:border-red-400/60 hover:shadow-2xl hover:shadow-red-500/15
-
                                 dark:bg-white/5 dark:backdrop-blur-lg
                                 dark:border-white/10 dark:hover:border-red-400/50
                                 dark:hover:shadow-2xl dark:hover:shadow-red-500/20

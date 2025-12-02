@@ -11,9 +11,8 @@ const Home = async () => {
 
     return (
         <section
-            id='Home'
             className="
-                min-h-screen w-full px-4 md:px-8 lg:px-16 md:pt-8 relative
+                min-h-screen w-full relative
             "
         >
             <div className="max-w-7xl mx-auto relative z-10">

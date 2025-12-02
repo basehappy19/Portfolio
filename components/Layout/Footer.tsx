@@ -16,7 +16,7 @@ export default async function Footer() {
         <footer
             className="
                 relative
-                bg-gray-100 text-gray-900
+                bg-white text-gray-900
                 dark:bg-gray-900 dark:text-white
             "
         >

@@ -84,7 +84,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-
 export default async function IndexPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
@@ -95,21 +94,52 @@ export default async function IndexPage(props: {
 
   return (
     <>
-      <div className="flex min-h-screen items-center justify-center bg-[#ffdada] dark:bg-[#282c33]">
-        <main className="flex w-full max-w-2xl md:max-w-6xl flex-col items-center justify-between py-8 md:px-0 bg-[#ffdada] dark:bg-[#282c33] sm:items-start space-y-16">
-          {/* <ThemeSwitch /> */}
-          <div className='md:hidden block m-0'>
-            <LanguageSwitcher />
+      {/* GLOBAL BACKGROUND */}
+      <div className="min-h-screen font-sans bg-rose-50 dark:bg-[#181b22]">
+
+        {/* SECTION 1 */}
+        <section id='Home' className="w-full bg-rose-50 dark:bg-[#20232b]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 md:pt-8">
+            <div className="md:hidden block mb-4">
+              <LanguageSwitcher />
+            </div>
+            <Home />
+            <Navbar />
           </div>
-          <Home />
-          <Navbar />
-          <About />
-          <Skills />
-          <Achievement slug={categorySlug} />
-          <Contact />
-        </main>
+        </section>
+
+        {/* SECTION 2 */}
+        <section id='About' className="w-full bg-white dark:bg-[#181b22]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+            <About />
+          </div>
+        </section>
+
+        {/* SECTION 3 */}
+        <section id='Skills' className="w-full bg-slate-50 dark:bg-[#20232b]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+            <Skills />
+          </div>
+        </section>
+
+        {/* SECTION 4 */}
+        <section id="Achievements" className="w-full bg-white dark:bg-[#181b22]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+            <Achievement slug={categorySlug} />
+          </div>
+        </section>
+
+        {/* SECTION 5 */}
+        <section id='Contact' className="w-full bg-slate-50 dark:bg-[#20232b]">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
+            <Contact />
+          </div>
+        </section>
+
       </div>
+
       <Footer />
     </>
   );
 }
+

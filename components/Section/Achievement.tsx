@@ -10,9 +10,8 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
     const t = await getTranslations("Index");
 
     return (
-        <section
-            className="min-h-screen w-full px-4 md:px-8 lg:px-16 py-16"
-            id="Achievements"
+        <div
+            className="min-h-screen w-full"
         >
             <div className="max-w-6xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
@@ -24,7 +23,7 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                     </Suspense>
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 
