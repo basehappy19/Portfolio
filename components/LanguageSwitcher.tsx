@@ -13,31 +13,56 @@ const LanguageSwitcher = () => {
     const query = queryString ? `?${queryString}` : "";
 
     const pathWithoutLocale = pathname.replace(/^\/(th|en)(?=\/|$)/, "");
-
     const normalizedPath = pathWithoutLocale === "" ? "/" : pathWithoutLocale;
 
     return (
-        <div className="inline-flex items-center rounded-full bg-white/10 p-1 border border-white/15">
+        <div
+            className="
+                inline-flex items-center rounded-full border p-1 transition
+                bg-gray-200/60 border-gray-400/40
+                dark:bg-white/10 dark:border-white/15
+            "
+        >
+            {/* TH Button */}
             <Link
                 href={`${normalizedPath}${query}`}
                 locale="th"
                 scroll={false}
-                className={`px-3 py-1 text-xs font-medium rounded-full transition ${locale === "th"
-                        ? "bg-white text-black"
-                        : "text-gray-300 hover:text-white"
-                    }`}
+                className={`
+                    px-3 py-1 text-xs font-medium rounded-full transition
+                    ${locale === "th"
+                        ? `
+                            bg-gray-900 text-white
+                            dark:bg-white dark:text-black
+                          `
+                        : `
+                            text-gray-700 hover:text-black
+                            dark:text-gray-300 dark:hover:text-white
+                          `
+                    }
+                `}
             >
                 ไทย
             </Link>
 
+            {/* EN Button */}
             <Link
                 href={`${normalizedPath}${query}`}
                 locale="en"
                 scroll={false}
-                className={`px-3 py-1 text-xs font-medium rounded-full transition ${locale === "en"
-                        ? "bg-white text-black"
-                        : "text-gray-300 hover:text-white"
-                    }`}
+                className={`
+                    px-3 py-1 text-xs font-medium rounded-full transition
+                    ${locale === "en"
+                        ? `
+                            bg-gray-900 text-white
+                            dark:bg-white dark:text-black
+                          `
+                        : `
+                            text-gray-700 hover:text-black
+                            dark:text-gray-300 dark:hover:text-white
+                          `
+                    }
+                `}
             >
                 EN
             </Link>

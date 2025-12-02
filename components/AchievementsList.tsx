@@ -29,8 +29,23 @@ export default async function AchievementsList({
 
     if (!achievements || achievements.length === 0) {
         return (
-            <div className="col-span-full flex flex-col items-center justify-center p-12 bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 text-center">
-                <div className="w-20 h-20 mb-6 text-white/20">
+            <div
+                className="
+                col-span-full flex flex-col items-center justify-center p-12 rounded-xl text-center
+                transition-all
+
+                bg-gray-100 border border-gray-300
+                text-gray-700
+                dark:bg-white/5 dark:border-white/10 dark:text-white
+                dark:backdrop-blur-lg
+            "
+            >
+                {/* Icon */}
+                <div className="
+                w-20 h-20 mb-6
+                text-gray-400
+                dark:text-white/20
+            ">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -43,16 +58,27 @@ export default async function AchievementsList({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             d="M9 12h3.75M9 15h3.75M9 9h3.75m3 6.75H18a2.25 2.25 0 002.25-2.25V6.108
-                               c0-.393-.154-.77-.427-1.05l-2.672-2.708A1.5 1.5 0 0015.879 2.25H6A2.25 
-                               2.25 0 003.75 4.5v12A2.25 2.25 0 006 18.75h9"
+                           c0-.393-.154-.77-.427-1.05l-2.672-2.708A1.5 1.5 0 0015.879 2.25H6A2.25 
+                           2.25 0 003.75 4.5v12A2.25 2.25 0 006 18.75h9"
                         />
                     </svg>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-2">
+                {/* Title */}
+                <h3 className="
+                text-xl font-bold mb-2
+                text-gray-900
+                dark:text-white
+            ">
                     {t("Achievement.NoItemsTitle")}
                 </h3>
-                <p className="text-white/50 text-sm">
+
+                {/* Description */}
+                <p className="
+                text-sm
+                text-gray-500
+                dark:text-white/50
+            ">
                     {t("Achievement.NoItemsDescription")}
                 </p>
             </div>

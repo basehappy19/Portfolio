@@ -15,7 +15,7 @@ const AnimatedRole = ({ roles }: { roles: string[] }) => {
 
     return (
         <div className="h-16 md:h-20">
-            <p className="text-2xl md:text-4xl text-white/80 font-medium transition-all duration-500">
+            <p className="text-red-500 text-2xl md:text-4xl dark:text-white/80 font-medium transition-all duration-500">
                 {roles[currentRole]}
             </p>
             <style jsx>{`

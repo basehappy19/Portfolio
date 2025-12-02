@@ -32,7 +32,11 @@ const FormContact = () => {
             setFormData({ name: '', email: '', message: '' });
         } catch (error) {
             console.error(error);
-            toast.success(isThai ? 'ส่งข้อความไม่สำเร็จ ลองใหม่อีกครั้ง' : 'Failed to send message, please try again.');
+            toast.success(
+                isThai
+                    ? 'ส่งข้อความไม่สำเร็จ ลองใหม่อีกครั้ง'
+                    : 'Failed to send message, please try again.'
+            );
         }
     };
 
@@ -46,14 +50,20 @@ const FormContact = () => {
     };
 
     return (
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">
+        <div
+            className="
+                rounded-2xl p-8
+                bg-white border border-gray-200 shadow-sm
+                dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-md
+            "
+        >
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
                 {isThai ? 'ส่งข้อความถึงผม' : 'Send Me A Message'}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
                         {isThai ? 'ชื่อของคุณ' : 'Your Name'}
                     </label>
                     <input
@@ -61,13 +71,21 @@ const FormContact = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                        className="
+                            w-full px-4 py-3 rounded-xl transition-all
+                            bg-white border border-gray-300
+                            text-gray-900 placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+
+                            dark:bg-white/10 dark:border-white/20
+                            dark:text-white dark:placeholder-white/40
+                        "
                         placeholder={isThai ? 'ใส่ชื่อของคุณ' : 'Enter Your Name'}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
                         {isThai ? 'อีเมล' : 'Email'}
                     </label>
                     <input
@@ -75,13 +93,21 @@ const FormContact = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                        className="
+                            w-full px-4 py-3 rounded-xl transition-all
+                            bg-white border border-gray-300
+                            text-gray-900 placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+
+                            dark:bg-white/10 dark:border-white/20
+                            dark:text-white dark:placeholder-white/40
+                        "
                         placeholder="your.email@example.com"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
                         {isThai ? 'ข้อความ' : 'Message'}
                     </label>
                     <textarea
@@ -89,14 +115,32 @@ const FormContact = () => {
                         value={formData.message}
                         onChange={handleChange}
                         rows={5}
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
-                        placeholder={isThai ? 'เขียนข้อความของคุณที่นี่' : 'Write Your Message Here'}
+                        className="
+                            w-full px-4 py-3 rounded-xl transition-all resize-none
+                            bg-white border border-gray-300
+                            text-gray-900 placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
+
+                            dark:bg-white/10 dark:border-white/20
+                            dark:text-white dark:placeholder-white/40
+                        "
+                        placeholder={
+                            isThai
+                                ? 'เขียนข้อความของคุณที่นี่'
+                                : 'Write Your Message Here'
+                        }
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="cursor-pointer w-full py-4 bg-red-500 rounded-xl text-white font-semibold hover:shadow-2xl hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center gap-2 group"
+                    className="
+                        cursor-pointer w-full py-4 rounded-xl font-semibold
+                        flex items-center justify-center gap-2 group
+                        bg-red-500 text-white
+                        hover:shadow-2xl hover:shadow-red-500/50
+                        transition-all duration-300
+                    "
                 >
                     <span>{isThai ? 'ส่งข้อความ' : 'Send Message'}</span>
                     <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

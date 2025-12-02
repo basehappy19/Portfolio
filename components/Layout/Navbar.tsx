@@ -27,10 +27,11 @@ export const scrollToSection = (sectionId: string) => {
 };
 
 const Navbar = () => {
-    const [activeSection, setActiveSection] = useState('home');
+    const [activeSection, setActiveSection] = useState('Home'); // ให้ตรงกับ id
     const [isScrolled, setIsScrolled] = useState(false);
     const locale = useLocale();
     const isThai = locale === 'th';
+
     useEffect(() => {
         const ACTIVATION_OFFSET = 450;
 
@@ -54,15 +55,28 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-
     return (
         <nav
-            className={`hidden md:block fixed top-12 left-0 right-0 z-50 transition-all duration-300`}
+            className={`
+                hidden md:block fixed top-12 left-0 right-0 z-50
+                transition-all duration-300
+            `}
         >
-            <div className={`max-w-3xl mx-auto px-6 rounded-4xl transition-all duration-300 ${isScrolled
-                ? 'bg-none backdrop-blur-lg shadow-lg'
-                : 'bg-white/30 backdrop-blur-md'
-                }`}>
+            <div
+                className={`
+                    max-w-3xl mx-auto px-6 rounded-4xl transition-all duration-300
+                    ${isScrolled
+                        ? `
+                            bg-white/80 shadow-lg backdrop-blur-lg
+                            dark:bg-black/50 dark:shadow-black/40
+                          `
+                        : `
+                            bg-white/40 backdrop-blur-md
+                            dark:bg-white/10
+                          `
+                    }
+                `}
+            >
                 <div className="flex items-center justify-center h-16">
 
                     {/* Nav Items */}
@@ -75,21 +89,56 @@ const Navbar = () => {
                                 <button
                                     key={item.id}
                                     onClick={() => scrollToSection(item.id)}
-                                    className={`cursor-pointer relative px-4 py-2 text-nowrap rounded-full flex items-center gap-2 transition-all duration-300 ${isActive
-                                        ? 'bg-linear-to-r from-yellow-500/20 to-orange-500/20'
-                                        : 'text-gray-700 hover:bg-gray-200/50'
-                                        }`}
+                                    className={`
+                                        cursor-pointer relative px-4 py-2 text-nowrap rounded-full
+                                        flex items-center gap-2
+                                        transition-all duration-300
+
+                                        ${isActive
+                                            ? `
+                                                bg-linear-to-r from-yellow-400/30 to-orange-500/30
+                                                dark:from-yellow-500/20 dark:to-orange-500/20
+                                              `
+                                            : `
+                                                text-gray-800 hover:bg-gray-100/80
+                                                dark:text-gray-200 dark:hover:bg-white/10
+                                              `
+                                        }
+                                    `}
                                 >
-                                    <Icon className={`w-4 h-4 ${isActive ? "text-red-600" : "text-white"}`} />
-                                    <span className="font-medium text-white">{isThai ? item.label_th : item.label_en}</span>
+                                    <Icon
+                                        className={`
+                                            w-4 h-4
+                                            ${isActive
+                                                ? 'text-red-600 dark:text-red-400'
+                                                : 'text-gray-700 dark:text-gray-200'
+                                            }
+                                        `}
+                                    />
+                                    <span
+                                        className={`
+                                            font-medium
+                                            ${isActive
+                                                ? 'text-gray-900 dark:text-white'
+                                                : 'text-gray-800 dark:text-gray-200'
+                                            }
+                                        `}
+                                    >
+                                        {isThai ? item.label_th : item.label_en}
+                                    </span>
 
                                     {/* Active Indicator */}
                                     {isActive && (
-                                        <div className="absolute inset-0 rounded-full border-2 border-red-500/30 animate-pulse" />
+                                        <div className="
+                                            absolute inset-0 rounded-full border-2
+                                            border-red-400/40 dark:border-red-500/40
+                                            animate-pulse
+                                        " />
                                     )}
                                 </button>
                             );
                         })}
+
                         <LanguageSwitcher />
                     </div>
                 </div>
