@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { ApiImage, ApiLink } from "@/types/Api";
 import { unlink, rm } from "fs/promises";
+import { auth } from "@/auth";
+import { headers } from "next/headers";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -13,6 +15,14 @@ export async function PUT(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     try {
         const { id: achievementId } = await params;
         const body = await req.json();
@@ -39,7 +49,6 @@ export async function PUT(
             links?: ApiLink[];
         } = body;
 
-        // ---- ดึงข้อมูลเดิม (รวม images & links ไว้ใช้เทียบ/ลบไฟล์) ----
         const existing = await prisma.achievement.findFirst({
             where: { id: achievementId },
             include: {
@@ -55,7 +64,6 @@ export async function PUT(
             );
         }
 
-        // --------- จัดการ Categories (ลบของเดิม + สร้างใหม่ตาม slug) ---------
         const categories =
             categorySlugs.length > 0
                 ? await prisma.category.findMany({
@@ -111,7 +119,6 @@ export async function PUT(
             }
         }
 
-        // ลบ record รูปใน DB
         if (imagesToDelete.length > 0) {
             await prisma.achievementImage.deleteMany({
                 where: {
@@ -120,7 +127,6 @@ export async function PUT(
             });
         }
 
-        // อัปเดต/สร้างรูปที่ยังอยู่ในฟอร์ม
         for (const img of imagePayload) {
             let url = img.preview;
             if (url.startsWith("/achievements/")) {
@@ -129,7 +135,6 @@ export async function PUT(
             }
 
             if (img.id) {
-                // รูปเก่า → update
                 await prisma.achievementImage.update({
                     where: { id: img.id },
                     data: {
@@ -140,7 +145,6 @@ export async function PUT(
                     },
                 });
             } else {
-                // รูปใหม่ → create
                 await prisma.achievementImage.create({
                     data: {
                         achievementId,
@@ -153,7 +157,6 @@ export async function PUT(
             }
         }
 
-        // --------- จัดการ Links (ลบใน DB ตามที่หายไปจากฟอร์ม) ---------
         const linkPayload = links as ApiLink[];
 
         const linkIdsToKeep = linkPayload
@@ -169,7 +172,6 @@ export async function PUT(
             },
         });
 
-        // อัปเดต/สร้างลิงก์
         for (const link of linkPayload) {
             if (link.id) {
                 await prisma.achievementLink.update({
@@ -194,7 +196,6 @@ export async function PUT(
             }
         }
 
-        // --------- อัปเดตฟิลด์หลัก: อะไรไม่ส่งมา → ไม่แตะ ---------
         const updateData: Prisma.AchievementUpdateInput = {};
 
         if (title_th !== undefined) updateData.title_th = title_th;
@@ -250,19 +251,17 @@ export async function DELETE(
         const fsBase =
             process.env.ACHIEVEMENTS_FS_BASE ?? "public/achievements";
 
-        // ลบไฟล์รูปในเครื่อง: /public/achievements/{achievementId}/{fileName}
         for (const img of existing.images) {
             const filePath = path.join(
                 process.cwd(),
                 fsBase,
                 achievementId,
-                img.url // ใน DB เก็บแค่ชื่อไฟล์
+                img.url
             );
 
             try {
                 await unlink(filePath);
             } catch (err: unknown) {
-                // ถ้าไฟล์ไม่มีแล้ว (ENOENT) ก็ข้าม
                 if (
                     typeof err === "object" &&
                     err &&
@@ -275,7 +274,6 @@ export async function DELETE(
             }
         }
 
-        // ลบ relation ต่าง ๆ (ถ้าไม่ได้ cascade ไว้ใน schema)
         await prisma.achievementsOnCategories.deleteMany({
             where: { achievementId },
         });

@@ -2,19 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { auth } from "@/auth";
+import { headers } from "next/headers";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const fsBase =
             process.env.ACHIEVEMENTS_FS_BASE ?? "public/achievements";
         const publicBase =
             process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
 
-        // รับ achievementId จาก query เช่น /api/uploads?achievementId=xxx
         const { searchParams } = new URL(req.url);
-        const achievementId = searchParams.get("achievementId") ?? "_temp"; // ถ้าไม่มี ใช้ _temp
+        const achievementId = searchParams.get("achievementId") ?? "_temp";
 
         const formData = await req.formData();
         const file = formData.get("file") as File | null;
@@ -36,7 +44,6 @@ export async function POST(req: NextRequest) {
 
         const fileName = `${crypto.randomUUID()}.${ext}`;
 
-        // โฟลเดอร์จริง: public/achievements/{achievementId}
         const uploadDir = path.join(process.cwd(), fsBase, achievementId);
         await mkdir(uploadDir, { recursive: true });
 

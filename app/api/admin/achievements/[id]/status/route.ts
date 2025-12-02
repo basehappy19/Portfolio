@@ -1,5 +1,7 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
+import { auth } from "@/auth";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const connectionString = process.env.DATABASE_URL;
@@ -10,6 +12,14 @@ export async function PUT(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     try {
         const { id: achievementId } = await params;
 

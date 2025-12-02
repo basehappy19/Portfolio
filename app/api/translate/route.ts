@@ -1,3 +1,5 @@
+import { auth } from "@/auth";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -6,6 +8,14 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { text } = await req.json();
 
     const completion = await openai.chat.completions.create({
