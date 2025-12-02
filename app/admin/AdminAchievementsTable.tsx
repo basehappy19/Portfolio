@@ -85,7 +85,7 @@ export const AdminAchievementsTable = ({
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-blue-200 dark:border-gray-700">
+                        <thead className="bg-linear-to-r from-red-50 to-rose-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-red-200 dark:border-gray-700">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     ผลงาน
@@ -126,7 +126,7 @@ export const AdminAchievementsTable = ({
                                     <React.Fragment key={achievement.id}>
                                         <tr
                                             key={achievement.id}
-                                            className="hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
+                                            className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                                             onClick={() => toggleRow(achievement.id)}
                                         >
                                             <td className="px-6 py-4">
@@ -137,10 +137,10 @@ export const AdminAchievementsTable = ({
                                                                 fill
                                                                 src={`${achievementsBase}/${achievement.id}/${achievement.images[0].url}`}
                                                                 alt={achievement.images[0].altText_th ?? achievement.title_th}
-                                                                className="w-full h-full object-cover rounded-lg shadow-md ring-2 ring-blue-100 dark:ring-gray-700"
+                                                                className="w-full h-full object-cover rounded-lg shadow-md ring-2 ring-red-100 dark:ring-gray-700"
                                                             ></Image>
                                                             {achievement.images.length > 1 && (
-                                                                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
+                                                                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
                                                                     +{achievement.images.length - 1}
                                                                 </span>
                                                             )}
@@ -182,7 +182,7 @@ export const AdminAchievementsTable = ({
                                                         achievement.categories.map((cat, idx) => (
                                                             <span
                                                                 key={idx}
-                                                                className="px-3 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full shadow-sm"
+                                                                className="px-3 py-1 text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full shadow-sm"
                                                             >
                                                                 {cat.category.name_th}
                                                             </span>
@@ -199,7 +199,7 @@ export const AdminAchievementsTable = ({
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button
-                                                    className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all ${achievement.status === 'PUBLIC'
+                                                    className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all ${achievement.status === 'PUBLIC'
                                                         ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800'
                                                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                                         }`}
@@ -234,7 +234,7 @@ export const AdminAchievementsTable = ({
                                                         <EditAchievement achievement={achievement} />
                                                     </div>
                                                     <button
-                                                        className="cursor-pointer p-2.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition-colors shadow-sm hover:shadow"
+                                                        className="dark:bg-[#282c33] cursor-pointer p-2.5 text-red-600 hover:bg-white dark:hover:bg-red-900 rounded-lg transition-colors shadow-sm hover:shadow"
                                                         title="ลบ"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -249,7 +249,7 @@ export const AdminAchievementsTable = ({
 
                                         {/* Expanded Row Details */}
                                         {expandedRows.has(achievement.id) && (
-                                            <tr className="bg-gray-50 dark:bg-gray-800">
+                                            <tr className="bg-white dark:bg-gray-800">
                                                 <td colSpan={7} className="px-6 py-6">
                                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                         {/* Left Column */}

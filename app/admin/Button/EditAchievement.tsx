@@ -9,7 +9,7 @@ const EditAchievement = ({ achievement }: { achievement: Achievement }) => {
     return (
         <button
             onClick={() => open(achievement)}
-            className="cursor-pointer p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg"
+            className="bg-white dark:bg-[#282c33] shadow-sm max-w-sm w-full p-2.5 cursor-pointer text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg"
             title="แก้ไข"
         >
             <Edit2 size={18} />
