@@ -1,19 +1,19 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type { UiCategory, CurrentCategory } from '../CategoryFilterTab';
+import type { slugCurrentCategory, UiCategory } from '../CategoryFilterTab';
 
 type CategoryButtonProps = {
-    currentCategory: CurrentCategory;
+    slugCurrentCategory?: slugCurrentCategory;
     category: UiCategory;
 };
 
-const CategoryButton = ({ currentCategory, category }: CategoryButtonProps) => {
+const CategoryButton = ({ slugCurrentCategory, category }: CategoryButtonProps) => {
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const isActive = currentCategory && currentCategory.id === category.id;
+    const isActive = slugCurrentCategory && slugCurrentCategory === category.slug;
 
     const handleClick = () => {
         const params = new URLSearchParams(searchParams.toString());

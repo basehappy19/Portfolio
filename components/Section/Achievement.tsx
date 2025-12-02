@@ -1,130 +1,27 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import SectionHeader from "../SectionHeader";
-import { PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 import CategoryFilterTab from "../CategoryFilterTab";
 import AchievementCard from "../AchievementCard";
-import { Category } from "@/types/Achievements";
+import { Achievement as AchievementType } from "@/types/Achievements";
 
 const Achievement = async ({ slug }: { slug: string | undefined }) => {
     const locale = await getLocale();
 
-    const connectionString = process.env.DATABASE_URL;
-    const adapter = new PrismaPg({ connectionString });
-    const prisma = new PrismaClient({ adapter });
+    const qs = slug ? `?category=${encodeURIComponent(slug)}` : "";
 
-    let currentCategoryRaw = null;
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/achievements${qs}`
+    );
+    const { achievements }: { achievements: AchievementType[] } =
+        await res.json();
 
-    if (slug) {
-        currentCategoryRaw = await prisma.category.findFirst({
-            select: {
-                id: true,
-                name_th: true,
-                name_en: true,
-                slug: true,
-            },
-            where: { slug }
-        });
-    }
-
-    const currentCategory: Category | null = currentCategoryRaw
-        ? {
-            id: currentCategoryRaw.id,
-            name_th: currentCategoryRaw.name_th,
-            name_en: currentCategoryRaw.name_en,
-            slug: currentCategoryRaw.slug,
-        }
-        : null;
-
-
-    let achievements;
-
-    if (currentCategory) {
-        achievements = await prisma.achievement.findMany({
-            select: {
-                id: true,
-                title_th: true,
-                description_th: true,
-                awardLevel_th: true,
-                location_th: true,
-
-                title_en: true,
-                description_en: true,
-                awardLevel_en: true,
-                location_en: true,
-
-                status: true,
-                sortOrder: true,
-                receivedAt: true,
-                createdAt: true,
-                updatedAt: true,
-                categories: {
-                    select: {
-                        category: true
-                    }
-                },
-                images: true,
-                links: true
-            },
-            where: {
-                categories: {
-                    some: {
-                        category: {
-                            slug: currentCategory.slug
-                        }
-                    }
-                },
-                status: "PUBLIC"
-            },
-            orderBy: { receivedAt: "desc" },
-        });
-    } else {
-        achievements = await prisma.achievement.findMany({
-            select: {
-                id: true,
-                title_th: true,
-                description_th: true,
-                awardLevel_th: true,
-                location_th: true,
-
-                title_en: true,
-                description_en: true,
-                awardLevel_en: true,
-                location_en: true,
-
-                status: true,
-                sortOrder: true,
-                receivedAt: true,
-                createdAt: true,
-                updatedAt: true,
-                categories: {
-                    select: {
-                        category: {
-                            select: {
-                                id: true,
-                                name_en: true,
-                                name_th: true,
-                                slug: true
-                            }
-                        }
-                    }
-                },
-                images: true,
-                links: true
-            },
-            orderBy: { receivedAt: "desc" },
-            where: {
-                status: "PUBLIC"
-            }
-        });
-    }
     const t = await getTranslations("Index");
 
     return (
         <section className="min-h-screen w-full px-4 md:px-8 lg:px-16 py-16" id="Achievements">
             <div className="max-w-6xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
-                <CategoryFilterTab currentCategory={currentCategory} />
+                <CategoryFilterTab slugCurrentCategory={slug} />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
                     {(!achievements || achievements.length === 0) ? (

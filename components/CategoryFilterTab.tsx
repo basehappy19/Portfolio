@@ -3,7 +3,6 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { getLocale, getTranslations } from 'next-intl/server';
 import CategoryButton from './Button/CategoryButton';
 import AllButton from './Button/AllButton';
-import { Category } from '@/types/Achievements';
 
 
 export type UiCategory = {
@@ -13,12 +12,12 @@ export type UiCategory = {
     totalAchievements: number;
 };
 
-export type CurrentCategory = Category | null
+export type slugCurrentCategory = string | null
 
 const CategoryFilterTab = async ({
-    currentCategory,
+    slugCurrentCategory,
 }: {
-    currentCategory: CurrentCategory;
+    slugCurrentCategory?: slugCurrentCategory;
 }) => {
     const locale = await getLocale();
     const t = await getTranslations('Index');
@@ -66,13 +65,13 @@ const CategoryFilterTab = async ({
             <AllButton
                 TotalAchievements={totalAchievements}
                 AllButtonLabel={AllButtonLabel}
-                CurrentCategory={currentCategory}
+                slugCurrentCategory={slugCurrentCategory}
             />
 
             {categories.map((category, idx) => (
                 <CategoryButton
                     key={idx}
-                    currentCategory={currentCategory}
+                    slugCurrentCategory={slugCurrentCategory}
                     category={category}
                 />
             ))}

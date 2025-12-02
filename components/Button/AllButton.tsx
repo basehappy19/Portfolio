@@ -1,16 +1,16 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CurrentCategory } from "../CategoryFilterTab";
+import { slugCurrentCategory } from "../CategoryFilterTab";
 
 type AllButtonProps = {
     TotalAchievements: number;
     AllButtonLabel: string;
-    CurrentCategory: CurrentCategory | null;
+    slugCurrentCategory?: slugCurrentCategory | null;
 };
 
-const AllButton = ({ TotalAchievements, AllButtonLabel, CurrentCategory }: AllButtonProps) => {
-    const isActive = !CurrentCategory;
+const AllButton = ({ TotalAchievements, AllButtonLabel, slugCurrentCategory }: AllButtonProps) => {
+    const isActive = !slugCurrentCategory;
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
