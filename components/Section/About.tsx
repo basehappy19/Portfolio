@@ -1,5 +1,4 @@
 import { getMessages, getTranslations } from 'next-intl/server';
-import Image from 'next/image';
 import SectionHeader from '../SectionHeader';
 import WarpToAchievement from '../Button/WarpToAchievement';
 import WarpToContact from '../Button/WarpToContact';
