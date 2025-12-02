@@ -2,8 +2,8 @@ import { Prisma, PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import { unlink } from "fs/promises";
 import { ApiImage, ApiLink } from "@/types/Api";
+import { unlink, rm } from "fs/promises";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -13,7 +13,6 @@ export async function PUT(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
-
     try {
         const { id: achievementId } = await params;
         const body = await req.json();
@@ -289,10 +288,17 @@ export async function DELETE(
             where: { achievementId },
         });
 
-        // ลบ achievement หลัก
         await prisma.achievement.delete({
             where: { id: achievementId },
         });
+
+        const dirPath = path.join(process.cwd(), fsBase, achievementId);
+
+        try {
+            await rm(dirPath, { recursive: true, force: true });
+        } catch (err) {
+            console.warn("Failed to delete directory:", dirPath, err);
+        }
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {

@@ -40,7 +40,8 @@ export const AchievementImagesSection: React.FC<Props> = ({
                 รูปภาพ (ลากเพื่อเรียงลำดับ)
             </label>
 
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
+            {/* Dropzone */}
+            <div className="border-2 border-dashed rounded-lg p-4 bg-white border-gray-300 dark:bg-transparent dark:border-gray-600">
                 <input
                     type="file"
                     accept="image/*"
@@ -71,15 +72,22 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                 onDragStart={(e) => handleDragStart(e, index)}
                                 onDragOver={(e) => handleDragOver(e, index)}
                                 onDragEnd={handleDragEnd}
-                                className={`flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border ${draggedIndex === index
-                                    ? 'border-blue-500'
-                                    : 'border-gray-200 dark:border-gray-700'
-                                    } cursor-move`}
+                                className={`
+                                    flex items-start gap-3 p-3 rounded-lg border cursor-move transition-all
+                                    bg-white shadow-sm
+                                    dark:bg-gray-800 dark:shadow-none
+                                    ${
+                                        draggedIndex === index
+                                            ? 'border-red-500'
+                                            : 'border-gray-200 dark:border-gray-700'
+                                    }
+                                `}
                             >
                                 <GripVertical
                                     size={20}
                                     className="text-gray-400 mt-2 shrink-0"
                                 />
+
                                 <Image
                                     src={img.preview}
                                     alt={img.altText_th || img.altText_en || 'achievement image'}
@@ -87,7 +95,9 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                     width={96}
                                     height={96}
                                 />
+
                                 <div className="flex-1 space-y-2">
+                                    {/* Alt TH */}
                                     <input
                                         type="text"
                                         placeholder="Alt text (ไทย)"
@@ -96,13 +106,20 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                             handleImageAltChange(index, 'altText_th', e.target.value)
                                         }
                                         onBlur={() => handleImageAltThaiBlur(index)}
-                                        className={
-                                            `w-full px-3 py-1 text-sm border rounded dark:bg-gray-700 dark:text-white ` +
-                                            (isTranslating
-                                                ? 'border-blue-400 animate-pulse'
-                                                : 'border-gray-300 dark:border-gray-600')
-                                        }
+                                        className={`
+                                            w-full px-3 py-1 text-sm rounded border shadow-sm
+                                            bg-white text-gray-900 placeholder-gray-400
+                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
+                                            ${
+                                                isTranslating
+                                                    ? 'border-red-400 animate-pulse'
+                                                    : 'border-gray-300 dark:border-gray-600'
+                                            }
+                                        `}
                                     />
+
+                                    {/* Alt EN */}
                                     <input
                                         type="text"
                                         placeholder="Alt text (English)"
@@ -110,12 +127,17 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                         onChange={(e) =>
                                             handleImageAltChange(index, 'altText_en', e.target.value)
                                         }
-                                        className="w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                        className="
+                                            w-full px-3 py-1 text-sm rounded border shadow-sm
+                                            bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
+                                        "
                                     />
 
                                     {isTranslating && (
-                                        <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-                                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                                        <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                                            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
                                             <span>AI กำลังแปล...</span>
                                         </div>
                                     )}
@@ -124,6 +146,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                         ลำดับ: {index + 1}
                                     </div>
                                 </div>
+
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveImage(index)}

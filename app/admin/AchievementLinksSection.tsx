@@ -40,7 +40,11 @@ export const AchievementLinksSection: React.FC<Props> = ({
                 <button
                     type="button"
                     onClick={addLink}
-                    className="cursor-pointer text-sm px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="
+                        cursor-pointer text-sm px-3 py-1 rounded-lg border transition-all
+                        bg-white text-gray-700 border-gray-300 hover:bg-gray-100
+                        dark:bg-transparent dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700
+                    "
                 >
                     + เพิ่มลิงก์
                 </button>
@@ -62,10 +66,16 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                 onDragStart={(e) => handleLinkDragStart(e, index)}
                                 onDragOver={(e) => handleLinkDragOver(e, index)}
                                 onDragEnd={handleLinkDragEnd}
-                                className={`p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 space-y-2 ${draggedLinkIndex === index
-                                    ? 'border-blue-500'
-                                    : 'border-gray-200 dark:border-gray-700'
-                                    }`}
+                                className={`
+                                    p-3 rounded-lg border space-y-2 transition-all
+                                    bg-white shadow-sm
+                                    dark:bg-gray-800 dark:shadow-none
+
+                                    ${draggedLinkIndex === index
+                                        ? 'border-red-500'
+                                        : 'border-gray-200 dark:border-gray-700'
+                                    }
+                                `}
                             >
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -83,6 +93,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    {/* label_th */}
                                     <input
                                         type="text"
                                         placeholder="ชื่อปุ่ม (ไทย)"
@@ -91,13 +102,19 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                             handleLinkChange(index, 'label_th', e.target.value)
                                         }
                                         onBlur={() => handleLinkThaiBlur(index)}
-                                        className={
-                                            `w-full px-3 py-2 text-sm border rounded dark:bg-gray-700 dark:text-white ` +
-                                            (isTranslating
-                                                ? 'border-blue-400 animate-pulse'
-                                                : 'border-gray-300 dark:border-gray-600')
-                                        }
+                                        className={`
+                                            w-full px-3 py-2 text-sm rounded border shadow-sm
+                                            bg-white text-gray-900 placeholder-gray-400
+                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
+                                            ${isTranslating
+                                                ? 'border-red-400 animate-pulse'
+                                                : 'border-gray-300 dark:border-gray-600'
+                                            }
+                                        `}
                                     />
+
+                                    {/* label_en */}
                                     <input
                                         type="text"
                                         placeholder="ชื่อปุ่ม (English)"
@@ -105,17 +122,23 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                         onChange={(e) =>
                                             handleLinkChange(index, 'label_en', e.target.value)
                                         }
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                        className="
+                                            w-full px-3 py-2 text-sm rounded border shadow-sm
+                                            bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
+                                        "
                                     />
                                 </div>
 
                                 {isTranslating && (
-                                    <div className="flex items-center gap-2 mt-1 text-xs text-blue-600 dark:text-blue-400">
-                                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                                    <div className="flex items-center gap-2 mt-1 text-xs text-red-600 dark:text-red-400">
+                                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
                                         <span>AI กำลังแปล...</span>
                                     </div>
                                 )}
 
+                                {/* URL input */}
                                 <input
                                     type="text"
                                     placeholder="URL (เช่น https://...)"
@@ -123,7 +146,12 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                     onChange={(e) =>
                                         handleLinkChange(index, 'url', e.target.value)
                                     }
-                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
+                                    className="
+                                        w-full px-3 py-2 text-sm rounded border shadow-sm
+                                        bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                                        focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                                        dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
+                                    "
                                 />
                             </div>
                         );

@@ -5,7 +5,6 @@ import { SubmitData } from "@/types/Form";
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-
 export const updateAchievement = async (id: string, payload: SubmitData) => {
     try {
         const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
@@ -63,3 +62,26 @@ export const deleteAchievement = async (id: string): Promise<void> => {
     }
     revalidatePath("/admin");
 };
+
+export const toggleAchievementStatus = async (
+    id: string,
+    currentStatus: "PUBLIC" | "DRAFT"
+) => {
+    const newStatus = currentStatus === "PUBLIC" ? "DRAFT" : "PUBLIC";
+
+    const res = await fetch(`${baseUrl}/api/admin/achievements/${id}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to update status");
+    }
+
+    const data = await res.json();
+    revalidatePath("/admin");
+    return data;
+}

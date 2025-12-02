@@ -37,20 +37,28 @@ export const AchievementTextField: React.FC<Props> = ({
     const hasError = Boolean(error && touched);
 
     const baseInputClass =
-        'w-full px-4 border focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white';
+        [
+            'w-full px-4',
+            'border',
+            'bg-white text-gray-900 placeholder-gray-400', 
+            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+            'shadow-sm',
+            'dark:bg-gray-800 dark:text-white dark:placeholder-gray-400',
+        ].join(' ');
 
     const sizeClass =
         size === 'lg'
-            ? 'py-3 rounded-xl focus:border-transparent transition-all duration-200'
+            ? 'py-3 rounded-xl transition-all duration-200'
             : 'py-2 rounded-lg';
 
     const borderClass = hasError
         ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
         : 'border-gray-300 dark:border-gray-600 hover:border-gray-400';
 
-    const translatingClass = isTranslating && !hasError
-        ? 'animate-pulse border-blue-400 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]'
-        : '';
+    const translatingClass =
+        isTranslating && !hasError
+            ? 'animate-pulse border-red-400 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]'
+            : '';
 
     return (
         <div className={`${hasError ? 'error-field' : ''} ${containerClassName}`}>
@@ -77,8 +85,8 @@ export const AchievementTextField: React.FC<Props> = ({
             )}
 
             {!hasError && isTranslating && (
-                <div className="flex items-center gap-2 mt-2 text-xs text-blue-600 dark:text-blue-400">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                <div className="flex items-center gap-2 mt-2 text-xs text-red-600 dark:text-red-400">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
                     <span>AI กำลังแปล...</span>
                 </div>
             )}

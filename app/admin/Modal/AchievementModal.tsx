@@ -74,8 +74,8 @@ const AchievementModalInner = ({
         categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
         sortOrder: Number(
             editData?.sortOrder != null
-                ? editData.sortOrder          
-                : defaultSortOrder            
+                ? editData.sortOrder
+                : defaultSortOrder
         ), isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -287,20 +287,32 @@ const AchievementModalInner = ({
 
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-sm bg-black/20"
+        <div
+            className="
+    fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer
+    backdrop-blur-sm
+    bg-black/30 dark:bg-black/60
+  "
             onClick={close}
             style={{
                 animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
-            }}>
+            }}
+        >
             <div
                 style={{
                     animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
                 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white dark:bg-[#1e222a] rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-
-                {/* Header - Minimal & Clean */}
-                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800">
+                className="
+      max-w-5xl w-full max-h-[90vh]
+      overflow-hidden flex flex-col
+      rounded-2xl shadow-2xl border
+      bg-white border-gray-200
+      dark:bg-[#1e222a] dark:border-gray-800
+    "
+            >
+                {/* Header */}
+                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-[#1e222a]">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
@@ -312,18 +324,23 @@ const AchievementModalInner = ({
                         </div>
                         <button
                             onClick={close}
-                            className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+                            className="
+            cursor-pointer w-10 h-10 flex items-center justify-center rounded-full
+            text-gray-500 hover:bg-gray-100
+            dark:text-gray-400 dark:hover:bg-gray-800
+            transition-colors
+          "
                         >
                             <X size={20} />
                         </button>
                     </div>
                 </div>
 
-                {/* Body - Scrollable */}
-                <div className="overflow-y-auto flex-1 px-8 py-6">
+                {/* Body */}
+                <div className="overflow-y-auto flex-1 px-8 py-6 bg-white dark:bg-[#1e222a]">
                     <div className="max-w-3xl mx-auto space-y-8">
 
-                        {/* Section: ข้อมูลหลัก */}
+                        {/* ข้อมูลหลัก */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
@@ -380,7 +397,7 @@ const AchievementModalInner = ({
                             />
                         </div>
 
-                        {/* Section: ข้อมูลรางวัล */}
+                        {/* ข้อมูลรางวัล */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-1 h-6 bg-amber-500 rounded-full"></div>
@@ -442,13 +459,18 @@ const AchievementModalInner = ({
                                     name="receivedAt"
                                     value={formData.receivedAt ?? ""}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white transition-all"
+                                    className="
+                w-full px-4 py-3 rounded-xl border shadow-sm transition-all
+                bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                dark:bg-gray-800/50 dark:text-white dark:border-gray-700
+              "
                                     placeholder="2025-11-30"
                                 />
                             </div>
                         </div>
 
-                        {/* Section: การจัดการ */}
+                        {/* การจัดการ */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
@@ -469,10 +491,16 @@ const AchievementModalInner = ({
                                         value={formData.categorySlugs}
                                         onChange={handleCategoryChange}
                                         onBlur={() => handleBlur('categorySlugs')}
-                                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800/50 dark:text-white transition-all ${errors.categorySlugs && touched.categorySlugs
-                                            ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
-                                            : 'border-gray-200 dark:border-gray-700 focus:border-blue-500'
-                                            }`}
+                                        className={`
+                  w-full px-4 py-3 rounded-xl border shadow-sm transition-all
+                  bg-white text-gray-900 border-gray-300
+                  focus:outline-none focus:ring-2 focus:ring-red-500/20
+                  dark:bg-gray-800/50 dark:text-white dark:border-gray-700
+                  ${errors.categorySlugs && touched.categorySlugs
+                                                ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
+                                                : 'focus:border-red-500'
+                                            }
+                `}
                                     >
                                         {categories.map((cat) => (
                                             <option key={cat.id} value={cat.slug}>
@@ -503,20 +531,41 @@ const AchievementModalInner = ({
                                         value={formData.sortOrder}
                                         onChange={handleInputChange}
                                         min={1}
-                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800/50 dark:text-white transition-all"
+                                        className="
+                  w-full px-4 py-3 rounded-xl border shadow-sm transition-all
+                  bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                  focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                  dark:bg-gray-800/50 dark:text-white dark:border-gray-700
+                "
                                     />
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-gray-100 dark:border-gray-800">
+                            <div
+                                className="
+              flex items-center gap-3 p-4 rounded-xl border transition-all
+              bg-white border-gray-300
+              dark:bg-gray-800/30 dark:border-gray-800
+            "
+                            >
                                 <input
                                     type="checkbox"
                                     name="isPublished"
                                     checked={formData.isPublished}
                                     onChange={handleInputChange}
-                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                                    className="
+                w-5 h-5 cursor-pointer rounded
+                text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2
+              "
                                 />
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+
+                                <label
+                                    className="
+                text-sm font-medium cursor-pointer select-none
+                text-gray-900
+                dark:text-gray-300
+              "
+                                >
                                     เผยแพร่ผลงานนี้ทันทีหลังบันทึก
                                 </label>
                             </div>
@@ -570,18 +619,31 @@ const AchievementModalInner = ({
                     </div>
                 </div>
 
-                {/* Footer - Fixed at Bottom */}
-                <div className="px-8 py-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
+                {/* Footer */}
+                <div className="
+      px-8 py-5 border-t
+      border-gray-100 bg-gray-50/80
+      dark:border-gray-800 dark:bg-gray-900/30
+    ">
                     <div className="max-w-3xl mx-auto flex justify-end gap-3">
                         <button
                             onClick={close}
-                            className="cursor-pointer px-6 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 font-medium transition-all"
+                            className="
+            cursor-pointer px-6 py-2.5 rounded-xl font-medium transition-all
+            border border-gray-200 text-gray-700 hover:bg-white
+            dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800
+          "
                         >
                             ยกเลิก
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="cursor-pointer px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-sm shadow-blue-600/20 hover:shadow-md hover:shadow-blue-600/30 transition-all"
+                            className="
+            cursor-pointer px-6 py-2.5 rounded-xl font-medium
+            bg-blue-600 hover:bg-blue-700 text-white
+            shadow-sm shadow-blue-600/20 hover:shadow-md hover:shadow-blue-600/30
+            transition-all
+          "
                         >
                             {editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}
                         </button>
