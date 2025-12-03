@@ -1,26 +1,23 @@
-export type UploadImageResult = {
-    fileName: string;
-    url: string;
-};
+import { supabaseServerClient } from "@/lib/supabaseServer";
 
-export const uploadAchievementImage = async (
+export const uploadAchievementImageDirect = async (
     file: File,
     achievementId: string | null
-): Promise<UploadImageResult> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("achievementId", achievementId ?? "_temp");
+) => {
+    const path = `${achievementId ?? "_temp"}/${Date.now()}-${file.name}`;
 
-    const res = await fetch(`/api/uploads`, {
-        method: "POST",
-        body: formData,
-    });
+    const { error } = await supabaseServerClient.storage
+        .from("achievements")
+        .upload(path, file);
 
-    if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        console.error("Upload image failed:", res.status, text);
-        throw new Error("Upload image failed");
-    }
+    if (error) throw error;
 
-    return (await res.json()) as UploadImageResult;
+    const { data: publicUrlData } = supabaseServerClient.storage
+        .from("achievements")
+        .getPublicUrl(path);
+
+    return {
+        fileName: file.name,
+        url: publicUrlData.publicUrl,
+    };
 };

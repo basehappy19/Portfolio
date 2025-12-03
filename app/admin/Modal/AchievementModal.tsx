@@ -8,7 +8,7 @@ import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import { EditData } from '@/types/Achievements';
 import { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
-import { uploadAchievementImage } from '../services/uploadAchievementImage';
+import { uploadAchievementImageDirect } from '../services/uploadAchievementImage';
 import { useAchievementFormHandlers } from '../hooks/useAchievementFormHandlers';
 import { useImageHandlers } from '../hooks/useImageHandlers';
 import { AchievementLinksSection } from '../AchievementLinksSection';
@@ -246,7 +246,7 @@ const AchievementModalInner = ({
             const uploadedImages: ImagePreview[] = await Promise.all(
                 imagePreview.map(async (img, idx) => {
                     if (img.file instanceof File && achievementId) {
-                        const { url } = await uploadAchievementImage(
+                        const { url } = await uploadAchievementImageDirect(
                             img.file,
                             achievementId
                         );
