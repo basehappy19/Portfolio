@@ -5,14 +5,6 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: "100mb",
-        },
-    },
-};
-
 export async function POST(req: NextRequest) {
     const session = await auth.api.getSession({
         headers: await headers(),
