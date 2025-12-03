@@ -17,10 +17,23 @@ export async function POST(req: NextRequest) {
     const achievementId = formData.get("achievementId") as string | null;
 
     if (!file || !achievementId) {
-        return NextResponse.json({ error: "file + achievementId required" }, { status: 400 });
+        return NextResponse.json(
+            { error: "file + achievementId required" },
+            { status: 400 }
+        );
     }
 
-    const ext = file.name.split(".").pop()!;
+    const rawName =
+        file instanceof File && typeof file.name === "string" ? file.name : "";
+
+    let ext = "bin";
+
+    if (rawName && rawName.includes(".")) {
+        ext = rawName.split(".").pop() as string;
+    } else if (file.type && file.type.includes("/")) {
+        ext = file.type.split("/").pop() as string;
+    }
+
     const fileName = `${Date.now()}.${ext}`;
     const filePath = `${achievementId}/${fileName}`;
 
@@ -29,15 +42,21 @@ export async function POST(req: NextRequest) {
         .upload(filePath, file);
 
     if (error) {
+        console.error("Supabase upload error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     const {
         data: { publicUrl },
-    } = supabaseServerClient.storage.from("achievements").getPublicUrl(data.path);
+    } = supabaseServerClient.storage
+        .from("achievements")
+        .getPublicUrl(data.path);
 
-    return NextResponse.json({
-        fileName,
-        url: publicUrl,
-    });
+    return NextResponse.json(
+        {
+            fileName,
+            url: publicUrl,
+        },
+        { status: 200 }
+    );
 }
