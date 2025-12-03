@@ -8,7 +8,7 @@ import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import { EditData } from '@/types/Achievements';
 import { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
-import { uploadAchievementImage } from '../lib/uploadAchievementImage';
+import { uploadAchievementImage } from '../services/uploadAchievementImage';
 import { useAchievementFormHandlers } from '../hooks/useAchievementFormHandlers';
 import { useImageHandlers } from '../hooks/useImageHandlers';
 import { AchievementLinksSection } from '../AchievementLinksSection';
