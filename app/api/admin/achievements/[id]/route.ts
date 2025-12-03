@@ -12,18 +12,18 @@ const prisma = new PrismaClient({ adapter });
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string } } 
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
-
+    
     if (!session) {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
     try {
-        const { id: achievementId } = params;
+        const { id: achievementId } = await params;
         const body = await req.json();
 
         const {
@@ -63,7 +63,6 @@ export async function PUT(
             );
         }
 
-        // --- categories ---
         const categories =
             categorySlugs.length > 0
                 ? await prisma.category.findMany({
@@ -85,7 +84,6 @@ export async function PUT(
             });
         }
 
-        // --- images ---
         const imagePayload = images as ApiImage[];
 
         const imageIdsToKeep = new Set(
@@ -96,7 +94,6 @@ export async function PUT(
             (img) => !imageIdsToKeep.has(String(img.id))
         );
 
-        // 🔥 ลบไฟล์จาก Supabase Storage แทนลบจาก filesystem
         if (imagesToDelete.length > 0) {
             const pathsToDelete: string[] = [];
 
@@ -105,7 +102,6 @@ export async function PUT(
 
                 try {
                     const url = new URL(img.url);
-                    // url.pathname: /storage/v1/object/public/achievements/<achievementId>/<fileName>
                     const prefix = "/storage/v1/object/public/achievements/";
                     const idx = url.pathname.indexOf(prefix);
 
@@ -147,11 +143,9 @@ export async function PUT(
             });
         }
 
-        // upsert รูปที่เหลือ + รูปใหม่
         for (const img of imagePayload) {
-            let url = img.preview; // ตอนนี้เป็น Supabase public URL อยู่แล้ว
+            let url = img.preview;
 
-            // ถ้าเป็นรูปเก่าแบบเก็บ path `/achievements/...` จะรองรับไว้เป็น fallback
             if (url.startsWith("/achievements/")) {
                 const parts = url.split("/");
                 url = parts[parts.length - 1];
@@ -254,7 +248,7 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -265,7 +259,7 @@ export async function DELETE(
     }
 
     try {
-        const { id: achievementId } = params;
+        const { id: achievementId } = await params;
 
         const existing = await prisma.achievement.findUnique({
             where: { id: achievementId },
@@ -281,9 +275,6 @@ export async function DELETE(
             );
         }
 
-        // 🔥 ลบไฟล์ใน Supabase Storage
-        // สมมติ img.url เป็น public URL เช่น:
-        // https://xxx.supabase.co/storage/v1/object/public/achievements/<achievementId>/<fileName>
         const pathsToDelete: string[] = [];
 
         for (const img of existing.images) {
