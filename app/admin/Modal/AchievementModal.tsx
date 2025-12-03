@@ -23,8 +23,6 @@ import { useAchievementTextTranslation } from '../hooks/useAchievementTextTransl
 import { useLinkTranslation } from '../hooks/useLinkTranslation';
 import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
 
-const publicBase = process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
-
 
 export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
@@ -103,7 +101,7 @@ const AchievementModalInner = ({
         editData?.images?.map((img, idx) => ({
             id: img.id,
             file: undefined,
-            preview: `${publicBase}/${editData.id}/${img.url}`,
+            preview: img.url,
             altText_th: img.altText_th ?? "",
             altText_en: img.altText_en ?? "",
             sortOrder: img.sortOrder ?? idx,

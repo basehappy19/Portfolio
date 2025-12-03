@@ -150,7 +150,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveImage(index)}
-                                    className="text-red-500 hover:text-red-700 shrink-0"
+                                    className="cursor-pointer text-red-500 hover:text-red-700 shrink-0"
                                 >
                                     <Trash2 size={20} />
                                 </button>
