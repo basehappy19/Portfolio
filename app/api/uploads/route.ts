@@ -3,14 +3,6 @@ import { supabaseServerClient } from "@/lib/supabaseServer";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
 
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: "20mb",
-        },
-    },
-};
-
 export async function POST(req: NextRequest) {
     const session = await auth.api.getSession({
         headers: await headers(),
