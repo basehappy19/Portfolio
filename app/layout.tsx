@@ -1,6 +1,7 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "react-hot-toast";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default async function RootLayout({
     children,
@@ -10,6 +11,7 @@ export default async function RootLayout({
     return (
         <html suppressHydrationWarning>
             <body>
+                <SpeedInsights />
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
