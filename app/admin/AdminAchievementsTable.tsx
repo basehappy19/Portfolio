@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import Image from 'next/image';
-import { Award, Calendar, ExternalLink, Eye, EyeOff, ImagePlus, Link2, MapPin, Trash2 } from 'lucide-react';
+import { Award, Calendar, ChevronDown, ChevronUp, ExternalLink, Eye, EyeOff, ImagePlus, Link2, MapPin, Trash2 } from 'lucide-react';
 import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';
 import EditAchievement from './Button/EditAchievement';
@@ -23,6 +23,10 @@ export const AdminAchievementsTable = ({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleteAnimating, setIsDeleteAnimating] = useState(false);
     const [deletingItem, setDeletingItem] = useState<{ id: string; title: string } | null>(null);
+    const sortOrders = achievements.map(a => a.sortOrder);
+    const minSortOrder = Math.min(...sortOrders);
+    const maxSortOrder = Math.max(...sortOrders);
+
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const toggleRow = (id: string) => {
@@ -68,6 +72,40 @@ export const AdminAchievementsTable = ({
                 toast.error("ไม่สามารถลบผลงานได้ กรุณาลองใหม่อีกครั้ง");
             } finally {
                 closeDeleteModal();
+            }
+        });
+    };
+
+    const handleChangeSortOrder = (
+        id: string,
+        direction: 'up' | 'down',
+        currentSortOrder: number
+    ) => {
+        const newSortOrder =
+            direction === 'up' ? currentSortOrder + 1 : currentSortOrder - 1;
+
+        if (newSortOrder < 1) {
+            toast.error('ลำดับต้องมากกว่า 0');
+            return;
+        }
+
+        startTransition(async () => {
+            try {
+                const res = await fetch(`/api/admin/achievements/${id}/sort-order`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ newSortOrder }),
+                });
+
+                if (!res.ok) throw new Error();
+
+                toast.success('เปลี่ยนลำดับเรียบร้อยแล้ว');
+                router.refresh();
+            } catch (error) {
+                console.error('Change sortOrder error:', error);
+                toast.error('ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง');
             }
         });
     };
@@ -214,10 +252,48 @@ export const AdminAchievementsTable = ({
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="inline-flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-lg">
-                                                    {achievement.sortOrder}
-                                                </span>
+                                            <td
+                                                className="px-6 py-4 text-center"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <div className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1 shadow-sm">
+
+                                                    {/* ปุ่มเลื่อนขึ้น */}
+                                                    <button
+                                                        className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title="เลื่อนขึ้น"
+                                                        disabled={
+                                                            achievements.length <= 1 ||
+                                                            achievement.sortOrder === maxSortOrder
+                                                        }
+                                                        onClick={() =>
+                                                            handleChangeSortOrder(achievement.id, 'up', achievement.sortOrder)
+                                                        }
+                                                    >
+                                                        <ChevronUp className="w-4 h-4" />
+                                                    </button>
+
+                                                    {/* เลขลำดับ */}
+                                                    <span className="inline-flex items-center justify-center w-10 h-8 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded">
+                                                        {achievement.sortOrder}
+                                                    </span>
+
+                                                    {/* ปุ่มเลื่อนลง */}
+                                                    <button
+                                                        className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        title="เลื่อนลง"
+                                                        disabled={
+                                                            achievements.length <= 1 ||
+                                                            achievement.sortOrder === minSortOrder
+                                                        }
+                                                        onClick={() =>
+                                                            handleChangeSortOrder(achievement.id, 'down', achievement.sortOrder)
+                                                        }
+                                                    >
+                                                        <ChevronDown className="w-4 h-4" />
+                                                    </button>
+
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button

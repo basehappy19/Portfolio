@@ -107,6 +107,9 @@ export default async function AdminPage(props: {
             createdAt: true,
             updatedAt: true,
         },
+        orderBy: {
+            sortOrder: "desc"
+        }
     });
 
     const categories = await prisma.category.findMany({

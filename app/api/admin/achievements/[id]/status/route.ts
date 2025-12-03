@@ -15,11 +15,11 @@ export async function PUT(
     const session = await auth.api.getSession({
         headers: await headers(),
     });
-
+    
     if (!session) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    
+
     try {
         const { id: achievementId } = await params;
 
