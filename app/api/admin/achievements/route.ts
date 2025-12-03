@@ -5,11 +5,19 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: "10mb",
+        },
+    },
+};
+
 export async function POST(req: NextRequest) {
     const session = await auth.api.getSession({
         headers: await headers(),
     });
-    
+
     if (!session) {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
