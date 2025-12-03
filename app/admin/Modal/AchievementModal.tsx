@@ -58,7 +58,7 @@ const AchievementModalInner = ({
     const categories = useCategories();
     const receivedAt =
         editData?.receivedAt instanceof Date
-            ? editData.receivedAt.toISOString().slice(0, 10) // -> "2025-12-01"
+            ? editData.receivedAt.toISOString().slice(0, 10)
             : editData?.receivedAt ?? "";
 
     const [formData, setFormData] = useState<FormState>(() => ({

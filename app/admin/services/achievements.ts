@@ -1,38 +1,40 @@
 "use server";
 
+"use server";
 import { revalidatePath } from "next/cache";
 import { SubmitData } from "@/types/Form";
+import { headers } from "next/headers";
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-export const updateAchievement = async (id: string, payload: SubmitData) => {
-    try {
-        const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
+export async function updateAchievement(id: string, payload: SubmitData) {
+    const headersList = await headers();
 
-        if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Update failed: ${errorText}`);
-        }
+    const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            cookie: headersList.get("cookie") ?? "",
+        },
+        body: JSON.stringify(payload),
+    });
 
-        const data = await res.json();
-        revalidatePath("/admin");
-
-        return data;
-    } catch (error) {
-        console.error("❌ updateAchievement Error:", error);
-        throw error;
+    if (!res.ok) {
+        throw new Error("Update failed");
     }
-};
+
+    return res.json();
+}
 
 export const createAchievement = async (payload: SubmitData) => {
+    const headersList = await headers();
     try {
         const res = await fetch(`${baseUrl}/api/admin/achievements`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                cookie: headersList.get("cookie") ?? "",
+            },
             body: JSON.stringify(payload),
         });
 
@@ -52,8 +54,13 @@ export const createAchievement = async (payload: SubmitData) => {
 };
 
 export const deleteAchievement = async (id: string): Promise<void> => {
+    const headersList = await headers();
+
     const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {
         method: "DELETE",
+        headers: {
+            cookie: headersList.get("cookie") ?? "",
+        },
     });
 
     if (!res.ok) {
@@ -67,12 +74,14 @@ export const toggleAchievementStatus = async (
     id: string,
     currentStatus: "PUBLIC" | "DRAFT"
 ) => {
+    const headersList = await headers();
     const newStatus = currentStatus === "PUBLIC" ? "DRAFT" : "PUBLIC";
 
     const res = await fetch(`${baseUrl}/api/admin/achievements/${id}/status`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
+            cookie: headersList.get("cookie") ?? "",
         },
         body: JSON.stringify({ status: newStatus }),
     });
@@ -84,4 +93,32 @@ export const toggleAchievementStatus = async (
     const data = await res.json();
     revalidatePath("/admin");
     return data;
-}
+};
+
+export const changeAchievementSortOrder = async (
+    id: string,
+    newSortOrder: number
+) => {
+    const headersList = await headers();
+
+    const res = await fetch(
+        `${baseUrl}/api/admin/achievements/${id}/sort-order`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                cookie: headersList.get("cookie") ?? "",
+            },
+            body: JSON.stringify({ newSortOrder }),
+        }
+    );
+
+    if (!res.ok) {
+        const errorText = await res.text().catch(() => "");
+        throw new Error(errorText || "Failed to change sort order");
+    }
+
+    const data = await res.json();
+    revalidatePath("/admin");
+    return data;
+};

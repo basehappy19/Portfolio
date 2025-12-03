@@ -304,7 +304,6 @@ export default async function AdminPage(props: {
                             </div>
                         </div>
 
-                        {/* Table Section */}
                         <AdminAchievementsTable
                             achievements={achievements}
                             achievementsBase={ACHIEVEMENTS_BASE}

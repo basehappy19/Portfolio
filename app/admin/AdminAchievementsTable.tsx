@@ -7,7 +7,7 @@ import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';
 import EditAchievement from './Button/EditAchievement';
 import { useRouter } from 'next/navigation';
-import { deleteAchievement } from './services/achievements';
+import { changeAchievementSortOrder, deleteAchievement, toggleAchievementStatus } from './services/achievements';
 import toast from 'react-hot-toast';
 
 type Props = {
@@ -78,58 +78,44 @@ export const AdminAchievementsTable = ({
 
     const handleChangeSortOrder = (
         id: string,
-        direction: 'up' | 'down',
+        direction: "up" | "down",
         currentSortOrder: number
     ) => {
         const newSortOrder =
-            direction === 'up' ? currentSortOrder + 1 : currentSortOrder - 1;
+            direction === "up" ? currentSortOrder + 1 : currentSortOrder - 1;
 
         if (newSortOrder < 1) {
-            toast.error('ลำดับต้องมากกว่า 0');
+            toast.error("ลำดับต้องมากกว่า 0");
             return;
         }
 
         startTransition(async () => {
             try {
-                const res = await fetch(`/api/admin/achievements/${id}/sort-order`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ newSortOrder }),
-                });
-
-                if (!res.ok) throw new Error();
-
-                toast.success('เปลี่ยนลำดับเรียบร้อยแล้ว');
+                await changeAchievementSortOrder(id, newSortOrder);
+                toast.success("เปลี่ยนลำดับเรียบร้อยแล้ว");
                 router.refresh();
             } catch (error) {
-                console.error('Change sortOrder error:', error);
-                toast.error('ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง');
+                console.error("Change sortOrder error:", error);
+                toast.error("ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง");
             }
         });
     };
 
-    const handleToggleStatus = async (id: string) => {
-        try {
-            const res = await fetch(`/api/admin/achievements/${id}/status`, {
-                method: "PUT",
-            });
+    const handleToggleStatus = (id: string, currentStatus: "PUBLIC" | "DRAFT") => {
+        startTransition(async () => {
+            try {
+                const data = await toggleAchievementStatus(id, currentStatus);
 
-            const data = await res.json();
-
-            if (!res.ok) throw new Error();
-
-            toast.success(
-                data.status === "PUBLIC"
-                    ? "เผยแพร่ผลงานแล้ว"
-                    : "บันทึกเป็นแบบร่างแล้ว"
-            );
-
-            router.refresh();
-        } catch {
-            toast.error("เปลี่ยนสถานะไม่สำเร็จ");
-        }
+                toast.success(
+                    data.status === "PUBLIC"
+                        ? "เผยแพร่ผลงานแล้ว"
+                        : "บันทึกเป็นแบบร่างแล้ว"
+                );
+                router.refresh();
+            } catch {
+                toast.error("เปลี่ยนสถานะไม่สำเร็จ");
+            }
+        });
     };
 
     const formatDate = (date: Date) => {
@@ -303,7 +289,7 @@ export const AdminAchievementsTable = ({
                                                         }`}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleToggleStatus(achievement.id);
+                                                        handleToggleStatus(achievement.id, achievement.status);
                                                     }}
                                                 >
                                                     {achievement.status === 'PUBLIC' ? (

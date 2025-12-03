@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { ApiImage, ApiLink } from "@/types/Api";
 import { unlink, rm } from "fs/promises";
-import { auth } from "@/auth";
 import { headers } from "next/headers";
+import { auth } from "@/auth";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -15,14 +15,14 @@ export async function PUT(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    // const session = await auth.api.getSession({
-    //     headers: await headers(),
-    // });
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
 
-    // if (!session) {        
-    //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
-    
+    if (!session) {
+        return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
     try {
         const { id: achievementId } = await params;
         const body = await req.json();
@@ -231,6 +231,13 @@ export async function DELETE(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    if (!session) {
+        return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
     try {
         const { id: achievementId } = await params;
 
