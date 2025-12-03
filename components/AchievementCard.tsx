@@ -70,8 +70,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             prev === 0 ? achievement.images.length - 1 : prev - 1
         );
     };
-    const ACHIEVEMENTS_BASE =
-        process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
+    
     return (
         <>
             {/* Card */}
@@ -83,7 +82,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                 <div className="relative h-56 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
                     {mainImage && !imageError ? (
                         <Image
-                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${mainImage.url}`}
+                            src={mainImage.url}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -208,7 +207,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     {/* Main Image */}
                                     <div className="relative h-[500px] bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                                         <Image
-                                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${achievement.images[currentImageIndex].url}`}
+                                            src={achievement.images[currentImageIndex].url}
                                             alt={tField(
                                                 achievement.images[currentImageIndex].altText_th,
                                                 achievement.images[currentImageIndex].altText_en,
@@ -259,7 +258,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                             }`}
                                                     >
                                                         <Image
-                                                            src={`${ACHIEVEMENTS_BASE}/${achievement.id}/${image.url}`}
+                                                            src={image.url}
                                                             alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
                                                             fill
                                                             className="object-cover"

@@ -120,9 +120,6 @@ export default async function AdminPage(props: {
             slug: true,
         },
     });
-
-    const ACHIEVEMENTS_BASE =
-        process.env.NEXT_PUBLIC_ACHIEVEMENTS_PUBLIC_BASE ?? "/achievements";
     
     const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
     const draftCount = achievements.filter(a => a.status === 'DRAFT').length;
@@ -306,7 +303,6 @@ export default async function AdminPage(props: {
 
                         <AdminAchievementsTable
                             achievements={achievements}
-                            achievementsBase={ACHIEVEMENTS_BASE}
                         />
                     </div>
 

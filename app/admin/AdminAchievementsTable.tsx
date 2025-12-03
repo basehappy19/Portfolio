@@ -12,12 +12,10 @@ import toast from 'react-hot-toast';
 
 type Props = {
     achievements: Achievement[];
-    achievementsBase: string;
 };
 
 export const AdminAchievementsTable = ({
     achievements,
-    achievementsBase,
 }: Props) => {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -181,7 +179,7 @@ export const AdminAchievementsTable = ({
                                                         <div className="relative w-20 h-20 shrink-0">
                                                             <Image
                                                                 fill
-                                                                src={`${achievementsBase}/${achievement.id}/${achievement.images[0].url}`}
+                                                                src={achievement.images[0].url}
                                                                 alt={achievement.images[0].altText_th ?? achievement.title_th}
                                                                 className="w-full h-full object-cover rounded-lg shadow-md ring-2 ring-red-100 dark:ring-gray-700"
                                                             ></Image>
@@ -432,7 +430,7 @@ export const AdminAchievementsTable = ({
                                                                     {achievement.images.map((image) => (
                                                                         <div key={image.id} className="group relative">
                                                                             <Image
-                                                                                src={`${achievementsBase}/${achievement.id}/${image.url}`}
+                                                                                src={image.url}
                                                                                 alt={image.altText_th ?? achievement.title_th}
                                                                                 width={100}
                                                                                 height={32}
