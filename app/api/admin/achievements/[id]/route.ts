@@ -1,11 +1,10 @@
 import { Prisma, PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
 import { ApiImage, ApiLink } from "@/types/Api";
-import { unlink, rm } from "fs/promises";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
+import { supabaseServerClient } from "@/lib/supabaseServer";
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -13,7 +12,7 @@ const prisma = new PrismaClient({ adapter });
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: { id: string } } 
 ) {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -24,7 +23,7 @@ export async function PUT(
     }
 
     try {
-        const { id: achievementId } = await params;
+        const { id: achievementId } = params;
         const body = await req.json();
 
         const {
@@ -64,6 +63,7 @@ export async function PUT(
             );
         }
 
+        // --- categories ---
         const categories =
             categorySlugs.length > 0
                 ? await prisma.category.findMany({
@@ -84,9 +84,8 @@ export async function PUT(
                 })),
             });
         }
-        const fsBase =
-            process.env.ACHIEVEMENTS_FS_BASE ?? "public/achievements";
 
+        // --- images ---
         const imagePayload = images as ApiImage[];
 
         const imageIdsToKeep = new Set(
@@ -97,29 +96,50 @@ export async function PUT(
             (img) => !imageIdsToKeep.has(String(img.id))
         );
 
-        for (const img of imagesToDelete) {
-            const filePath = path.join(
-                process.cwd(),
-                fsBase,
-                achievementId,
-                img.url
-            );
-            try {
-                await unlink(filePath);
-            } catch (err: unknown) {
-                if (
-                    typeof err === "object" &&
-                    err &&
-                    "code" in err &&
-                    (err as { code: string }).code === "ENOENT"
-                ) {
-                } else {
-                    console.warn("Failed to delete file:", filePath, err);
+        // 🔥 ลบไฟล์จาก Supabase Storage แทนลบจาก filesystem
+        if (imagesToDelete.length > 0) {
+            const pathsToDelete: string[] = [];
+
+            for (const img of imagesToDelete) {
+                if (!img.url) continue;
+
+                try {
+                    const url = new URL(img.url);
+                    // url.pathname: /storage/v1/object/public/achievements/<achievementId>/<fileName>
+                    const prefix = "/storage/v1/object/public/achievements/";
+                    const idx = url.pathname.indexOf(prefix);
+
+                    if (idx !== -1) {
+                        const pathInBucket = url.pathname.substring(
+                            idx + prefix.length
+                        );
+                        // pathInBucket: <achievementId>/<fileName>
+                        pathsToDelete.push(pathInBucket);
+                    } else {
+                        // fallback กรณีเก็บเป็น path ตรง ๆ
+                        pathsToDelete.push(img.url);
+                    }
+                } catch {
+                    // ถ้า parse URL ไม่ได้ (เช่นค่าที่เก่ามาก) ก็ลองใช้ url ดิบ ๆ
+                    pathsToDelete.push(img.url);
                 }
             }
-        }
 
-        if (imagesToDelete.length > 0) {
+            if (pathsToDelete.length > 0) {
+                const { error: deleteError } =
+                    await supabaseServerClient.storage
+                        .from("achievements")
+                        .remove(pathsToDelete);
+
+                if (deleteError) {
+                    console.warn(
+                        "Failed to delete images from Supabase:",
+                        deleteError
+                    );
+                }
+            }
+
+            // ลบ record image จาก DB
             await prisma.achievementImage.deleteMany({
                 where: {
                     id: { in: imagesToDelete.map((img) => img.id) },
@@ -127,8 +147,11 @@ export async function PUT(
             });
         }
 
+        // upsert รูปที่เหลือ + รูปใหม่
         for (const img of imagePayload) {
-            let url = img.preview;
+            let url = img.preview; // ตอนนี้เป็น Supabase public URL อยู่แล้ว
+
+            // ถ้าเป็นรูปเก่าแบบเก็บ path `/achievements/...` จะรองรับไว้เป็น fallback
             if (url.startsWith("/achievements/")) {
                 const parts = url.split("/");
                 url = parts[parts.length - 1];
@@ -157,6 +180,7 @@ export async function PUT(
             }
         }
 
+        // --- links ---
         const linkPayload = links as ApiLink[];
 
         const linkIdsToKeep = linkPayload
@@ -196,6 +220,7 @@ export async function PUT(
             }
         }
 
+        // --- achievement fields ---
         const updateData: Prisma.AchievementUpdateInput = {};
 
         if (title_th !== undefined) updateData.title_th = title_th;
@@ -229,7 +254,7 @@ export async function PUT(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    { params }: { params: { id: string } }
 ) {
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -238,8 +263,9 @@ export async function DELETE(
     if (!session) {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
+
     try {
-        const { id: achievementId } = await params;
+        const { id: achievementId } = params;
 
         const existing = await prisma.achievement.findUnique({
             where: { id: achievementId },
@@ -255,32 +281,45 @@ export async function DELETE(
             );
         }
 
-        const fsBase =
-            process.env.ACHIEVEMENTS_FS_BASE ?? "public/achievements";
+        // 🔥 ลบไฟล์ใน Supabase Storage
+        // สมมติ img.url เป็น public URL เช่น:
+        // https://xxx.supabase.co/storage/v1/object/public/achievements/<achievementId>/<fileName>
+        const pathsToDelete: string[] = [];
 
         for (const img of existing.images) {
-            const filePath = path.join(
-                process.cwd(),
-                fsBase,
-                achievementId,
-                img.url
-            );
+            if (!img.url) continue;
 
             try {
-                await unlink(filePath);
-            } catch (err: unknown) {
-                if (
-                    typeof err === "object" &&
-                    err &&
-                    "code" in err &&
-                    (err as { code: string }).code === "ENOENT"
-                ) {
-                    continue;
+                const url = new URL(img.url);
+                const prefix = "/storage/v1/object/public/achievements/";
+                const idx = url.pathname.indexOf(prefix);
+
+                if (idx !== -1) {
+                    const pathInBucket = url.pathname.substring(idx + prefix.length);
+                    pathsToDelete.push(pathInBucket);
+                } else {
+
+                    pathsToDelete.push(img.url);
                 }
-                console.warn("Failed to delete file:", filePath, err);
+            } catch {
+                pathsToDelete.push(img.url);
             }
         }
 
+        if (pathsToDelete.length > 0) {
+            const { error: deleteError } = await supabaseServerClient.storage
+                .from("achievements") // ชื่อ bucket
+                .remove(pathsToDelete);
+
+            if (deleteError) {
+                console.warn(
+                    "Failed to delete files from Supabase:",
+                    deleteError
+                );
+            }
+        }
+
+        // 🗂️ ลบ relation / records ใน DB ตามเดิม
         await prisma.achievementsOnCategories.deleteMany({
             where: { achievementId },
         });
@@ -297,14 +336,6 @@ export async function DELETE(
             where: { id: achievementId },
         });
 
-        const dirPath = path.join(process.cwd(), fsBase, achievementId);
-
-        try {
-            await rm(dirPath, { recursive: true, force: true });
-        } catch (err) {
-            console.warn("Failed to delete directory:", dirPath, err);
-        }
-
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {
         console.error("DELETE /api/admin/achievements/[id] error", error);
@@ -314,3 +345,4 @@ export async function DELETE(
         );
     }
 }
+
