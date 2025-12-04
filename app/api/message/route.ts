@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({ connectionString });
     const prisma = new PrismaClient({ adapter });
-    
+
     try {
         const { name, email, message } = await req.json();
 

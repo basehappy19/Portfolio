@@ -20,12 +20,10 @@ export const useAchievementTextTranslation = ({
 }: Props) => {
     const isEditMode = !!editData;
 
-    // ใช้ track การแปลของแต่ละฟิลด์
     const [translating, setTranslating] = useState<
         Partial<Record<keyof FormState, boolean>>
     >({});
 
-    // ใช้ป้องกันแปลซ้ำถ้าข้อความเดียวกัน
     const [lastTranslatedSource, setLastTranslatedSource] = useState<
         Partial<Record<keyof FormState, string>>
     >({});
