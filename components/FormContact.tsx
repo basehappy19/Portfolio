@@ -19,7 +19,6 @@ type TouchedState = {
     message: boolean;
 };
 
-// ใช้ regex ตัวเดียวทั้ง validate และเปิด/ปิดปุ่ม
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const FormContact = () => {
@@ -63,7 +62,6 @@ const FormContact = () => {
             [name]: value as string,
         }));
 
-        // เคลียร์ error ของ field นั้น ๆ ทิ้งเมื่อพิมพ์ใหม่
         setErrors(prev => {
             if (!(name in prev)) return prev;
             const newErrors = { ...prev };
@@ -147,7 +145,6 @@ const FormContact = () => {
                 isThai ? 'ข้อความถูกส่งแล้ว!' : 'Message sent!'
             );
 
-            // รีเซ็ตฟอร์ม
             setFormData({ name: '', email: '', message: '' });
             setErrors({});
             setTouched({ name: false, email: false, message: false });
@@ -165,7 +162,6 @@ const FormContact = () => {
         }
     };
 
-    // ใช้คุมปุ่มให้เปิดเมื่อกรอกครบ + email ถูกต้อง
     const isFormValid =
         formData.name.trim() !== '' &&
         formData.email.trim() !== '' &&
@@ -315,7 +311,6 @@ const FormContact = () => {
                         />
                     )}
 
-                    {/* Content */}
                     <div className="relative z-10 flex items-center gap-2">
                         {isSubmitting ? (
                             <>

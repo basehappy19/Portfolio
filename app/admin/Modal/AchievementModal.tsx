@@ -3,7 +3,7 @@ import {
     useState,
     DragEvent,
 } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle, Save, Loader2 } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import { EditData } from '@/types/Achievements';
@@ -76,12 +76,18 @@ const AchievementModalInner = ({
                 : defaultSortOrder
         ), isPublished: editData ? editData.status === 'PUBLIC' : true,
     }));
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
         title_th: false,
         title_en: false,
         categorySlugs: false,
     });
+
+    const isFormValid =
+        formData.title_th.trim() !== '' &&
+        formData.title_en.trim() !== '' &&
+        formData.categorySlugs.length > 0;
 
     const {
         handleBlur,
@@ -210,6 +216,7 @@ const AchievementModalInner = ({
     };
 
     const handleSubmit = async () => {
+        if (isSubmitting) return;
         if (!validateForm()) {
             toast.error("กรุณากรอกข้อมูลให้ครบถ้วน");
 
@@ -218,6 +225,8 @@ const AchievementModalInner = ({
 
             return;
         }
+
+        setIsSubmitting(true);
 
         const normalizedLinks = links.map((link, idx) => ({
             ...link,
@@ -279,6 +288,8 @@ const AchievementModalInner = ({
         } catch (error) {
             console.error(error);
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -623,6 +634,7 @@ const AchievementModalInner = ({
       border-gray-100 bg-gray-50/80
       dark:border-gray-800 dark:bg-gray-900/30
     ">
+
                     <div className="max-w-3xl mx-auto flex justify-end gap-3">
                         <button
                             onClick={close}
@@ -630,20 +642,68 @@ const AchievementModalInner = ({
             cursor-pointer px-6 py-2.5 rounded-xl font-medium transition-all
             border border-gray-200 text-gray-700 hover:bg-white
             dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800
-          "
+        "
                         >
                             ยกเลิก
                         </button>
+
                         <button
                             onClick={handleSubmit}
+                            disabled={isSubmitting || !isFormValid}
                             className="
             cursor-pointer px-6 py-2.5 rounded-xl font-medium
-            bg-blue-600 hover:bg-blue-700 text-white
-            shadow-sm shadow-blue-600/20 hover:shadow-md hover:shadow-blue-600/30
+            bg-blue-600 text-white
+            shadow-sm shadow-blue-600/20
             transition-all
-          "
+            hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/30
+            disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none
+            relative overflow-hidden group
+        "
                         >
-                            {editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}
+                            {isSubmitting && (
+                                <div
+                                    className="absolute inset-0 bg-linear-to-r from-blue-700 via-sky-400 to-blue-700"
+                                    style={{
+                                        backgroundSize: '200% 100%',
+                                        animation: 'shimmer 2s infinite linear',
+                                    }}
+                                />
+                            )}
+
+                            <div className="relative z-10 flex items-center gap-2">
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="relative">
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <div className="absolute inset-0 w-5 h-5 rounded-full border-2 border-white/30 animate-ping" />
+                                        </div>
+                                        <span className="animate-pulse">
+                                            {editData ? 'กำลังบันทึกการแก้ไข...' : 'กำลังบันทึกผลงาน...'}
+                                        </span>
+                                        <div className="flex gap-1">
+                                            <div
+                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                                                style={{ animationDelay: '0ms' }}
+                                            />
+                                            <div
+                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                                                style={{ animationDelay: '150ms' }}
+                                            />
+                                            <div
+                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
+                                                style={{ animationDelay: '300ms' }}
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>
+                                            {editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}
+                                        </span>
+                                        <Save className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </>
+                                )}
+                            </div>
                         </button>
                     </div>
                 </div>
