@@ -307,7 +307,7 @@ const FormContact = () => {
                 >
                     {isSubmitting && (
                         <div
-                            className="absolute inset-0 bg-gradient-to-r from-red-600 via-red-400 to-red-600"
+                            className="absolute inset-0 bg-linear-to-r from-red-600 via-red-400 to-red-600"
                             style={{
                                 backgroundSize: '200% 100%',
                                 animation: 'shimmer 2s infinite linear',
