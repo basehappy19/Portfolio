@@ -338,7 +338,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                             >
                                                 <div className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1 shadow-sm">
                                                     <button
-                                                        className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        className="dark:text-white cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนขึ้น"
                                                         disabled={
                                                             achievements.length <= 1 ||
@@ -360,7 +360,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                     </span>
 
                                                     <button
-                                                        className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                                                        className="dark:text-white cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนลง"
                                                         disabled={
                                                             achievements.length <= 1 ||
