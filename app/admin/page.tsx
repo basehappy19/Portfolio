@@ -75,6 +75,8 @@ export default async function AdminPage(props: {
             awardLevel_en: true,
             location_th: true,
             location_en: true,
+            given_by_th: true,
+            given_by_en: true,
             receivedAt: true,
             status: true,
             sortOrder: true,
