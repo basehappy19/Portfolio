@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
             awardLevel_en,
             location_th,
             location_en,
+            given_by_th,
+            given_by_en,
             receivedAt,
             sortOrder = 0,
             status = "DRAFT",
@@ -44,6 +46,8 @@ export async function POST(req: NextRequest) {
             awardLevel_en?: string | null;
             location_th?: string | null;
             location_en?: string | null;
+            given_by_th?: string | null;
+            given_by_en?: string | null;
             receivedAt?: string | null;
             sortOrder?: number;
             status?: "PUBLIC" | "DRAFT";
@@ -75,6 +79,8 @@ export async function POST(req: NextRequest) {
                 awardLevel_en: awardLevel_en ?? null,
                 location_th: location_th ?? null,
                 location_en: location_en ?? null,
+                given_by_th: given_by_th ?? null,
+                given_by_en: given_by_en ?? null,
                 receivedAt: receivedAt ?? null,
                 sortOrder,
                 status,

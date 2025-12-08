@@ -31,6 +31,13 @@ export async function PUT(
             title_en,
             description_th,
             description_en,
+            location_th,
+            location_en,
+            given_by_th,
+            given_by_en,
+            awardLevel_th,
+            awardLevel_en,
+            receivedAt,
             sortOrder,
             status,
             categorySlugs = [],
@@ -41,6 +48,13 @@ export async function PUT(
             title_en?: string;
             description_th?: string | null;
             description_en?: string | null;
+            location_th?: string | null;
+            location_en?: string | null;
+            given_by_th?: string | null;
+            given_by_en?: string | null;
+            awardLevel_th?: string | null;
+            awardLevel_en?: string | null;
+            receivedAt?: string | null;
             sortOrder?: number;
             status?: "PUBLIC" | "DRAFT";
             categorySlugs?: string[];
@@ -223,8 +237,23 @@ export async function PUT(
             updateData.description_th = description_th ?? null;
         if (description_en !== undefined)
             updateData.description_en = description_en ?? null;
+        if (location_th !== undefined)
+            updateData.location_th = location_th ?? null;
+        if (location_en !== undefined)
+            updateData.location_en = location_en ?? null;
+        if (given_by_th !== undefined)
+            updateData.given_by_th = given_by_th ?? null;
+        if (given_by_en !== undefined)
+            updateData.given_by_en = given_by_en ?? null;
+        if (awardLevel_th !== undefined)
+            updateData.awardLevel_th = awardLevel_th ?? null;
+        if (awardLevel_en !== undefined)
+            updateData.awardLevel_en = awardLevel_en ?? null;
+        if (receivedAt !== undefined)
+            updateData.receivedAt = receivedAt ?? null;
         if (sortOrder !== undefined) updateData.sortOrder = sortOrder;
         if (status !== undefined) updateData.status = status;
+
 
         const updated = await prisma.achievement.update({
             where: { id: achievementId },

@@ -38,6 +38,7 @@ export const useAchievementTextTranslation = ({
         { th: "description_th", en: "description_en" },
         { th: "awardLevel_th", en: "awardLevel_en" },
         { th: "location_th", en: "location_en" },
+        { th: "given_by_th", en: "given_by_en" },
     ];
 
     const isTouchedKey = (
@@ -48,7 +49,6 @@ export const useAchievementTextTranslation = ({
         );
     };
 
-    /** 🔥 translate เพียงฟิลด์เดียว — independent — แปลพร้อมกันได้ */
     const translateField = async (
         source: keyof FormState,
         target: keyof FormState,
@@ -90,7 +90,6 @@ export const useAchievementTextTranslation = ({
         }
     };
 
-    /** 🔥 blur แต่ละฟิลด์ → debounce → translate (ไม่ต้องรอฟิลด์อื่น) */
     const handleThaiBlur = (field: keyof FormState) => {
         if (isTouchedKey(field)) {
             handleBlur(field);

@@ -35,7 +35,6 @@ export const createAchievement = async (payload: SubmitData) => {
         }
 
         const data = await res.json();
-        // ❌ ไม่ต้อง revalidatePath ที่นี่ เพราะคุณใช้ router.refresh() แล้ว
         return data;
     } catch (error) {
         console.error("❌ createAchievement Error:", error);

@@ -27,7 +27,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
     };
 
     const title = tField(achievement.title_th, achievement.title_en, locale);
-    const gived_by = tField(achievement.gived_by_th, achievement.gived_by_en, locale);
+    const given_by = tField(achievement.given_by_th, achievement.given_by_en, locale);
     const description = tField(achievement.description_th, achievement.description_en, locale);
     const awardLevel = tField(achievement.awardLevel_th, achievement.awardLevel_en, locale);
     const location = tField(achievement.location_th, achievement.location_en, locale);
@@ -134,10 +134,10 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         {title}
                     </h3>
 
-                    {/* gived_by */}
-                    {gived_by && (
+                    {/* given_by */}
+                    {given_by && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
-                            {gived_by}
+                            {given_by}
                         </p>
                     )}
 

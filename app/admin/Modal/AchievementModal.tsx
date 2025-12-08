@@ -68,6 +68,8 @@ const AchievementModalInner = ({
         awardLevel_en: editData?.awardLevel_en ?? '',
         location_th: editData?.location_th ?? '',
         location_en: editData?.location_en ?? '',
+        given_by_th: editData?.given_by_th ?? '',
+        given_by_en: editData?.given_by_en ?? '',
         receivedAt,
         categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
         sortOrder: Number(
@@ -383,6 +385,28 @@ const AchievementModalInner = ({
                                 size="md"
                                 error={errors.title_en}
                                 touched={touched.title_en}
+                            />
+
+                            <AchievementTextField
+                                label="มอบโดย"
+                                name="given_by_th"
+                                value={formData.given_by_th}
+                                onChange={handleInputChange}
+                                onBlur={() => handleThaiBlur('given_by_th')}
+                                placeholder="มอบโดย"
+                                required
+                                size="md"
+                                isTranslating={!!translating.given_by_th}
+                            />
+
+                            <AchievementTextField
+                                label="มอบโดย (English)"
+                                name="given_by_en"
+                                value={formData.given_by_en}
+                                onChange={handleInputChange}
+                                placeholder="Given by"
+                                required
+                                size="md"
                             />
 
                             <AchievementTextarea
