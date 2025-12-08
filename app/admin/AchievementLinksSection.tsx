@@ -15,7 +15,10 @@ type Props = {
     handleLinkDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragOver: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragEnd: () => void;
-    handleLinkThaiBlur: (index: number) => void;
+    // ❌ เดิม: handleLinkThaiBlur
+    // handleLinkThaiBlur: (index: number) => void;
+    // ✅ ใหม่: ปุ่มแปล
+    handleTranslateLink: (index: number) => void;
     translatingLink?: Record<number, boolean>;
 };
 
@@ -28,8 +31,8 @@ export const AchievementLinksSection: React.FC<Props> = ({
     handleLinkDragStart,
     handleLinkDragOver,
     handleLinkDragEnd,
-    handleLinkThaiBlur,
-    translatingLink
+    handleTranslateLink,
+    translatingLink,
 }) => {
     return (
         <div>
@@ -41,10 +44,10 @@ export const AchievementLinksSection: React.FC<Props> = ({
                     type="button"
                     onClick={addLink}
                     className="
-                        cursor-pointer text-sm px-3 py-1 rounded-lg border transition-all
-                        bg-white text-gray-700 border-gray-300 hover:bg-gray-100
-                        dark:bg-transparent dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700
-                    "
+            cursor-pointer text-sm px-3 py-1 rounded-lg border transition-all
+            bg-white text-gray-700 border-gray-300 hover:bg-gray-100
+            dark:bg-transparent dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700
+          "
                 >
                     + เพิ่มลิงก์
                 </button>
@@ -67,15 +70,14 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                 onDragOver={(e) => handleLinkDragOver(e, index)}
                                 onDragEnd={handleLinkDragEnd}
                                 className={`
-                                    p-3 rounded-lg border space-y-2 transition-all
-                                    bg-white shadow-sm
-                                    dark:bg-gray-800 dark:shadow-none
-
-                                    ${draggedLinkIndex === index
+                  p-3 rounded-lg border space-y-2 transition-all
+                  bg-white shadow-sm
+                  dark:bg-gray-800 dark:shadow-none
+                  ${draggedLinkIndex === index
                                         ? 'border-red-500'
                                         : 'border-gray-200 dark:border-gray-700'
                                     }
-                                `}
+                `}
                             >
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -93,26 +95,58 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    {/* label_th */}
-                                    <input
-                                        type="text"
-                                        placeholder="ชื่อปุ่ม (ไทย)"
-                                        value={link.label_th}
-                                        onChange={(e) =>
-                                            handleLinkChange(index, 'label_th', e.target.value)
-                                        }
-                                        onBlur={() => handleLinkThaiBlur(index)}
-                                        className={`
-                                            w-full px-3 py-2 text-sm rounded border shadow-sm
-                                            bg-white text-gray-900 placeholder-gray-400
-                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
-                                            ${isTranslating
-                                                ? 'border-red-400 animate-pulse'
-                                                : 'border-gray-300 dark:border-gray-600'
+                                    {/* label_th + ปุ่มแปล */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            placeholder="ชื่อปุ่ม (ไทย)"
+                                            value={link.label_th}
+                                            onChange={(e) =>
+                                                handleLinkChange(index, 'label_th', e.target.value)
                                             }
-                                        `}
-                                    />
+                                            className={`
+                        w-full px-3 py-2 text-sm rounded border shadow-sm
+                        bg-white text-gray-900 placeholder-gray-400
+                        focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                        pr-28
+                        dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
+                        ${isTranslating
+                                                    ? 'border-red-400 animate-pulse'
+                                                    : 'border-gray-300 dark:border-gray-600'
+                                                }
+                      `}
+                                        />
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleTranslateLink(index)}
+                                            disabled={isTranslating}
+                                            className={`
+                        absolute right-2 top-1/2 -translate-y-1/2
+                        inline-flex items-center justify-center
+                        px-3 py-1.5
+                        text-xs font-medium
+                        rounded-lg
+                        border border-sky-500/70
+                        bg-sky-50 text-sky-700
+                        hover:bg-sky-100 hover:border-sky-600
+                        dark:bg-sky-900/20 dark:text-sky-200 dark:border-sky-500/60
+                        dark:hover:bg-sky-900/40
+                        disabled:opacity-60 disabled:cursor-not-allowed
+                        transition-all
+                        active:scale-[0.97]
+                      `}
+                                        >
+                                            {isTranslating ? (
+                                                <span className="flex items-center gap-1">
+                                                    <span className="w-3 h-3 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
+                                                    กำลังแปล...
+                                                </span>
+                                            ) : (
+                                                <span>แปลเป็นอังกฤษ</span>
+                                            )}
+                                        </button>
+                                    </div>
 
                                     {/* label_en */}
                                     <input
@@ -123,11 +157,11 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                             handleLinkChange(index, 'label_en', e.target.value)
                                         }
                                         className="
-                                            w-full px-3 py-2 text-sm rounded border shadow-sm
-                                            bg-white text-gray-900 placeholder-gray-400 border-gray-300
-                                            focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                                            dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
-                                        "
+                      w-full px-3 py-2 text-sm rounded border shadow-sm
+                      bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                      focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                      dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
+                    "
                                     />
                                 </div>
 
@@ -147,11 +181,11 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                         handleLinkChange(index, 'url', e.target.value)
                                     }
                                     className="
-                                        w-full px-3 py-2 text-sm rounded border shadow-sm
-                                        bg-white text-gray-900 placeholder-gray-400 border-gray-300
-                                        focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                                        dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
-                                    "
+                    w-full px-3 py-2 text-sm rounded border shadow-sm
+                    bg-white text-gray-900 placeholder-gray-400 border-gray-300
+                    focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
+                    dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
+                  "
                                 />
                             </div>
                         );

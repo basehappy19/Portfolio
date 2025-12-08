@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { EditData } from "@/types/Achievements";
 import { ImagePreview } from "@/types/Form";
 
@@ -11,12 +11,9 @@ type Props = {
 };
 
 export const useImageAltTranslation = ({
-    editData,
     imagePreview,
     setImagePreview,
 }: Props) => {
-    const isEditMode = !!editData;
-
     const [translatingImageAlt, setTranslatingImageAlt] = useState<
         Record<number, boolean>
     >({});
@@ -25,9 +22,17 @@ export const useImageAltTranslation = ({
         Record<number, string>
     >({});
 
-    const timers = useRef<Record<number, number>>({});
+    const translateAlt = async (index: number) => {
+        const current = imagePreview[index];
+        const raw = current?.altText_th;
 
-    const translateAlt = async (index: number, textTh: string) => {
+        if (typeof raw !== "string") return;
+
+        const textTh = raw.trim();
+        if (!textTh) return;
+
+        if (lastTranslatedTh[index] === textTh) return;
+
         try {
             setTranslatingImageAlt((prev) => ({ ...prev, [index]: true }));
 
@@ -63,30 +68,8 @@ export const useImageAltTranslation = ({
         }
     };
 
-    const handleImageAltThaiBlur = (index: number) => {
-        if (isEditMode) return;
-
-        const current = imagePreview[index];
-        const raw = current?.altText_th;
-
-        if (typeof raw !== "string") return;
-
-        const textTh = raw.trim();
-        if (!textTh) return;
-
-        if (lastTranslatedTh[index] === textTh) return;
-
-        if (timers.current[index]) {
-            clearTimeout(timers.current[index]);
-        }
-
-        timers.current[index] = window.setTimeout(() => {
-            translateAlt(index, textTh);
-        }, 250);
-    };
-
     return {
         translatingImageAlt,
-        handleImageAltThaiBlur,
+        handleTranslateImageAlt: translateAlt,
     };
 };

@@ -140,20 +140,18 @@ const AchievementModalInner = ({
         })) ?? []
     );
 
-    const { translating, handleThaiBlur } = useAchievementTextTranslation({
+    const { translating, handleTranslate } = useAchievementTextTranslation({
         editData,
         formData,
         setFormData,
-        handleBlur,
     });
 
-    const { translatingLink, handleLinkThaiBlur } = useLinkTranslation({
-        editData,
+    const { translatingLink, handleTranslateLink } = useLinkTranslation({
         links,
         setLinks,
     });
 
-    const { translatingImageAlt, handleImageAltThaiBlur } = useImageAltTranslation({
+    const { translatingImageAlt, handleTranslateImageAlt } = useImageAltTranslation({
         editData,
         imagePreview,
         setImagePreview,
@@ -365,13 +363,14 @@ const AchievementModalInner = ({
                                 name="title_th"
                                 value={formData.title_th}
                                 onChange={handleInputChange}
-                                onBlur={() => handleThaiBlur('title_th')}
+                                onBlur={() => handleBlur("title_th")}
                                 placeholder="ชื่อผลงาน"
                                 required
                                 size="lg"
                                 error={errors.title_th}
                                 touched={touched.title_th}
                                 isTranslating={!!translating.title_th}
+                                onTranslate={() => handleTranslate("title_th")}
                             />
 
                             <AchievementTextField
@@ -392,11 +391,11 @@ const AchievementModalInner = ({
                                 name="given_by_th"
                                 value={formData.given_by_th}
                                 onChange={handleInputChange}
-                                onBlur={() => handleThaiBlur('given_by_th')}
                                 placeholder="มอบโดย"
                                 required
                                 size="md"
                                 isTranslating={!!translating.given_by_th}
+                                onTranslate={() => handleTranslate("given_by_th")}
                             />
 
                             <AchievementTextField
@@ -414,10 +413,10 @@ const AchievementModalInner = ({
                                 name="description_th"
                                 value={formData.description_th}
                                 onChange={handleInputChange}
-                                onBlur={() => handleThaiBlur('description_th')}
                                 placeholder="อธิบายรายละเอียดผลงาน..."
                                 rows={4}
                                 isTranslating={!!translating.description_th}
+                                onTranslate={() => handleTranslate("description_th")}
                             />
 
                             <AchievementTextarea
@@ -445,10 +444,10 @@ const AchievementModalInner = ({
                                     name="awardLevel_th"
                                     value={formData.awardLevel_th}
                                     onChange={handleInputChange}
-                                    onBlur={() => handleThaiBlur('awardLevel_th')}
                                     placeholder="ประเทศ | จังหวัด | เขต"
                                     size="md"
                                     isTranslating={!!translating.awardLevel_th}
+                                    onTranslate={() => handleTranslate("awardLevel_th")}
                                 />
 
                                 <AchievementTextField
@@ -467,10 +466,10 @@ const AchievementModalInner = ({
                                     name="location_th"
                                     value={formData.location_th}
                                     onChange={handleInputChange}
-                                    onBlur={() => handleThaiBlur('location_th')}
                                     placeholder="สถานที่"
                                     size="md"
                                     isTranslating={!!translating.location_th}
+                                    onTranslate={() => handleTranslate("location_th")}
                                 />
 
                                 <AchievementTextField
@@ -622,7 +621,7 @@ const AchievementModalInner = ({
                                 handleLinkDragStart={handleLinkDragStart}
                                 handleLinkDragOver={handleLinkDragOver}
                                 handleLinkDragEnd={handleLinkDragEnd}
-                                handleLinkThaiBlur={handleLinkThaiBlur}
+                                handleTranslateLink={handleTranslateLink}
                                 translatingLink={translatingLink}
                             />
                         </div>
@@ -645,7 +644,7 @@ const AchievementModalInner = ({
                                 handleDragStart={handleDragStart}
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
-                                handleImageAltThaiBlur={handleImageAltThaiBlur}
+                                handleTranslateImageAlt={handleTranslateImageAlt}
                                 translatingImageAlt={translatingImageAlt}
                             />
                         </div>

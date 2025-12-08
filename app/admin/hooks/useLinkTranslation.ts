@@ -1,17 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { EditData } from "@/types/Achievements";
+import { useState } from "react";
 import { LinkForm } from "@/types/Form";
 
 type Props = {
-    editData: EditData | null;
     links: LinkForm[];
     setLinks: React.Dispatch<React.SetStateAction<LinkForm[]>>;
 };
 
-export const useLinkTranslation = ({ editData, links, setLinks }: Props) => {
-    const isEditMode = !!editData;
+export const useLinkTranslation = ({ links, setLinks }: Props) => {
     const [translatingLink, setTranslatingLink] = useState<
         Record<number, boolean>
     >({});
@@ -20,9 +17,17 @@ export const useLinkTranslation = ({ editData, links, setLinks }: Props) => {
         Record<number, string>
     >({});
 
-    const timers = useRef<Record<number, number>>({});
+    const translateLabel = async (index: number) => {
+        const current = links[index];
+        const raw = current?.label_th;
 
-    const translateLabel = async (index: number, textTh: string) => {
+        if (typeof raw !== "string") return;
+
+        const textTh = raw.trim();
+        if (!textTh) return;
+
+        if (lastTranslatedTh[index] === textTh) return;
+
         try {
             setTranslatingLink((prev) => ({ ...prev, [index]: true }));
 
@@ -58,30 +63,8 @@ export const useLinkTranslation = ({ editData, links, setLinks }: Props) => {
         }
     };
 
-    const handleLinkThaiBlur = (index: number) => {
-        if (isEditMode) return;
-
-        const current = links[index];
-        const raw = current?.label_th;
-
-        if (typeof raw !== "string") return;
-
-        const textTh = raw.trim();
-        if (!textTh) return;
-
-        if (lastTranslatedTh[index] === textTh) return;
-
-        if (timers.current[index]) {
-            clearTimeout(timers.current[index]);
-        }
-
-        timers.current[index] = window.setTimeout(() => {
-            translateLabel(index, textTh);
-        }, 250);
-    };
-
     return {
         translatingLink,
-        handleLinkThaiBlur,
+        handleTranslateLink: translateLabel,
     };
 };

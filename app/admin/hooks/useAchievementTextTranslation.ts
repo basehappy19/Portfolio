@@ -1,25 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { EditData } from "@/types/Achievements";
 import { FormState } from "@/types/Form";
-import { TouchedState } from "../types/achievementValidation";
 
 type Props = {
     editData: EditData | null;
     formData: FormState;
     setFormData: React.Dispatch<React.SetStateAction<FormState>>;
-    handleBlur: (field: keyof TouchedState) => void;
 };
 
 export const useAchievementTextTranslation = ({
-    editData,
     formData,
     setFormData,
-    handleBlur,
 }: Props) => {
-    const isEditMode = !!editData;
-
     const [translating, setTranslating] = useState<
         Partial<Record<keyof FormState, boolean>>
     >({});
@@ -27,11 +21,6 @@ export const useAchievementTextTranslation = ({
     const [lastTranslatedSource, setLastTranslatedSource] = useState<
         Partial<Record<keyof FormState, string>>
     >({});
-
-    // debounce แยก field
-    const translateTimers = useRef<Partial<Record<keyof FormState, number>>>(
-        {}
-    );
 
     const FIELD_PAIRS: { th: keyof FormState; en: keyof FormState }[] = [
         { th: "title_th", en: "title_en" },
@@ -41,24 +30,13 @@ export const useAchievementTextTranslation = ({
         { th: "given_by_th", en: "given_by_en" },
     ];
 
-    const isTouchedKey = (
-        field: keyof FormState
-    ): field is keyof TouchedState => {
-        return ["title_th", "title_en", "categorySlugs"].includes(
-            field as string
-        );
-    };
-
     const translateField = async (
         source: keyof FormState,
         target: keyof FormState,
         value: string
     ) => {
         try {
-            setTranslating((prev) => ({
-                ...prev,
-                [source]: true,
-            }));
+            setTranslating((prev) => ({ ...prev, [source]: true }));
 
             const res = await fetch("/api/translate", {
                 method: "POST",
@@ -90,13 +68,8 @@ export const useAchievementTextTranslation = ({
         }
     };
 
-    const handleThaiBlur = (field: keyof FormState) => {
-        if (isTouchedKey(field)) {
-            handleBlur(field);
-        }
-
-        if (isEditMode) return;
-
+    // เรียกตอนกดปุ่มแปล
+    const handleTranslate = (field: keyof FormState) => {
         const pair = FIELD_PAIRS.find((p) => p.th === field);
         if (!pair) return;
 
@@ -104,24 +77,18 @@ export const useAchievementTextTranslation = ({
         const targetKey = pair.en;
 
         const raw = formData[sourceKey];
-
         if (typeof raw !== "string" || !raw.trim()) return;
 
         const value = raw;
 
+        // กัน spam แปลซ้ำข้อความเดิม (จะรักษาไว้หรือจะลบก็ได้)
         if (lastTranslatedSource[sourceKey] === value) return;
 
-        if (translateTimers.current[field]) {
-            clearTimeout(translateTimers.current[field]!);
-        }
-
-        translateTimers.current[field] = window.setTimeout(() => {
-            translateField(sourceKey, targetKey, value);
-        }, 250);
+        translateField(sourceKey, targetKey, value);
     };
 
     return {
         translating,
-        handleThaiBlur,
+        handleTranslate,
     };
 };

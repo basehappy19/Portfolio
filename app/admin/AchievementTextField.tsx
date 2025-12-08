@@ -18,6 +18,7 @@ type Props = {
     /** ถ้าอยาก override class ของ container */
     containerClassName?: string;
     isTranslating?: boolean;
+    onTranslate?: () => void;
 };
 
 export const AchievementTextField: React.FC<Props> = ({
@@ -33,23 +34,23 @@ export const AchievementTextField: React.FC<Props> = ({
     size = 'md',
     containerClassName = '',
     isTranslating = false,
+    onTranslate,
 }) => {
     const hasError = Boolean(error && touched);
 
-    const baseInputClass =
-        [
-            'w-full px-4',
-            'border',
-            'bg-white text-gray-900 placeholder-gray-400', 
-            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
-            'shadow-sm',
-            'dark:bg-gray-800 dark:text-white dark:placeholder-gray-400',
-        ].join(' ');
+    const baseInputClass = [
+        'w-full',
+        'border',
+        'bg-white text-gray-900 placeholder-gray-400',
+        'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+        'shadow-sm',
+        'dark:bg-gray-800 dark:text-white dark:placeholder-gray-400',
+    ].join(' ');
 
     const sizeClass =
         size === 'lg'
-            ? 'py-3 rounded-xl transition-all duration-200'
-            : 'py-2 rounded-lg';
+            ? 'px-4 py-3 rounded-xl transition-all duration-200'
+            : 'px-3 py-2 rounded-lg';
 
     const borderClass = hasError
         ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
@@ -60,6 +61,8 @@ export const AchievementTextField: React.FC<Props> = ({
             ? 'animate-pulse border-red-400 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]'
             : '';
 
+    const paddingRightClass = onTranslate ? 'pr-28' : '';
+
     return (
         <div className={`${hasError ? 'error-field' : ''} ${containerClassName}`}>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -67,15 +70,50 @@ export const AchievementTextField: React.FC<Props> = ({
                 {required && <span className="text-red-500">*</span>}
             </label>
 
-            <input
-                type="text"
-                name={name}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                placeholder={placeholder}
-                className={`${baseInputClass} ${sizeClass} ${borderClass} ${translatingClass}`}
-            />
+            <div className="relative flex items-center">
+                <input
+                    type="text"
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    placeholder={placeholder}
+                    className={`${baseInputClass} ${sizeClass} ${borderClass} ${translatingClass} ${paddingRightClass}`}
+                />
+
+                {onTranslate && (
+                    <button
+                        type="button"
+                        onClick={onTranslate}
+                        disabled={isTranslating}
+                        className={`
+                            cursor-pointer
+                            absolute right-2
+                            inline-flex items-center justify-center
+                            px-3 py-1.5
+                            text-xs font-medium
+                            rounded-lg
+                            border border-sky-500/70
+                            bg-sky-50 text-sky-700
+                            hover:bg-sky-100 hover:border-sky-600
+                            dark:bg-sky-900/20 dark:text-sky-200 dark:border-sky-500/60
+                            dark:hover:bg-sky-900/40
+                            disabled:opacity-60 disabled:cursor-not-allowed
+                            transition-all
+                            active:scale-[0.97]
+                        `}
+                    >
+                        {isTranslating ? (
+                            <span className="flex items-center gap-1">
+                                <span className="w-3 h-3 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
+                                กำลังแปล...
+                            </span>
+                        ) : (
+                            <span>แปลเป็นอังกฤษ</span>
+                        )}
+                    </button>
+                )}
+            </div>
 
             {hasError && (
                 <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-slideDown">
