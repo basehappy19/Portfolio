@@ -38,11 +38,13 @@ export type Achievement = {
     description_th: string | null;
     awardLevel_th: string | null;
     location_th: string | null;
+    gived_by_th: string | null;
 
     title_en: string;
     description_en: string | null;
     awardLevel_en: string | null;
     location_en: string | null;
+    gived_by_en: string | null;
 
     sortOrder: number;
     receivedAt: Date | null;
