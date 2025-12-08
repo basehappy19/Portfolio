@@ -620,14 +620,14 @@ const AchievementModalInner = ({
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, sortOrder: Math.max(1, prev.sortOrder - 1) }))}
-                                                className="p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                                className="cursor-pointer p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
                                             >
                                                 <span className="text-lg font-bold text-gray-700 dark:text-gray-300">−</span>
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, sortOrder: prev.sortOrder + 1 }))}
-                                                className="p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                                className="cursor-pointer p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
                                             >
                                                 <span className="text-lg font-bold text-gray-700 dark:text-gray-300">+</span>
                                             </button>
