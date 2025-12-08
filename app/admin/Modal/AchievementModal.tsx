@@ -3,7 +3,7 @@ import {
     useState,
     DragEvent,
 } from 'react';
-import { X, AlertCircle, Save, Loader2 } from 'lucide-react';
+import { X, AlertCircle, Save, Loader2, Grid3x3, CheckCircle2 } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import { EditData } from '@/types/Achievements';
@@ -482,23 +482,24 @@ const AchievementModalInner = ({
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    ได้รับเมื่อ
+                            <div className="group">
+                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                                    วันที่ได้รับ
                                 </label>
-                                <input
-                                    type="date"
-                                    name="receivedAt"
-                                    value={formData.receivedAt ?? ""}
-                                    onChange={handleInputChange}
-                                    className="
-                w-full px-4 py-3 rounded-xl border shadow-sm transition-all
-                bg-white text-gray-900 placeholder-gray-400 border-gray-300
-                focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                dark:bg-gray-800/50 dark:text-white dark:border-gray-700
-              "
-                                    placeholder="2025-11-30"
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        name="receivedAt"
+                                        value={formData.receivedAt}
+                                        onChange={handleInputChange}
+                                        className="
+                    w-full px-4 py-3.5 rounded-xl border-gray-300 border-2 transition-all duration-200
+                    bg-white text-gray-900 placeholder-gray-400 hover:border-red-300 hover:bg-white
+                    dark:hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500
+                    shadow-sm dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-red-500
+                  "
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -511,65 +512,127 @@ const AchievementModalInner = ({
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className={errors.categorySlugs && touched.categorySlugs ? 'error-field' : ''}>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        หมวดหมู่ <span className="text-red-500">*</span>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                {/* Categories - Enhanced Multi-Select */}
+                                <div className="lg:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                                        <Grid3x3 className="w-4 h-4 text-red-500" />
+                                        หมวดหมู่
+                                        <span className="text-red-500">*</span>
                                     </label>
 
-                                    <select
-                                        multiple
-                                        name="categorySlugs"
-                                        value={formData.categorySlugs}
-                                        onChange={handleCategoryChange}
-                                        onBlur={() => handleBlur('categorySlugs')}
-                                        className={`
-                  w-full px-4 py-3 rounded-xl border shadow-sm transition-all
-                  bg-white text-gray-900 border-gray-300
-                  focus:outline-none focus:ring-2 focus:ring-red-500/20
-                  dark:bg-gray-800/50 dark:text-white dark:border-gray-700
+                                    <div className={`
+                  rounded-xl border-2 transition-all duration-200 overflow-hidden
                   ${errors.categorySlugs && touched.categorySlugs
-                                                ? 'border-red-400 bg-red-50 dark:bg-red-900/20 focus:border-red-500'
-                                                : 'focus:border-red-500'
-                                            }
-                `}
-                                    >
-                                        {categories.map((cat) => (
-                                            <option key={cat.id} value={cat.slug}>
-                                                {cat.name_th} - {cat.name_en}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            ? 'border-red-400 bg-red-50/50 dark:bg-red-950/20 dark:border-red-500'
+                                            : 'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700'
+                                        }
+                `}>
+                                        <select
+                                            multiple
+                                            name="categorySlugs"
+                                            value={formData.categorySlugs}
+                                            onChange={handleCategoryChange}
+                                            onBlur={() => handleBlur('categorySlugs')}
+                                            className="
+  w-full min-h-[200px] border-2 px-4 py-3
+  text-sm sm:text-base
+  bg-white text-gray-900 border-gray-200 shadow-sm
+  focus:outline-none
 
-                                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                        💡 กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายหมวดหมู่
-                                    </p>
+  dark:bg-gray-900 dark:text-gray-50 dark:border-gray-700 dark:shadow-sm
+
+  [&>option]:bg-white [&>option]:text-gray-900 [&>option]:border [&>option]:border-gray-200
+  [&>option]:py-2.5 [&>option]:px-3 [&>option]:my-1 [&>option]:rounded-lg
+
+  [&>option:hover]:bg-gray-100 [&>option:hover]:cursor-pointer
+
+  [&>option:checked]:bg-red-500 [&>option:checked]:text-white
+
+  dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100 dark:[&>option]:border-gray-600
+  dark:[&>option:hover]:bg-gray-700
+  dark:[&>option:checked]:bg-red-500 dark:[&>option:checked]:text-white
+"
+                                        >
+                                            {categories.map((cat) => (
+                                                <option key={cat.id} value={cat.slug}>
+                                                    {cat.name_th} - {cat.name_en}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <div className="cursor-default px-4 py-3 bg-gray-50 border-t border-gray-200 dark:bg-gray-900/50 dark:border-gray-700">
+                                            <div className="flex items-center justify-between gap-4">
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                                    <span>💡</span>
+                                                    <span>
+                                                        กด <kbd className="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Ctrl</kbd>
+                                                        {' '}/{' '}
+                                                        <kbd className="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Cmd</kbd>
+                                                        {' '}ค้างไว้เพื่อเลือกหลายหมวดหมู่
+                                                    </span>
+                                                </p>
+
+                                                {formData.categorySlugs.length > 0 && (
+                                                    <div className="flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                                        <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                                                            {formData.categorySlugs.length} หมวดหมู่
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
 
                                     {errors.categorySlugs && touched.categorySlugs && (
-                                        <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
-                                            <AlertCircle size={16} />
-                                            <span>{errors.categorySlugs}</span>
+                                        <div className="flex items-center gap-2 mt-3 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                                            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+                                            <span className="text-sm text-red-600 dark:text-red-400 font-medium">{errors.categorySlugs}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {/* Sort Order - Enhanced */}
+                                <div className="lg:col-span-2">
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
                                         ลำดับการแสดงผล
                                     </label>
-                                    <input
-                                        type="number"
-                                        name="sortOrder"
-                                        value={formData.sortOrder}
-                                        onChange={handleInputChange}
-                                        min={1}
-                                        className="
-                  w-full px-4 py-3 rounded-xl border shadow-sm transition-all
-                  bg-white text-gray-900 placeholder-gray-400 border-gray-300
-                  focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                  dark:bg-gray-800/50 dark:text-white dark:border-gray-700
-                "
-                                    />
+                                    <div className="flex items-center gap-4">
+                                        <input
+                                            type="number"
+                                            name="sortOrder"
+                                            value={formData.sortOrder}
+                                            onChange={handleInputChange}
+                                            min={1}
+                                            className="
+                      flex-1 px-4 py-3.5 rounded-xl border-2 transition-all duration-200
+                      bg-gray-50 text-gray-900 border-gray-200
+                      hover:border-red-300 hover:bg-white
+                      focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 focus:bg-white
+                      dark:bg-gray-900/50 dark:text-white dark:border-gray-700
+                      dark:hover:border-red-400 dark:hover:bg-gray-900
+                      dark:focus:border-red-500
+                    "
+                                        />
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({ ...prev, sortOrder: Math.max(1, prev.sortOrder - 1) }))}
+                                                className="p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                            >
+                                                <span className="text-lg font-bold text-gray-700 dark:text-gray-300">−</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({ ...prev, sortOrder: prev.sortOrder + 1 }))}
+                                                className="p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                            >
+                                                <span className="text-lg font-bold text-gray-700 dark:text-gray-300">+</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

@@ -37,7 +37,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
     return (
         <div>
             <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                     ลิงก์ที่เกี่ยวข้อง
                 </label>
                 <button

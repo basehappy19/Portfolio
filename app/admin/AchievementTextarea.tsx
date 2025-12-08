@@ -30,12 +30,11 @@ export const AchievementTextarea: React.FC<Props> = ({
     const hasError = Boolean(errorMessage);
 
     const baseClass = [
-        'w-full px-4 py-3 border rounded-xl resize-none transition-all',
-        // light mode
-        'bg-white text-gray-900 placeholder-gray-400',
-        'focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500',
-        // dark mode
-        'dark:bg-gray-800/50 dark:text-white dark:placeholder-gray-400',
+        'w-full px-4 py-3.5 rounded-xl border-2 transition-all duration-200',
+        'bg-white text-gray-900 placeholder-gray-400 hover:border-red-300 hover:bg-white',
+        'dark:hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500',
+        'shadow-sm',
+        'dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-red-500',
     ].join(' ');
 
     const borderClass = hasError
@@ -49,7 +48,7 @@ export const AchievementTextarea: React.FC<Props> = ({
 
     return (
         <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
                 {label}
             </label>
 
