@@ -100,7 +100,7 @@ export default async function IndexPage(props: {
         {/* SECTION 1 */}
         <section id='Home' className="w-full bg-rose-50 dark:bg-[#20232b]">
           <div className="max-w-6xl mx-auto px-4 md:px-6 md:pt-8">
-            <div className="md:hidden block mb-4">
+            <div className="md:hidden flex items-center justify-center pt-16">
               <LanguageSwitcher />
             </div>
             <Home />
