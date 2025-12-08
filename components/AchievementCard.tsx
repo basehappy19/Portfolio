@@ -194,17 +194,29 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {/* Modal */}
             {isModalOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-md bg-black/40"
+                    className="
+    fixed inset-0 z-50 flex items-center justify-center 
+    cursor-pointer backdrop-blur-md bg-black/40 
+    md:p-4
+  "
                     onClick={closeModal}
                     style={{
-                        animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
+                        animation: isAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
                     }}
                 >
                     <div
-                        className="cursor-default relative w-full max-w-6xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden"
+                        className="
+      cursor-default relative 
+      w-full h-full              
+      md:w-full md:max-w-6xl     
+      md:h-auto md:max-h-[95vh]  
+      bg-white dark:bg-gray-900 
+      md:rounded-3xl shadow-2xl 
+      overflow-hidden
+    "
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
+                            animation: isAnimating ? "modalSlideIn 0.3s ease-out" : "modalSlideOut 0.2s ease-in",
                         }}
                     >
                         {/* Close Button */}
@@ -291,7 +303,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                             {/* Content */}
                             <div className="p-10">
-                                <div className="max-w-4xl mx-auto space-y-8">
+                                <div className="space-y-8">
                                     {/* Badges */}
                                     <div className="flex flex-wrap gap-2">
                                         {awardLevel && (
