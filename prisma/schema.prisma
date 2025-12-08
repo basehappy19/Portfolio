@@ -19,11 +19,13 @@ model Achievement {
   description_th String?
   awardLevel_th  String?
   location_th    String?
+  given_by_th    String?
 
   title_en       String
   description_en String?
   awardLevel_en  String?
   location_en    String?
+  given_by_en    String?
 
   receivedAt DateTime?
   sortOrder  Int                        @default(0)
