@@ -71,7 +71,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             prev === 0 ? achievement.images.length - 1 : prev - 1
         );
     };
-    
+
     return (
         <>
             {/* Card */}
@@ -134,11 +134,18 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         {title}
                     </h3>
 
-                    {/* given_by */}
+                    {/* Given By */}
                     {given_by && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
-                            {given_by}
-                        </p>
+                        <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                                    {locale === "th" ? "มอบโดย" : "Awarded By"}
+                                </span>
+                            </div>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
+                                {given_by}
+                            </p>
+                        </div>
                     )}
 
                     {/* Description */}
@@ -151,7 +158,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                     {/* Location */}
                     {location && (
                         <div className="flex items-center gap-2 mb-5">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700">
+                            <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700">
                                 <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                             </div>
                             <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
@@ -261,8 +268,8 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                         key={index}
                                                         onClick={() => setCurrentImageIndex(index)}
                                                         className={`cursor-pointer relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
-                                                                ? 'border-red-500 ring-2 ring-red-200 dark:ring-red-800 scale-105'
-                                                                : 'border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 hover:scale-105'
+                                                            ? 'border-red-500 ring-2 ring-red-200 dark:ring-red-800 scale-105'
+                                                            : 'border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 hover:scale-105'
                                                             }`}
                                                     >
                                                         <Image
@@ -327,18 +334,38 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                         )}
                                     </div>
 
-                                    {/* Description */}
-                                    {description && (
-                                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
-                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                                                <div className="w-1 h-6 bg-red-500 rounded-full"></div>
-                                                {locale === "th" ? "รายละเอียด" : "Description"}
-                                            </h3>
-                                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                                                {description}
-                                            </p>
-                                        </div>
-                                    )}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {/* Given By */}
+                                        {given_by && (
+                                            <div className="bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-amber-100 dark:border-amber-800/50 h-fit">
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                                    <div className="w-1 h-6 bg-linear-to-b from-amber-500 to-orange-500 rounded-full"></div>
+                                                    {locale === "th" ? "ผู้มอบรางวัล" : "Awarded By"}
+                                                </h3>
+                                                <div className="flex items-start gap-3">
+                                                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-linear-to-br from-amber-100 to-orange-100 dark:from-amber-900/50 dark:to-orange-900/50 shrink-0 shadow-sm">
+                                                        <Award className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                                                    </div>
+                                                    <p className="text-gray-800 dark:text-gray-200 leading-relaxed font-medium text-base mt-1">
+                                                        {given_by}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Description */}
+                                        {description && (
+                                            <div className={`bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 ${!given_by ? 'lg:col-span-2' : ''}`}>
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                                    <div className="w-1 h-6 bg-red-500 rounded-full"></div>
+                                                    {locale === "th" ? "รายละเอียด" : "Description"}
+                                                </h3>
+                                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                                                    {description}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* Links */}
                                     {achievement.links.length > 0 && (
@@ -367,7 +394,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div >
             )}
         </>
     );

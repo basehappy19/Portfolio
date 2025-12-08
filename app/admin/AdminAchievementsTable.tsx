@@ -2,31 +2,61 @@
 
 import React, { useState, useTransition } from 'react';
 import Image from 'next/image';
-import { Award, Calendar, ChevronDown, ChevronUp, ExternalLink, Eye, EyeOff, ImagePlus, Link2, MapPin, Trash2 } from 'lucide-react';
+import {
+    Award,
+    Calendar,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    Download,
+    ExternalLink,
+    Eye,
+    EyeOff,
+    ImagePlus,
+    Link2,
+    MapPin,
+    Trash2,
+    ZoomIn,
+    X, // ✅ เพิ่มเข้ามาเพื่อใช้ในปุ่มปิด lightbox
+} from 'lucide-react';
 import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';
 import EditAchievement from './Button/EditAchievement';
 import { useRouter } from 'next/navigation';
-import { changeAchievementSortOrder, deleteAchievement, toggleAchievementStatus } from './services/achievements';
+import {
+    changeAchievementSortOrder,
+    deleteAchievement,
+    toggleAchievementStatus,
+} from './services/achievements';
 import toast from 'react-hot-toast';
 
 type Props = {
     achievements: Achievement[];
 };
 
-export const AdminAchievementsTable = ({
-    achievements,
-}: Props) => {
+export const AdminAchievementsTable = ({ achievements }: Props) => {
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleteAnimating, setIsDeleteAnimating] = useState(false);
-    const [deletingItem, setDeletingItem] = useState<{ id: string; title: string } | null>(null);
-    const sortOrders = achievements.map(a => a.sortOrder);
+    const [deletingItem, setDeletingItem] = useState<{
+        id: string;
+        title: string;
+    } | null>(null);
+
+    const [lightbox, setLightbox] = useState<{
+        achievementId: string;
+        index: number;
+    } | null>(null);
+    const [isImagesAnimating, setIsImagesAnimating] = useState(false);
+
+    const sortOrders = achievements.map((a) => a.sortOrder);
     const minSortOrder = Math.min(...sortOrders);
     const maxSortOrder = Math.max(...sortOrders);
 
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
+
     const toggleRow = (id: string) => {
         const newExpanded = new Set(expandedRows);
         if (newExpanded.has(id)) {
@@ -66,8 +96,8 @@ export const AdminAchievementsTable = ({
                 toast.success(`ลบผลงาน "${deletingItem.title}" เรียบร้อยแล้ว`);
                 router.refresh();
             } catch (error) {
-                console.error("Delete error:", error);
-                toast.error("ไม่สามารถลบผลงานได้ กรุณาลองใหม่อีกครั้ง");
+                console.error('Delete error:', error);
+                toast.error('ไม่สามารถลบผลงานได้ กรุณาลองใหม่อีกครั้ง');
             } finally {
                 closeDeleteModal();
             }
@@ -76,42 +106,42 @@ export const AdminAchievementsTable = ({
 
     const handleChangeSortOrder = (
         id: string,
-        direction: "up" | "down",
+        direction: 'up' | 'down',
         currentSortOrder: number
     ) => {
         const newSortOrder =
-            direction === "up" ? currentSortOrder + 1 : currentSortOrder - 1;
+            direction === 'up' ? currentSortOrder + 1 : currentSortOrder - 1;
 
         if (newSortOrder < 1) {
-            toast.error("ลำดับต้องมากกว่า 0");
+            toast.error('ลำดับต้องมากกว่า 0');
             return;
         }
 
         startTransition(async () => {
             try {
                 await changeAchievementSortOrder(id, newSortOrder);
-                toast.success("เปลี่ยนลำดับเรียบร้อยแล้ว");
+                toast.success('เปลี่ยนลำดับเรียบร้อยแล้ว');
                 router.refresh();
             } catch (error) {
-                console.error("Change sortOrder error:", error);
-                toast.error("ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง");
+                console.error('Change sortOrder error:', error);
+                toast.error('ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง');
             }
         });
     };
 
-    const handleToggleStatus = (id: string, currentStatus: "PUBLIC" | "DRAFT") => {
+    const handleToggleStatus = (id: string, currentStatus: 'PUBLIC' | 'DRAFT') => {
         startTransition(async () => {
             try {
                 const data = await toggleAchievementStatus(id, currentStatus);
 
                 toast.success(
-                    data.status === "PUBLIC"
-                        ? "เผยแพร่ผลงานแล้ว"
-                        : "บันทึกเป็นแบบร่างแล้ว"
+                    data.status === 'PUBLIC'
+                        ? 'เผยแพร่ผลงานแล้ว'
+                        : 'บันทึกเป็นแบบร่างแล้ว'
                 );
                 router.refresh();
             } catch {
-                toast.error("เปลี่ยนสถานะไม่สำเร็จ");
+                toast.error('เปลี่ยนสถานะไม่สำเร็จ');
             }
         });
     };
@@ -120,9 +150,70 @@ export const AdminAchievementsTable = ({
         return new Intl.DateTimeFormat('th-TH', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
         }).format(date);
     };
+
+    // ==========================
+    //   IMAGE / LIGHTBOX LOGIC
+    // ==========================
+
+    const activeAchievement =
+        achievements.find((a) => a.id === lightbox?.achievementId) ?? null;
+
+    const activeImages = activeAchievement?.images ?? [];
+    const currentIndex = lightbox?.index ?? 0;
+    const selectedImage =
+        activeImages.length > 0 && currentIndex >= 0
+            ? activeImages[currentIndex]
+            : null;
+
+    // เปิด lightbox พร้อมจำว่าเป็นผลงานไหน รูป index ไหน
+    const openLightbox = (achievementId: string, index: number) => {
+        setIsImagesAnimating(true);
+        setLightbox({ achievementId, index });
+    };
+
+    const closeLightbox = () => {
+        setIsImagesAnimating(false);
+        setTimeout(() => {
+            setLightbox(null);
+            document.body.style.overflow = 'unset';
+        }, 200);
+    };
+
+    const goToNext = () => {
+        if (!lightbox || activeImages.length === 0) return;
+        const nextIndex = (lightbox.index + 1) % activeImages.length;
+        setLightbox({ ...lightbox, index: nextIndex });
+    };
+
+    const goToPrev = () => {
+        if (!lightbox || activeImages.length === 0) return;
+        const prevIndex =
+            (lightbox.index - 1 + activeImages.length) % activeImages.length;
+        setLightbox({ ...lightbox, index: prevIndex });
+    };
+
+    // ✅ keyboard navigation (ESC, ←, →)
+    React.useEffect(() => {
+        if (!lightbox) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') goToNext();
+            if (e.key === 'ArrowLeft') goToPrev();
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'unset';
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lightbox, activeImages.length]);
 
     return (
         <>
@@ -161,7 +252,9 @@ export const AdminAchievementsTable = ({
                                         <div className="flex flex-col items-center justify-center text-gray-400">
                                             <Award className="w-16 h-16 mb-4 opacity-50" />
                                             <p className="text-lg font-medium">ไม่พบข้อมูลผลงาน</p>
-                                            <p className="text-sm mt-1">เริ่มต้นสร้างผลงานใหม่ของคุณ</p>
+                                            <p className="text-sm mt-1">
+                                                เริ่มต้นสร้างผลงานใหม่ของคุณ
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
@@ -169,7 +262,6 @@ export const AdminAchievementsTable = ({
                                 achievements.map((achievement) => (
                                     <React.Fragment key={achievement.id}>
                                         <tr
-                                            key={achievement.id}
                                             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                                             onClick={() => toggleRow(achievement.id)}
                                         >
@@ -180,9 +272,13 @@ export const AdminAchievementsTable = ({
                                                             <Image
                                                                 fill
                                                                 src={achievement.images[0].url}
-                                                                alt={achievement.images[0].altText_th ?? achievement.title_th}
-                                                                className="w-full h-full object-cover rounded-lg shadow-md ring-2 ring-red-100 dark:ring-gray-700"
-                                                            ></Image>
+                                                                alt={
+                                                                    achievement.images[0].altText_th ??
+                                                                    achievement.title_th
+                                                                }
+                                                                className="object-cover rounded-lg shadow-md ring-2 ring-red-100 dark:ring-gray-700"
+                                                                sizes="80px"
+                                                            />
                                                             {achievement.images.length > 1 && (
                                                                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
                                                                     +{achievement.images.length - 1}
@@ -241,8 +337,6 @@ export const AdminAchievementsTable = ({
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <div className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1 shadow-sm">
-
-                                                    {/* ปุ่มเลื่อนขึ้น */}
                                                     <button
                                                         className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนขึ้น"
@@ -251,18 +345,20 @@ export const AdminAchievementsTable = ({
                                                             achievement.sortOrder === maxSortOrder
                                                         }
                                                         onClick={() =>
-                                                            handleChangeSortOrder(achievement.id, 'up', achievement.sortOrder)
+                                                            handleChangeSortOrder(
+                                                                achievement.id,
+                                                                'up',
+                                                                achievement.sortOrder
+                                                            )
                                                         }
                                                     >
                                                         <ChevronUp className="w-4 h-4" />
                                                     </button>
 
-                                                    {/* เลขลำดับ */}
                                                     <span className="inline-flex items-center justify-center w-10 h-8 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded">
                                                         {achievement.sortOrder}
                                                     </span>
 
-                                                    {/* ปุ่มเลื่อนลง */}
                                                     <button
                                                         className="cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนลง"
@@ -271,12 +367,15 @@ export const AdminAchievementsTable = ({
                                                             achievement.sortOrder === minSortOrder
                                                         }
                                                         onClick={() =>
-                                                            handleChangeSortOrder(achievement.id, 'down', achievement.sortOrder)
+                                                            handleChangeSortOrder(
+                                                                achievement.id,
+                                                                'down',
+                                                                achievement.sortOrder
+                                                            )
                                                         }
                                                     >
                                                         <ChevronDown className="w-4 h-4" />
                                                     </button>
-
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-center">
@@ -295,18 +394,24 @@ export const AdminAchievementsTable = ({
                                                     ) : (
                                                         <EyeOff className="w-4 h-4" />
                                                     )}
-                                                    {achievement.status === 'PUBLIC' ? 'เผยแพร่' : 'แบบร่าง'}
+                                                    {achievement.status === 'PUBLIC'
+                                                        ? 'เผยแพร่'
+                                                        : 'แบบร่าง'}
                                                 </button>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <div className="flex items-center justify-center gap-3">
                                                     <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                                                         <ImagePlus className="w-4 h-4" />
-                                                        <span className="text-sm font-medium">{achievement.images.length}</span>
+                                                        <span className="text-sm font-medium">
+                                                            {achievement.images.length}
+                                                        </span>
                                                     </div>
                                                     <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                                                         <Link2 className="w-4 h-4" />
-                                                        <span className="text-sm font-medium">{achievement.links.length}</span>
+                                                        <span className="text-sm font-medium">
+                                                            {achievement.links.length}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -339,39 +444,68 @@ export const AdminAchievementsTable = ({
                                                             {/* Description */}
                                                             <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                                                                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                                                                    <div className="w-1 h-4 bg-blue-600 rounded"></div>
+                                                                    <div className="w-1 h-4 bg-blue-600 rounded" />
                                                                     คำอธิบาย
                                                                 </h4>
                                                                 <div className="space-y-2">
                                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                        <span className="font-medium">TH:</span> {achievement.description_th || '-'}
+                                                                        <span className="font-medium">TH:</span>{' '}
+                                                                        {achievement.description_th || '-'}
                                                                     </p>
                                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                        <span className="font-medium">EN:</span> {achievement.description_en || '-'}
+                                                                        <span className="font-medium">EN:</span>{' '}
+                                                                        {achievement.description_en || '-'}
                                                                     </p>
                                                                 </div>
                                                             </div>
 
+                                                            {/* Given By */}
+                                                            {(achievement.given_by_th ||
+                                                                achievement.given_by_en) && (
+                                                                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                                                                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                                                                            <div className="w-1 h-4 bg-yellow-600 rounded" />
+                                                                            ผู้มอบรางวัล
+                                                                        </h4>
+                                                                        <div className="space-y-2">
+                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                                                <span className="font-medium">TH:</span>{' '}
+                                                                                {achievement.given_by_th || '-'}
+                                                                            </p>
+                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                                                <span className="font-medium">EN:</span>{' '}
+                                                                                {achievement.given_by_en || '-'}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
                                                             {/* Dates */}
                                                             <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                                                                 <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                                                                    <div className="w-1 h-4 bg-green-600 rounded"></div>
+                                                                    <div className="w-1 h-4 bg-green-600 rounded" />
                                                                     วันที่
                                                                 </h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-green-600" />
                                                                         <div>
-                                                                            <p className="text-xs text-gray-500">วันที่ได้รับ</p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                                วันที่ได้รับ
+                                                                            </p>
                                                                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                                                {achievement.receivedAt ? formatDate(achievement.receivedAt) : '-'}
+                                                                                {achievement.receivedAt
+                                                                                    ? formatDate(achievement.receivedAt)
+                                                                                    : '-'}
                                                                             </p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-blue-600" />
                                                                         <div>
-                                                                            <p className="text-xs text-gray-500">วันที่สร้าง</p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                                วันที่สร้าง
+                                                                            </p>
                                                                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                                                 {formatDate(achievement.createdAt)}
                                                                             </p>
@@ -380,7 +514,9 @@ export const AdminAchievementsTable = ({
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-purple-600" />
                                                                         <div>
-                                                                            <p className="text-xs text-gray-500">อัปเดตล่าสุด</p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                                อัปเดตล่าสุด
+                                                                            </p>
                                                                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                                                 {formatDate(achievement.updatedAt)}
                                                                             </p>
@@ -393,7 +529,7 @@ export const AdminAchievementsTable = ({
                                                             {achievement.links.length > 0 && (
                                                                 <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                                                                     <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                                                                        <div className="w-1 h-4 bg-purple-600 rounded"></div>
+                                                                        <div className="w-1 h-4 bg-purple-600 rounded" />
                                                                         ลิงก์ที่เกี่ยวข้อง
                                                                     </h4>
                                                                     <div className="space-y-2">
@@ -410,7 +546,9 @@ export const AdminAchievementsTable = ({
                                                                                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-purple-600 truncate">
                                                                                         {link.label_th}
                                                                                     </p>
-                                                                                    <p className="text-xs text-gray-500 truncate">{link.url}</p>
+                                                                                    <p className="text-xs text-gray-500 truncate">
+                                                                                        {link.url}
+                                                                                    </p>
                                                                                 </div>
                                                                             </a>
                                                                         ))}
@@ -419,27 +557,55 @@ export const AdminAchievementsTable = ({
                                                             )}
                                                         </div>
 
-                                                        {/* Right Column - Images */}
+                                                        {/* Gallery Grid */}
                                                         {achievement.images.length > 0 && (
-                                                            <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                                                                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                                                                    <div className="w-1 h-4 bg-pink-600 rounded"></div>
-                                                                    รูปภาพทั้งหมด ({achievement.images.length})
-                                                                </h4>
-                                                                <div className="grid grid-cols-2 gap-3">
-                                                                    {achievement.images.map((image) => (
-                                                                        <div key={image.id} className="group relative">
+                                                            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                                                                <div className="flex items-center justify-between mb-6">
+                                                                    <h4 className="text-lg font-bold text-gray-700 dark:text-gray-300 flex items-center gap-3">
+                                                                        รูปภาพทั้งหมด
+                                                                        <span className="ml-2 px-3 py-1 bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 rounded-full text-sm font-semibold">
+                                                                            {achievement.images.length}
+                                                                        </span>
+                                                                    </h4>
+                                                                </div>
+
+                                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                                    {achievement.images.map((image, index) => (
+                                                                        <div
+                                                                            key={image.id}
+                                                                            className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-700"
+                                                                            onClick={() =>
+                                                                                openLightbox(achievement.id, index)
+                                                                            }
+                                                                        >
                                                                             <Image
+                                                                                fill
                                                                                 src={image.url}
-                                                                                alt={image.altText_th ?? achievement.title_th}
-                                                                                width={100}
-                                                                                height={32}
-                                                                                className="w-full h-32 object-cover rounded-lg shadow-md group-hover:shadow-xl transition-shadow"
-                                                                            ></Image>
-                                                                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-75 rounded-lg transition-all flex items-end p-2">
-                                                                                <p className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                                    {image.altText_th || 'No description'}
-                                                                                </p>
+                                                                                alt={
+                                                                                    image.altText_th ??
+                                                                                    achievement.title_th
+                                                                                }
+                                                                                className="object-cover transition-all duration-300 group-hover:scale-110"
+                                                                                sizes="(min-width: 1024px) 25vw, 50vw"
+                                                                            />
+
+                                                                            {/* Overlay */}
+                                                                            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                                                                        <ZoomIn className="w-6 h-6 text-white" />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="absolute bottom-0 left-0 right-0 p-3">
+                                                                                    <p className="text-white text-sm font-medium line-clamp-2">
+                                                                                        {image.altText_th || 'ไม่มีคำอธิบาย'}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Image Counter Badge */}
+                                                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                                                {index + 1}/{achievement.images.length}
                                                                             </div>
                                                                         </div>
                                                                     ))}
@@ -458,6 +624,125 @@ export const AdminAchievementsTable = ({
                 </div>
             </div>
 
+            {activeAchievement && selectedImage && (
+                <>
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40"
+                        onClick={closeLightbox}
+                        style={{
+                            animation: isImagesAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
+                        }}
+
+                    >
+                        {/* Close Button */}
+                        <button
+                            onClick={closeLightbox}
+                            className="cursor-pointer absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                            title="ปิด (ESC)"
+                        >
+                            <X className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
+                        </button>
+
+                        {/* Previous Button */}
+                        {activeImages.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    goToPrev();
+                                }}
+                                className="cursor-pointer absolute left-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                                title="ก่อนหน้า (←)"
+                            >
+                                <ChevronLeft className="w-6 h-6 text-white group-hover:-translate-x-1 transition-transform duration-200" />
+                            </button>
+                        )}
+
+                        {/* Next Button */}
+                        {activeImages.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    goToNext();
+                                }}
+                                className="cursor-pointer absolute right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                                title="ถัดไป (→)"
+                            >
+                                <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform duration-200" />
+                            </button>
+                        )}
+
+                        {/* Image Container */}
+                        <div
+                            className="relative max-w-7xl w-full mx-4 h-[80vh]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <Image
+                                fill
+                                src={selectedImage.url}
+                                alt={selectedImage.altText_th ?? activeAchievement.title_th}
+                                className="object-contain rounded-lg shadow-2xl"
+                                sizes="90vw"
+                            />
+
+                            {/* Image Info Bar */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 rounded-b-lg">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <p className="text-white font-semibold text-lg mb-1">
+                                            {selectedImage.altText_th || 'ไม่มีคำอธิบาย'}
+                                        </p>
+                                        <p className="text-white/70 text-sm">
+                                            รูปที่ {currentIndex + 1} จาก {activeImages.length}
+                                        </p>
+                                    </div>
+                                    <a
+                                        href={selectedImage.url}
+                                        download
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-white font-medium"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        ดาวน์โหลด
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Thumbnail Strip */}
+                        {activeImages.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-4xl w-full px-4">
+                                <div className="flex gap-2 justify-center overflow-x-auto pb-2 scrollbar-hide">
+                                    {activeImages.map((image, index) => (
+                                        <button
+                                            key={image.id}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setLightbox({
+                                                    achievementId: activeAchievement.id,
+                                                    index,
+                                                });
+                                            }}
+                                            className={`cursor-pointer relative shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-200 ${index === currentIndex
+                                                ? 'ring-4 ring-white scale-110'
+                                                : 'ring-2 ring-white/30 hover:ring-white/60 opacity-60 hover:opacity-100'
+                                                }`}
+                                        >
+                                            <Image
+                                                fill
+                                                src={image.url}
+                                                alt={image.altText_th ?? activeAchievement.title_th}
+                                                className="object-cover"
+                                                sizes="64px"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+
             <DeleteModal
                 isOpen={isDeleteModalOpen}
                 isAnimating={isDeleteAnimating}
@@ -466,7 +751,6 @@ export const AdminAchievementsTable = ({
                 itemName={deletingItem?.title}
                 isLoading={isPending}
             />
-
         </>
     );
 };

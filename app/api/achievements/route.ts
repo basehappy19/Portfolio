@@ -17,11 +17,13 @@ export async function GET(req: Request) {
             description_th: true,
             awardLevel_th: true,
             location_th: true,
+            given_by_th: true,
 
             title_en: true,
             description_en: true,
             awardLevel_en: true,
             location_en: true,
+            given_by_en: true,
 
             status: true,
             sortOrder: true,
