@@ -14,7 +14,84 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Home, Award, Filter } from 'lucide-react';
+import { getLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 
+export async function generateMetadata(): Promise<Metadata> {
+    const locale = await getLocale();
+    const isTH = locale === "th";
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const path = "/admin";
+    const url = `${baseUrl}${path}`;
+
+    const title = isTH
+        ? "ระบบจัดการผลงาน | พอร์ตฟอลิโอของผม"
+        : "Achievements Admin Panel | My Portfolio";
+
+    const description = isTH
+        ? "ระบบหลังบ้านสำหรับจัดการผลงาน รางวัล และข้อมูลในพอร์ตฟอลิโอของผม"
+        : "Admin dashboard for managing achievements, awards, and portfolio content.";
+
+    const image = process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? "";
+
+    return {
+        title,
+        description,
+        keywords: isTH
+            ? [
+                "ระบบจัดการผลงาน",
+                "แอดมิน",
+                "พอร์ตฟอลิโอ",
+                "ผลงาน",
+                "จัดการเนื้อหา",
+            ]
+            : [
+                "admin",
+                "dashboard",
+                "achievements",
+                "portfolio admin",
+                "content management",
+            ],
+
+        openGraph: {
+            title,
+            description,
+            url,
+            siteName: isTH ? "พอร์ตฟอลิโอของผม" : "My Portfolio",
+            images: [
+                {
+                    url: image,
+                    width: 1200,
+                    height: 630,
+                    alt: isTH ? "ระบบจัดการผลงาน" : "Achievements Admin Panel",
+                },
+            ],
+            locale,
+            type: "website",
+        },
+
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [image],
+        },
+
+        alternates: {
+            canonical: url,
+            languages: {
+                en: `${baseUrl}/en${path}`,
+                th: `${baseUrl}/th${path}`,
+            },
+        },
+
+        robots: {
+            index: false,
+            follow: false,
+        },
+    };
+}
 
 export default async function AdminPage(props: {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -122,7 +199,7 @@ export default async function AdminPage(props: {
             slug: true,
         },
     });
-    
+
     const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
     const draftCount = achievements.filter(a => a.status === 'DRAFT').length;
     const totalImages = achievements.reduce((sum, a) => sum + a.images.length, 0);
@@ -133,7 +210,7 @@ export default async function AdminPage(props: {
     });
 
     const nextSortOrder = (sortOrderAgg._max.sortOrder ?? 0) + 1;
-    
+
     return (
         <CategoriesProvider categories={categories}>
             <AchievementModalProvider>
