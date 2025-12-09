@@ -52,32 +52,42 @@ const AchievementModalInner = ({
     isAnimating: boolean
     defaultSortOrder: number;
 }) => {
+    const createInitialFormState = (
+        editData: EditData | null,
+        defaultSortOrder: number
+    ): FormState => {
+        const receivedAt =
+            editData?.receivedAt instanceof Date
+                ? editData.receivedAt.toISOString().slice(0, 10)
+                : editData?.receivedAt ?? "";
+
+        return {
+            title_th: editData?.title_th ?? "",
+            title_en: editData?.title_en ?? "",
+            description_th: editData?.description_th ?? "",
+            description_en: editData?.description_en ?? "",
+            awardLevel_th: editData?.awardLevel_th ?? "",
+            awardLevel_en: editData?.awardLevel_en ?? "",
+            location_th: editData?.location_th ?? "",
+            location_en: editData?.location_en ?? "",
+            given_by_th: editData?.given_by_th ?? "",
+            given_by_en: editData?.given_by_en ?? "",
+            receivedAt,
+            categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
+            sortOrder: Number(
+                editData?.sortOrder != null ? editData.sortOrder : defaultSortOrder
+            ),
+            isPublished: editData ? editData.status === "PUBLIC" : true,
+        };
+    };
+
     const router = useRouter();
     const categories = useCategories();
-    const receivedAt =
-        editData?.receivedAt instanceof Date
-            ? editData.receivedAt.toISOString().slice(0, 10)
-            : editData?.receivedAt ?? "";
 
-    const [formData, setFormData] = useState<FormState>(() => ({
-        title_th: editData?.title_th ?? '',
-        title_en: editData?.title_en ?? '',
-        description_th: editData?.description_th ?? '',
-        description_en: editData?.description_en ?? '',
-        awardLevel_th: editData?.awardLevel_th ?? '',
-        awardLevel_en: editData?.awardLevel_en ?? '',
-        location_th: editData?.location_th ?? '',
-        location_en: editData?.location_en ?? '',
-        given_by_th: editData?.given_by_th ?? '',
-        given_by_en: editData?.given_by_en ?? '',
-        receivedAt,
-        categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
-        sortOrder: Number(
-            editData?.sortOrder != null
-                ? editData.sortOrder
-                : defaultSortOrder
-        ), isPublished: editData ? editData.status === 'PUBLIC' : true,
-    }));
+    const [formData, setFormData] = useState<FormState>(() =>
+        createInitialFormState(editData, defaultSortOrder)
+    );
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -282,15 +292,28 @@ const AchievementModalInner = ({
 
             await updateAchievement(achievementId!, finalPayload);
 
-            toast.success(editData ? 'แก้ไขผลงานเรียบร้อย' : 'เพิ่มผลงานเรียบร้อย');
+            toast.success(editData ? "แก้ไขผลงานเรียบร้อย" : "เพิ่มผลงานเรียบร้อย");
             router.refresh();
-            close();
+
+            if (!editData) {
+                const nextSortOrder = formData.sortOrder + 1;
+                setFormData(createInitialFormState(null, nextSortOrder));
+                setImagePreview([]);
+                setLinks([]);
+                setErrors({});
+                setTouched({
+                    title_th: false,
+                    title_en: false,
+                    categorySlugs: false,
+                });
+            }
         } catch (error) {
             console.error(error);
-            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+            toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
         } finally {
             setIsSubmitting(false);
         }
+
     };
 
 
@@ -392,7 +415,6 @@ const AchievementModalInner = ({
                                 value={formData.given_by_th}
                                 onChange={handleInputChange}
                                 placeholder="มอบโดย"
-                                required
                                 size="md"
                                 isTranslating={!!translating.given_by_th}
                                 onTranslate={() => handleTranslate("given_by_th")}
@@ -404,7 +426,6 @@ const AchievementModalInner = ({
                                 value={formData.given_by_en}
                                 onChange={handleInputChange}
                                 placeholder="Given by"
-                                required
                                 size="md"
                             />
 
