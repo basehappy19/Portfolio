@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import Image from 'next/image';
 import {
     Award,
@@ -36,6 +36,11 @@ type Props = {
 };
 
 export const AdminAchievementsTable = ({ achievements }: Props) => {
+    const [localAchievements, setLocalAchievements] = useState(achievements);
+    const [isPending, startTransition] = useTransition();
+    const [workingId, setWorkingId] = useState<string | null>(null);
+    const router = useRouter();
+
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleteAnimating, setIsDeleteAnimating] = useState(false);
@@ -50,12 +55,12 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     } | null>(null);
     const [isImagesAnimating, setIsImagesAnimating] = useState(false);
 
-    const sortOrders = achievements.map((a) => a.sortOrder);
-    const minSortOrder = Math.min(...sortOrders);
-    const maxSortOrder = Math.max(...sortOrders);
+    const minSortOrder = Math.min(...localAchievements.map(a => a.sortOrder));
+    const maxSortOrder = Math.max(...localAchievements.map(a => a.sortOrder));
 
-    const [isPending, startTransition] = useTransition();
-    const router = useRouter();
+    useEffect(() => {
+        setLocalAchievements(achievements);
+    }, [achievements]);
 
     const toggleRow = (id: string) => {
         const newExpanded = new Set(expandedRows);
@@ -107,33 +112,78 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     const handleChangeSortOrder = (
         id: string,
         direction: 'up' | 'down',
-        currentSortOrder: number
     ) => {
-        const newSortOrder =
-            direction === 'up' ? currentSortOrder + 1 : currentSortOrder - 1;
+        if (localAchievements.length <= 1) return;
 
-        if (newSortOrder < 1) {
-            toast.error('ลำดับต้องมากกว่า 0');
-            return;
-        }
+        // 1) ทำสำเนา list ปัจจุบัน (เรียงตาม sortOrder ก่อนเพื่อความชัวร์)
+        const sorted = [...localAchievements].sort(
+            (a, b) => b.sortOrder - a.sortOrder
+        );
 
+        const currentIndex = sorted.findIndex(a => a.id === id);
+        if (currentIndex === -1) return;
+
+        const targetIndex =
+            direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+        // ถ้าอยู่บนสุดแล้วกดขึ้น หรืออยู่ล่างสุดแล้วกดลง → ไม่ทำอะไร
+        if (targetIndex < 0 || targetIndex >= sorted.length) return;
+
+        // 2) ย้ายตำแหน่ง item ใน array (swap)
+        const newList = [...sorted];
+        const [moved] = newList.splice(currentIndex, 1);
+        newList.splice(targetIndex, 0, moved);
+
+        // 3) re-index sortOrder ใหม่ให้ทุกตัวสอดคล้อง (อันนี้ใช้มากไปน้อย: N..1)
+        const maxOrder = newList.length;
+        let newSortOrderForClicked = moved.sortOrder;
+
+        const reindexed = newList.map((a, index) => {
+            const sortOrder = maxOrder - index; // แถวบนสุด = maxOrder, แถวล่างสุด = 1
+            if (a.id === id) {
+                newSortOrderForClicked = sortOrder;
+            }
+            return {
+                ...a,
+                sortOrder,
+            };
+        });
+
+        // 4) อัปเดต UI ทันที (optimistic)
+        setLocalAchievements(reindexed);
+        setWorkingId(id);
+
+        // 5) ยิงไป server ให้ sync จริง
         startTransition(async () => {
             try {
-                await changeAchievementSortOrder(id, newSortOrder);
+                await changeAchievementSortOrder(id, newSortOrderForClicked);
                 toast.success('เปลี่ยนลำดับเรียบร้อยแล้ว');
                 router.refresh();
             } catch (error) {
                 console.error('Change sortOrder error:', error);
                 toast.error('ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง');
+                setLocalAchievements(achievements);
+            } finally {
+                setWorkingId(null);
             }
         });
     };
 
+
     const handleToggleStatus = (id: string, currentStatus: 'PUBLIC' | 'DRAFT') => {
+        const nextStatus = currentStatus === 'PUBLIC' ? 'DRAFT' : 'PUBLIC';
+
+        // optimistic update
+        setLocalAchievements(prev =>
+            prev.map(a =>
+                a.id === id ? { ...a, status: nextStatus } : a
+            )
+        );
+        setWorkingId(id);
+
         startTransition(async () => {
             try {
                 const data = await toggleAchievementStatus(id, currentStatus);
-
                 toast.success(
                     data.status === 'PUBLIC'
                         ? 'เผยแพร่ผลงานแล้ว'
@@ -142,9 +192,13 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                 router.refresh();
             } catch {
                 toast.error('เปลี่ยนสถานะไม่สำเร็จ');
+                setLocalAchievements(achievements);
+            } finally {
+                setWorkingId(null);
             }
         });
     };
+
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat('th-TH', {
@@ -195,7 +249,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         setLightbox({ ...lightbox, index: prevIndex });
     };
 
-    // ✅ keyboard navigation (ESC, ←, →)
     React.useEffect(() => {
         if (!lightbox) return;
 
@@ -246,7 +299,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {achievements.length === 0 ? (
+                            {localAchievements.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-16 text-center">
                                         <div className="flex flex-col items-center justify-center text-gray-400">
@@ -259,7 +312,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                     </td>
                                 </tr>
                             ) : (
-                                achievements.map((achievement) => (
+                                localAchievements.map((achievement) => (
                                     <React.Fragment key={achievement.id}>
                                         <tr
                                             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
@@ -336,19 +389,21 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                 className="px-6 py-4 text-center"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
-                                                <div className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1 shadow-sm">
+                                                <div className={`inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1 shadow-sm
+    ${workingId === achievement.id ? 'opacity-60 cursor-wait' : ''}
+  `}>
                                                     <button
                                                         className="dark:text-white cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนขึ้น"
                                                         disabled={
-                                                            achievements.length <= 1 ||
-                                                            achievement.sortOrder === maxSortOrder
+                                                            localAchievements.length <= 1 ||
+                                                            achievement.sortOrder === maxSortOrder ||
+                                                            workingId === achievement.id
                                                         }
                                                         onClick={() =>
                                                             handleChangeSortOrder(
                                                                 achievement.id,
                                                                 'up',
-                                                                achievement.sortOrder
                                                             )
                                                         }
                                                     >
@@ -363,14 +418,14 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                         className="dark:text-white cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
                                                         title="เลื่อนลง"
                                                         disabled={
-                                                            achievements.length <= 1 ||
-                                                            achievement.sortOrder === minSortOrder
+                                                            localAchievements.length <= 1 ||
+                                                            achievement.sortOrder === minSortOrder ||
+                                                            workingId === achievement.id
                                                         }
                                                         onClick={() =>
                                                             handleChangeSortOrder(
                                                                 achievement.id,
                                                                 'down',
-                                                                achievement.sortOrder
                                                             )
                                                         }
                                                     >
@@ -378,12 +433,17 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                     </button>
                                                 </div>
                                             </td>
+
                                             <td className="px-6 py-4 text-center">
                                                 <button
-                                                    className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all ${achievement.status === 'PUBLIC'
-                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800'
-                                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                                                        }`}
+                                                    className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all
+      ${achievement.status === 'PUBLIC'
+                                                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800'
+                                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                                        }
+      ${workingId === achievement.id ? 'opacity-60 cursor-wait' : ''}
+    `}
+                                                    disabled={workingId === achievement.id}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleToggleStatus(achievement.id, achievement.status);
