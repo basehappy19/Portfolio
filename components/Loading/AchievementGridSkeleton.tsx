@@ -54,4 +54,12 @@ const AchievementCardSkeleton = () => {
     );
 };
 
-export default AchievementCardSkeleton;
+const AchievementGridSkeleton = () => (
+    <>
+        {Array.from({ length: 6 }).map((_, i) => (
+            <AchievementCardSkeleton key={i} />
+        ))}
+    </>
+);
+
+export default AchievementGridSkeleton;

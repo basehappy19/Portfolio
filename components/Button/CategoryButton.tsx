@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import type { slugCurrentCategory, UiCategory } from '../CategoryFilterTab';
 
 type CategoryButtonProps = {
@@ -10,27 +11,26 @@ type CategoryButtonProps = {
 
 const CategoryButton = ({ slugCurrentCategory, category }: CategoryButtonProps) => {
     const pathname = usePathname();
-    const router = useRouter();
     const searchParams = useSearchParams();
 
     const isActive = slugCurrentCategory && slugCurrentCategory === category.slug;
 
-    const handleClick = () => {
-        const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams.toString());
+    if (isActive) {
+        params.delete('category');
+    } else {
+        params.set('category', category.slug);
+    }
 
-        if (isActive) {
-            params.delete('category');
-        } else {
-            params.set('category', category.slug);
-        }
-
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    };
+    const href = `${pathname}?${params.toString()}`;
 
     return (
-        <button
-            onClick={handleClick}
+        <Link
+            href={href}
+            scroll={false}
+            prefetch
             className={`
+                inline-flex items-center justify-center
                 cursor-pointer px-6 py-2.5 rounded-full font-medium
                 transition-all duration-200
 
@@ -38,7 +38,6 @@ const CategoryButton = ({ slugCurrentCategory, category }: CategoryButtonProps) 
                     ? `
                         bg-red-600 text-white
                         shadow-lg shadow-red-500/30
-
                         dark:bg-red-500 dark:text-black
                         dark:shadow-red-400/30
                       `
@@ -51,7 +50,7 @@ const CategoryButton = ({ slugCurrentCategory, category }: CategoryButtonProps) 
             `}
         >
             {category.name} ({category.totalAchievements})
-        </button>
+        </Link>
     );
 };
 
