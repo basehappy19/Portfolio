@@ -50,6 +50,9 @@ importers:
       openai:
         specifier: ^6.9.1
         version: 6.10.0(ws@8.18.3)(zod@4.1.13)
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
       react:
         specifier: 19.2.0
         version: 19.2.0
