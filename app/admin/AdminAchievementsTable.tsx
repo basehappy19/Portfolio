@@ -54,6 +54,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         index: number;
     } | null>(null);
     const [isImagesAnimating, setIsImagesAnimating] = useState(false);
+    const [sortInputValues, setSortInputValues] = useState<Record<string, string>>({});
 
     const minSortOrder = Math.min(...localAchievements.map(a => a.sortOrder));
     const maxSortOrder = Math.max(...localAchievements.map(a => a.sortOrder));
@@ -61,6 +62,67 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     useEffect(() => {
         setLocalAchievements(achievements);
     }, [achievements]);
+
+    useEffect(() => {
+        setSortInputValues(
+            localAchievements.reduce((acc, a) => {
+                acc[a.id] = String(a.sortOrder);
+                return acc;
+            }, {} as Record<string, string>)
+        );
+    }, [localAchievements]);
+
+    const handleSetSortOrder = (id: string, targetSortOrder: number) => {
+        if (localAchievements.length <= 1) return;
+
+        const sorted = [...localAchievements].sort(
+            (a, b) => b.sortOrder - a.sortOrder
+        );
+
+        const currentIndex = sorted.findIndex(a => a.id === id);
+        if (currentIndex === -1) return;
+
+        const maxOrder = sorted.length;
+        const clamped = Math.max(1, Math.min(maxOrder, Math.round(targetSortOrder)));
+
+        const currentOrder = sorted[currentIndex].sortOrder;
+        if (clamped === currentOrder) {
+            setSortInputValues(prev => ({
+                ...prev,
+                [id]: String(currentOrder),
+            }));
+            return;
+        }
+
+        const targetIndex = maxOrder - clamped;
+
+        const newList = [...sorted];
+        const [moved] = newList.splice(currentIndex, 1);
+        newList.splice(targetIndex, 0, moved);
+
+        const reindexed = newList.map((a, index) => ({
+            ...a,
+            sortOrder: maxOrder - index,
+        }));
+
+        setLocalAchievements(reindexed);
+        setWorkingId(id);
+
+        startTransition(async () => {
+            try {
+                await changeAchievementSortOrder(id, clamped);
+                toast.success("เปลี่ยนลำดับเรียบร้อยแล้ว");
+                router.refresh();
+            } catch (error) {
+                console.error("Change sortOrder error:", error);
+                toast.error("ไม่สามารถเปลี่ยนลำดับได้ กรุณาลองใหม่อีกครั้ง");
+                setLocalAchievements(achievements);
+            } finally {
+                setWorkingId(null);
+            }
+        });
+    };
+
 
     const toggleRow = (id: string) => {
         const newExpanded = new Set(expandedRows);
@@ -115,7 +177,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     ) => {
         if (localAchievements.length <= 1) return;
 
-        // 1) ทำสำเนา list ปัจจุบัน (เรียงตาม sortOrder ก่อนเพื่อความชัวร์)
         const sorted = [...localAchievements].sort(
             (a, b) => b.sortOrder - a.sortOrder
         );
@@ -126,20 +187,17 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         const targetIndex =
             direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-        // ถ้าอยู่บนสุดแล้วกดขึ้น หรืออยู่ล่างสุดแล้วกดลง → ไม่ทำอะไร
         if (targetIndex < 0 || targetIndex >= sorted.length) return;
 
-        // 2) ย้ายตำแหน่ง item ใน array (swap)
         const newList = [...sorted];
         const [moved] = newList.splice(currentIndex, 1);
         newList.splice(targetIndex, 0, moved);
 
-        // 3) re-index sortOrder ใหม่ให้ทุกตัวสอดคล้อง (อันนี้ใช้มากไปน้อย: N..1)
         const maxOrder = newList.length;
         let newSortOrderForClicked = moved.sortOrder;
 
         const reindexed = newList.map((a, index) => {
-            const sortOrder = maxOrder - index; // แถวบนสุด = maxOrder, แถวล่างสุด = 1
+            const sortOrder = maxOrder - index;
             if (a.id === id) {
                 newSortOrderForClicked = sortOrder;
             }
@@ -149,11 +207,9 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
             };
         });
 
-        // 4) อัปเดต UI ทันที (optimistic)
         setLocalAchievements(reindexed);
         setWorkingId(id);
 
-        // 5) ยิงไป server ให้ sync จริง
         startTransition(async () => {
             try {
                 await changeAchievementSortOrder(id, newSortOrderForClicked);
@@ -434,9 +490,48 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                         <ChevronUp className="w-4 h-4" />
                                                     </button>
 
-                                                    <span className="inline-flex items-center justify-center w-10 h-8 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded">
-                                                        {achievement.sortOrder}
-                                                    </span>
+                                                    <input
+                                                        type="number"
+                                                        className="
+        w-12 h-8
+        bg-gray-200 dark:bg-gray-700
+        text-gray-700 dark:text-gray-200
+        font-bold text-sm
+        rounded
+        text-center
+        border-none
+        focus:outline-none focus:ring-2 focus:ring-red-400
+        disabled:opacity-60 disabled:cursor-not-allowed
+    "
+                                                        value={sortInputValues[achievement.id] ?? achievement.sortOrder}
+                                                        disabled={workingId === achievement.id}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            setSortInputValues(prev => ({
+                                                                ...prev,
+                                                                [achievement.id]: value,
+                                                            }));
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter") {
+                                                                e.preventDefault();
+                                                                const raw = sortInputValues[achievement.id] ?? "";
+                                                                const num = Number(raw);
+
+                                                                if (!Number.isFinite(num)) {
+                                                                    const real = localAchievements.find(a => a.id === achievement.id)?.sortOrder ?? achievement.sortOrder;
+                                                                    setSortInputValues(prev => ({
+                                                                        ...prev,
+                                                                        [achievement.id]: String(real),
+                                                                    }));
+                                                                    return;
+                                                                }
+
+                                                                handleSetSortOrder(achievement.id, num);
+                                                            }
+                                                        }}
+                                                    />
 
                                                     <button
                                                         className="dark:text-white cursor-pointer p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
