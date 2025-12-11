@@ -317,11 +317,11 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                         <tr
                                             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                                             onClick={() => toggleRow(achievement.id)}
-                                        >    
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-4">
+                                        >
+                                            <td className="px-4 md:px-6 py-4 align-top">
+                                                <div className="flex items-start gap-3 md:gap-4">
                                                     {achievement.images.length > 0 ? (
-                                                        <div className="relative w-20 h-20 shrink-0">
+                                                        <div className="relative w-16 h-16 md:w-20 md:h-20 shrink-0">
                                                             <Image
                                                                 fill
                                                                 src={achievement.images[0].url}
@@ -333,25 +333,32 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                 sizes="80px"
                                                             />
                                                             {achievement.images.length > 1 && (
-                                                                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
+                                                                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] md:text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center shadow-lg">
                                                                     +{achievement.images.length - 1}
                                                                 </span>
                                                             )}
                                                         </div>
                                                     ) : (
-                                                        <div className="w-20 h-20 flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg shadow-md">
-                                                            <Award className="w-10 h-10 text-gray-400" />
+                                                        <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-lg shadow-md shrink-0">
+                                                            <Award className="w-8 h-8 md:w-10 md:h-10 text-gray-400" />
                                                         </div>
                                                     )}
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="font-semibold text-gray-900 dark:text-white text-base mb-1 truncate">
+
+                                                    {/* ข้อความฝั่งขวา */}
+                                                    <div className="min-w-0 flex-1 max-w-[220px] sm:max-w-[280px] lg:max-w-[360px]">
+                                                        {/* ชื่อไทย */}
+                                                        <div className="font-semibold text-gray-900 dark:text-white text-sm md:text-base mb-0.5 line-clamp-2">
                                                             {achievement.title_th}
                                                         </div>
-                                                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate mb-1">
+
+                                                        {/* ชื่ออังกฤษ */}
+                                                        <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-0.5 line-clamp-1">
                                                             {achievement.title_en}
                                                         </div>
+
+                                                        {/* สถานที่ */}
                                                         {achievement.location_th && (
-                                                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                                            <div className="flex items-center gap-1 text-[11px] md:text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                                                                 <MapPin className="w-3 h-3" />
                                                                 <span>{achievement.location_th}</span>
                                                             </div>
@@ -359,6 +366,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                     </div>
                                                 </div>
                                             </td>
+
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <div onClick={(e) => e.stopPropagation()}>
@@ -496,7 +504,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                         {/* Expanded Row Details */}
                                         {expandedRows.has(achievement.id) && (
                                             <tr className="bg-white dark:bg-gray-800">
-                                                <td colSpan={7} className="px-6 py-6">
+                                                <td colSpan={7} className="px-4 md:px-6 py-6">
                                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                         {/* Left Column */}
                                                         <div className="space-y-4">
@@ -507,37 +515,36 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                     คำอธิบาย
                                                                 </h4>
                                                                 <div className="space-y-2">
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                        <span className="font-medium">TH:</span>{' '}
-                                                                        {achievement.description_th || '-'}
+                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
+                                                                        <span className="font-medium">TH:</span>{" "}
+                                                                        {achievement.description_th || "-"}
                                                                     </p>
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                        <span className="font-medium">EN:</span>{' '}
-                                                                        {achievement.description_en || '-'}
+                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
+                                                                        <span className="font-medium">EN:</span>{" "}
+                                                                        {achievement.description_en || "-"}
                                                                     </p>
                                                                 </div>
                                                             </div>
 
                                                             {/* Given By */}
-                                                            {(achievement.given_by_th ||
-                                                                achievement.given_by_en) && (
-                                                                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                                                                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                                                                            <div className="w-1 h-4 bg-yellow-600 rounded" />
-                                                                            ผู้มอบรางวัล
-                                                                        </h4>
-                                                                        <div className="space-y-2">
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                <span className="font-medium">TH:</span>{' '}
-                                                                                {achievement.given_by_th || '-'}
-                                                                            </p>
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                                                <span className="font-medium">EN:</span>{' '}
-                                                                                {achievement.given_by_en || '-'}
-                                                                            </p>
-                                                                        </div>
+                                                            {(achievement.given_by_th || achievement.given_by_en) && (
+                                                                <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                                                                    <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                                                                        <div className="w-1 h-4 bg-yellow-600 rounded" />
+                                                                        ผู้มอบรางวัล
+                                                                    </h4>
+                                                                    <div className="space-y-2">
+                                                                        <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
+                                                                            <span className="font-medium">TH:</span>{" "}
+                                                                            {achievement.given_by_th || "-"}
+                                                                        </p>
+                                                                        <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
+                                                                            <span className="font-medium">EN:</span>{" "}
+                                                                            {achievement.given_by_en || "-"}
+                                                                        </p>
                                                                     </div>
-                                                                )}
+                                                                </div>
+                                                            )}
 
                                                             {/* Dates */}
                                                             <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -548,35 +555,29 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-green-600" />
-                                                                        <div>
-                                                                            <p className="text-xs text-gray-500">
-                                                                                วันที่ได้รับ
-                                                                            </p>
-                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                        <div className="min-w-0">
+                                                                            <p className="text-xs text-gray-500">วันที่ได้รับ</p>
+                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 wrap-break-word">
                                                                                 {achievement.receivedAt
                                                                                     ? formatDate(achievement.receivedAt)
-                                                                                    : '-'}
+                                                                                    : "-"}
                                                                             </p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-blue-600" />
-                                                                        <div>
-                                                                            <p className="text-xs text-gray-500">
-                                                                                วันที่สร้าง
-                                                                            </p>
-                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                        <div className="min-w-0">
+                                                                            <p className="text-xs text-gray-500">วันที่สร้าง</p>
+                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 wrap-break-word">
                                                                                 {formatDate(achievement.createdAt)}
                                                                             </p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="flex items-center gap-2">
                                                                         <Calendar className="w-4 h-4 text-purple-600" />
-                                                                        <div>
-                                                                            <p className="text-xs text-gray-500">
-                                                                                อัปเดตล่าสุด
-                                                                            </p>
-                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                        <div className="min-w-0">
+                                                                            <p className="text-xs text-gray-500">อัปเดตล่าสุด</p>
+                                                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 wrap-break-word">
                                                                                 {formatDate(achievement.updatedAt)}
                                                                             </p>
                                                                         </div>
@@ -602,10 +603,10 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                             >
                                                                                 <ExternalLink className="w-4 h-4 text-purple-600 shrink-0" />
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-purple-600 truncate">
-                                                                                        {link.label_th}
+                                                                                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-purple-600 line-clamp-2 wrap-break-word">
+                                                                                        {link.label_th || link.label_en || link.url}
                                                                                     </p>
-                                                                                    <p className="text-xs text-gray-500 truncate">
+                                                                                    <p className="text-xs text-gray-500 break-all">
                                                                                         {link.url}
                                                                                     </p>
                                                                                 </div>
@@ -633,17 +634,12 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                         <div
                                                                             key={image.id}
                                                                             className="group relative aspect-square cursor-pointer overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-700"
-                                                                            onClick={() =>
-                                                                                openLightbox(achievement.id, index)
-                                                                            }
+                                                                            onClick={() => openLightbox(achievement.id, index)}
                                                                         >
                                                                             <Image
                                                                                 fill
                                                                                 src={image.url}
-                                                                                alt={
-                                                                                    image.altText_th ??
-                                                                                    achievement.title_th
-                                                                                }
+                                                                                alt={image.altText_th ?? achievement.title_th}
                                                                                 className="object-cover transition-all duration-300 group-hover:scale-110"
                                                                                 sizes="(min-width: 1024px) 25vw, 50vw"
                                                                             />
@@ -656,8 +652,8 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="absolute bottom-0 left-0 right-0 p-3">
-                                                                                    <p className="text-white text-sm font-medium line-clamp-2">
-                                                                                        {image.altText_th || 'ไม่มีคำอธิบาย'}
+                                                                                    <p className="text-white text-sm font-medium line-clamp-2 wrap-break-word">
+                                                                                        {image.altText_th || "ไม่มีคำอธิบาย"}
                                                                                     </p>
                                                                                 </div>
                                                                             </div>
