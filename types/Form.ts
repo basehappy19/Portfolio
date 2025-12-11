@@ -13,6 +13,7 @@ export type ImagePreview = {
     altText_th: string;
     altText_en: string;
     sortOrder: number;
+    clientId: string; 
 };
 
 export type FormState = {

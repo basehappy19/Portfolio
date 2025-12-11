@@ -17,7 +17,7 @@ export async function PUT(
     const session = await auth.api.getSession({
         headers: await headers(),
     });
-    
+
     if (!session) {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
@@ -123,14 +123,11 @@ export async function PUT(
                         const pathInBucket = url.pathname.substring(
                             idx + prefix.length
                         );
-                        // pathInBucket: <achievementId>/<fileName>
                         pathsToDelete.push(pathInBucket);
                     } else {
-                        // fallback กรณีเก็บเป็น path ตรง ๆ
                         pathsToDelete.push(img.url);
                     }
                 } catch {
-                    // ถ้า parse URL ไม่ได้ (เช่นค่าที่เก่ามาก) ก็ลองใช้ url ดิบ ๆ
                     pathsToDelete.push(img.url);
                 }
             }
@@ -254,14 +251,36 @@ export async function PUT(
         if (sortOrder !== undefined) updateData.sortOrder = sortOrder;
         if (status !== undefined) updateData.status = status;
 
+        const allImages = await prisma.achievementImage.findMany({
+            where: { achievementId },
+            orderBy: {
+                sortOrder: "asc",
+            },
+        });
+
+        for (let index = 0; index < allImages.length; index++) {
+            const img = allImages[index];
+            await prisma.achievementImage.update({
+                where: { id: img.id },
+                data: { sortOrder: index + 1 },
+            });
+        }
 
         const updated = await prisma.achievement.update({
             where: { id: achievementId },
             data: updateData,
             include: {
                 categories: { include: { category: true } },
-                images: true,
-                links: true,
+                images: {
+                    orderBy: {
+                        sortOrder: "asc",
+                    },
+                },
+                links: {
+                    orderBy: {
+                        sortOrder: "asc",
+                    },
+                },
             },
         });
 
@@ -315,10 +334,11 @@ export async function DELETE(
                 const idx = url.pathname.indexOf(prefix);
 
                 if (idx !== -1) {
-                    const pathInBucket = url.pathname.substring(idx + prefix.length);
+                    const pathInBucket = url.pathname.substring(
+                        idx + prefix.length
+                    );
                     pathsToDelete.push(pathInBucket);
                 } else {
-
                     pathsToDelete.push(img.url);
                 }
             } catch {
@@ -365,4 +385,3 @@ export async function DELETE(
         );
     }
 }
-

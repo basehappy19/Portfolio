@@ -18,13 +18,14 @@ export const useImageHandlers = ({
         const files = Array.from(e.target.files ?? []);
 
         setImagePreview((prev) => {
-            const baseIndex = prev.length;
+            const baseIndex = prev.length; 
             const newImages: ImagePreview[] = files.map((file, index) => ({
                 file,
                 preview: URL.createObjectURL(file),
                 altText_th: "",
                 altText_en: "",
-                sortOrder: baseIndex + index,
+                clientId: crypto.randomUUID(), 
+                sortOrder: baseIndex + index + 1,
             }));
 
             return [...prev, ...newImages];
@@ -38,13 +39,21 @@ export const useImageHandlers = ({
     ) => {
         setImagePreview((prev) => {
             const updated = [...prev];
+            if (!updated[index]) return prev;
             updated[index] = { ...updated[index], [field]: value };
             return updated;
         });
     };
 
     const handleRemoveImage = (index: number) => {
-        setImagePreview((prev) => prev.filter((_, i) => i !== index));
+        setImagePreview((prev) =>
+            prev
+                .filter((_, i) => i !== index)
+                .map((img, idx) => ({
+                    ...img,
+                    sortOrder: idx + 1,
+                }))
+        );
     };
 
     const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
@@ -58,6 +67,8 @@ export const useImageHandlers = ({
 
         const newImages = [...imagePreview];
         const draggedItem = newImages[draggedIndex];
+        if (!draggedItem) return;
+
         newImages.splice(draggedIndex, 1);
         newImages.splice(index, 0, draggedItem);
 
@@ -70,7 +81,7 @@ export const useImageHandlers = ({
         setImagePreview((prev) =>
             prev.map((img, idx) => ({
                 ...img,
-                sortOrder: idx,
+                sortOrder: idx + 1,
             }))
         );
     };

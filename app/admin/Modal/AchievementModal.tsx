@@ -116,14 +116,18 @@ const AchievementModalInner = ({
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
-        editData?.images?.map((img, idx) => ({
+    (editData?.images
+        ?.slice()
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)) 
+        .map((img, idx) => ({
             id: img.id,
             file: undefined,
             preview: img.url,
             altText_th: img.altText_th ?? "",
             altText_en: img.altText_en ?? "",
-            sortOrder: img.sortOrder ?? idx,
-        })) ?? []
+            sortOrder: idx + 1,
+            clientId: img.id ?? crypto.randomUUID(),
+        })) ?? [])
     );
 
     const {
@@ -146,7 +150,7 @@ const AchievementModalInner = ({
             label_th: link.label_th ?? '',
             label_en: link.label_en ?? '',
             url: link.url ?? '',
-            sortOrder: link.sortOrder ?? idx,
+            sortOrder: link.sortOrder ?? idx + 1,
         })) ?? []
     );
 
@@ -192,7 +196,7 @@ const AchievementModalInner = ({
         setLinks(prev =>
             prev.map((link, idx) => ({
                 ...link,
-                sortOrder: idx,
+                sortOrder: idx + 1,
             }))
         );
     };
@@ -216,13 +220,20 @@ const AchievementModalInner = ({
                 label_th: '',
                 label_en: '',
                 url: '',
-                sortOrder: prev.length,
+                sortOrder: prev.length + 1, // 👈 +1
             },
         ]);
     };
 
     const removeLink = (index: number) => {
-        setLinks(prev => prev.filter((_, i) => i !== index));
+        setLinks(prev =>
+            prev
+                .filter((_, i) => i !== index)
+                .map((link, idx) => ({
+                    ...link,
+                    sortOrder: idx + 1,
+                }))
+        );
     };
 
     const handleSubmit = async () => {
@@ -240,8 +251,9 @@ const AchievementModalInner = ({
 
         const normalizedLinks = links.map((link, idx) => ({
             ...link,
-            sortOrder: idx,
+            sortOrder: idx + 1,
         }));
+
 
         let achievementId: string | null = editData?.id ?? null;
 
@@ -278,13 +290,13 @@ const AchievementModalInner = ({
                             return {
                                 ...img,
                                 preview: url,
-                                sortOrder: idx,
+                                sortOrder: idx + 1,
                             };
                         }
 
                         return {
                             ...img,
-                            sortOrder: idx,
+                            sortOrder: idx + 1,
                         };
                     })
                 );

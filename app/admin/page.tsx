@@ -181,14 +181,22 @@ export default async function AdminPage(props: {
                     createdAt: true,
                     updatedAt: true,
                 },
+                orderBy: {
+                    sortOrder: "asc",    
+                },
             },
-            links: true,
+            links: {
+                orderBy: {
+                    sortOrder: "asc",   
+                },
+            },
             createdAt: true,
             updatedAt: true,
         },
+
         orderBy: {
-            sortOrder: "desc"
-        }
+            sortOrder: "desc", 
+        },
     });
 
     const categories = await prisma.category.findMany({

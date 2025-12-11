@@ -14,27 +14,32 @@ export const useImageAltTranslation = ({
     imagePreview,
     setImagePreview,
 }: Props) => {
+    // ใช้ string key แทน number
     const [translatingImageAlt, setTranslatingImageAlt] = useState<
-        Record<number, boolean>
+        Record<string, boolean>
     >({});
 
     const [lastTranslatedTh, setLastTranslatedTh] = useState<
-        Record<number, string>
+        Record<string, string>
     >({});
 
     const translateAlt = async (index: number) => {
         const current = imagePreview[index];
-        const raw = current?.altText_th;
+        if (!current) return;
 
+        const key =
+            current.id ?? current.clientId ?? current.preview ?? String(index);
+
+        const raw = current.altText_th;
         if (typeof raw !== "string") return;
 
         const textTh = raw.trim();
         if (!textTh) return;
 
-        if (lastTranslatedTh[index] === textTh) return;
+        if (lastTranslatedTh[key] === textTh) return;
 
         try {
-            setTranslatingImageAlt((prev) => ({ ...prev, [index]: true }));
+            setTranslatingImageAlt((prev) => ({ ...prev, [key]: true }));
 
             const res = await fetch("/api/translate", {
                 method: "POST",
@@ -59,14 +64,15 @@ export const useImageAltTranslation = ({
 
             setLastTranslatedTh((prev) => ({
                 ...prev,
-                [index]: textTh,
+                [key]: textTh,
             }));
         } catch (e) {
             console.error("translate image alt error", e);
         } finally {
-            setTranslatingImageAlt((prev) => ({ ...prev, [index]: false }));
+            setTranslatingImageAlt((prev) => ({ ...prev, [key]: false }));
         }
     };
+
 
     return {
         translatingImageAlt,
