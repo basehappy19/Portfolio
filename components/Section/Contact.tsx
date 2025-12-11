@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { getTranslations } from 'next-intl/server';
 import FormContact from "../FormContact";
+import Link from "next/link";
 
 const Contact = async () => {
     const t = await getTranslations("Index.Contact");
@@ -139,7 +140,7 @@ const Contact = async () => {
                                     const Icon = iconMap[social.icon];
 
                                     return (
-                                        <a
+                                        <Link
                                             key={index}
                                             href={social.href}
                                             target="_blank"
@@ -153,7 +154,7 @@ const Contact = async () => {
                                             <p className="text-xs text-white text-center font-medium">
                                                 {social.name}
                                             </p>
-                                        </a>
+                                        </Link>
                                     );
                                 })}
                             </div>
