@@ -37,14 +37,13 @@ export async function GET(req: Request) {
 
         let achievements;
 
-        // ✔ ถ้ามี category → filter categories.some.category.slug
         if (category) {
             achievements = await prisma.achievement.findMany({
                 select: {
                     ...baseSelect,
                     categories: {
                         select: {
-                            category: true, // select all fields
+                            category: true,
                         },
                     },
                 },
@@ -56,10 +55,10 @@ export async function GET(req: Request) {
                         },
                     },
                 },
-                orderBy: { receivedAt: "desc" },
+                orderBy: { sortOrder: "desc" }, 
             });
         }
-        // ✔ ถ้าไม่มี category → ดึงทั้งหมด (เวอร์ชัน select เฉพาะ)
+
         else {
             achievements = await prisma.achievement.findMany({
                 select: {
@@ -80,7 +79,7 @@ export async function GET(req: Request) {
                 where: {
                     status: "PUBLIC",
                 },
-                orderBy: { receivedAt: "desc" },
+                orderBy: { sortOrder: "desc" }, 
             });
         }
 
