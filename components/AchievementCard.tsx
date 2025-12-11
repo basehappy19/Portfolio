@@ -17,7 +17,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
     const [isAnimating, setIsAnimating] = useState(false);
 
     const mainImage = achievement.images[0];
-
+    
     const tField = (
         th: string | null | undefined,
         en: string | null | undefined,

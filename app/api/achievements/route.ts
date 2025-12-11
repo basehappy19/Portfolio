@@ -31,8 +31,6 @@ export async function GET(req: Request) {
             createdAt: true,
             updatedAt: true,
 
-            images: true,
-            links: true,
         };
 
         let achievements;
@@ -41,6 +39,16 @@ export async function GET(req: Request) {
             achievements = await prisma.achievement.findMany({
                 select: {
                     ...baseSelect,
+                    images: {
+                        orderBy: {
+                            sortOrder: "asc",
+                        },
+                    },
+                    links: {
+                        orderBy: {
+                            sortOrder: "asc",
+                        },
+                    },
                     categories: {
                         select: {
                             category: true,
@@ -55,14 +63,22 @@ export async function GET(req: Request) {
                         },
                     },
                 },
-                orderBy: { sortOrder: "desc" }, 
+                orderBy: { sortOrder: "desc" }, // เรียงลิสต์ achievement ตาม sortOrder (ตัวใหญ่-เล็กแล้วแต่ดีไซน์)
             });
-        }
-
-        else {
+        } else {
             achievements = await prisma.achievement.findMany({
                 select: {
                     ...baseSelect,
+                    images: {
+                        orderBy: {
+                            sortOrder: "asc",
+                        },
+                    },
+                    links: {
+                        orderBy: {
+                            sortOrder: "asc",
+                        },
+                    },
                     categories: {
                         select: {
                             category: {
@@ -79,7 +95,7 @@ export async function GET(req: Request) {
                 where: {
                     status: "PUBLIC",
                 },
-                orderBy: { sortOrder: "desc" }, 
+                orderBy: { sortOrder: "desc" },
             });
         }
 
