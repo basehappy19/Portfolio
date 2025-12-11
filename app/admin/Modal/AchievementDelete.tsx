@@ -48,10 +48,21 @@ const DeleteModal = ({
                     ยืนยันการลบ
                 </h2>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+                <p
+                    className="
+        text-sm text-gray-600 dark:text-gray-300 mb-6
+        wrap-break-word overflow-hidden line-clamp-2
+    "
+                >
                     คุณแน่ใจหรือไม่ว่าต้องการลบ
-                    {itemName ? ` “${itemName}”` : 'รายการนี้'}?
-                    <br />
+                    {itemName ? (
+                        <span className="font-semibold wrap-break-word">
+                            {` “${itemName}”`}
+                        </span>
+                    ) : (
+                        "รายการนี้"
+                    )}
+                    ?<br />
                     การลบนี้ไม่สามารถย้อนกลับได้
                 </p>
 
