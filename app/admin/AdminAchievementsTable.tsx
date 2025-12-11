@@ -278,6 +278,9 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     ผลงาน
                                 </th>
+                                <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    จัดการ
+                                </th>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     ระดับรางวัล
                                 </th>
@@ -290,11 +293,8 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     สถานะ
                                 </th>
-                                <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    ไฟล์แนบ
-                                </th>
                                 <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    จัดการ
+                                    ไฟล์แนบ
                                 </th>
                             </tr>
                         </thead>
@@ -317,7 +317,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                         <tr
                                             className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                                             onClick={() => toggleRow(achievement.id)}
-                                        >
+                                        >    
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
                                                     {achievement.images.length > 0 ? (
@@ -360,9 +360,25 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <EditAchievement achievement={achievement} />
+                                                    </div>
+                                                    <button
+                                                        className="dark:bg-[#282c33] cursor-pointer p-2.5 text-red-600 hover:bg-white dark:hover:bg-red-900 rounded-lg transition-colors shadow-sm hover:shadow"
+                                                        title="ลบ"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openDeleteModal(achievement);
+                                                        }}
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
                                                 {achievement.awardLevel_th ? (
                                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-linear-to-r from-yellow-100 to-amber-100 dark:from-yellow-900 dark:to-amber-900 text-yellow-800 dark:text-yellow-200 rounded-lg font-medium text-sm shadow-sm">
-                                                        <Award className="w-4 h-4" />
                                                         <span>{achievement.awardLevel_th}</span>
                                                     </div>
                                                 ) : (
@@ -473,23 +489,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                             {achievement.links.length}
                                                         </span>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <div onClick={(e) => e.stopPropagation()}>
-                                                        <EditAchievement achievement={achievement} />
-                                                    </div>
-                                                    <button
-                                                        className="dark:bg-[#282c33] cursor-pointer p-2.5 text-red-600 hover:bg-white dark:hover:bg-red-900 rounded-lg transition-colors shadow-sm hover:shadow"
-                                                        title="ลบ"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            openDeleteModal(achievement);
-                                                        }}
-                                                    >
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>

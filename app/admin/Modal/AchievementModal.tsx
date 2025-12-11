@@ -16,7 +16,7 @@ import { AchievementImagesSection } from '../AchievementImagesSection';
 import { TouchedState, ValidationErrors } from '../types/achievementValidation';
 import { AchievementTextField } from '../AchievementTextField';
 import { useRouter } from 'next/navigation';
-import { createAchievement, updateAchievement } from '../services/achievements';
+import { createAchievement, deleteAchievement, updateAchievement } from '../services/achievements';
 import toast from 'react-hot-toast';
 import { AchievementTextarea } from '../AchievementTextarea';
 import { useAchievementTextTranslation } from '../hooks/useAchievementTextTranslation';
@@ -257,32 +257,51 @@ const AchievementModalInner = ({
         };
 
         try {
-            if (!achievementId) {
+            const isCreate = !achievementId;
+
+            if (isCreate) {
                 const created = await createAchievement(basePayload);
                 achievementId = created.id;
             }
 
-            const uploadedImages: ImagePreview[] = await Promise.all(
-                imagePreview.map(async (img, idx) => {
-                    if (img.file instanceof File && achievementId) {
-                        const { url } = await uploadAchievementImageDirect(
-                            img.file,
-                            achievementId
-                        );
+            let uploadedImages: ImagePreview[] = [];
+
+            try {
+                uploadedImages = await Promise.all(
+                    imagePreview.map(async (img, idx) => {
+                        if (img.file instanceof File && achievementId) {
+                            const { url } = await uploadAchievementImageDirect(
+                                img.file,
+                                achievementId
+                            );
+
+                            return {
+                                ...img,
+                                preview: url,
+                                sortOrder: idx,
+                            };
+                        }
 
                         return {
                             ...img,
-                            preview: url,
                             sortOrder: idx,
                         };
-                    }
+                    })
+                );
+            } catch (uploadErr) {
+                console.error(uploadErr);
+                toast.error("อัพโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
 
-                    return {
-                        ...img,
-                        sortOrder: idx,
-                    };
-                })
-            );
+                if (isCreate && achievementId) {
+                    try {
+                        await deleteAchievement(achievementId);
+                    } catch (rollbackErr) {
+                        console.error("ไม่สามารถลบ achievement ที่สร้างค้างไว้ได้", rollbackErr);
+                    }
+                }
+
+                return;
+            }
 
             const finalPayload: SubmitData = {
                 ...basePayload,
@@ -313,9 +332,7 @@ const AchievementModalInner = ({
         } finally {
             setIsSubmitting(false);
         }
-
     };
-
 
 
     return (
