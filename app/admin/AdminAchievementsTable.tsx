@@ -229,7 +229,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     const handleToggleStatus = (id: string, currentStatus: 'PUBLIC' | 'DRAFT') => {
         const nextStatus = currentStatus === 'PUBLIC' ? 'DRAFT' : 'PUBLIC';
 
-        // optimistic update
         setLocalAchievements(prev =>
             prev.map(a =>
                 a.id === id ? { ...a, status: nextStatus } : a
@@ -264,10 +263,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         }).format(date);
     };
 
-    // ==========================
-    //   IMAGE / LIGHTBOX LOGIC
-    // ==========================
-
     const activeAchievement =
         achievements.find((a) => a.id === lightbox?.achievementId) ?? null;
 
@@ -278,7 +273,6 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
             ? activeImages[currentIndex]
             : null;
 
-    // เปิด lightbox พร้อมจำว่าเป็นผลงานไหน รูป index ไหน
     const openLightbox = (achievementId: string, index: number) => {
         setIsImagesAnimating(true);
         setLightbox({ achievementId, index });
@@ -305,7 +299,7 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         setLightbox({ ...lightbox, index: prevIndex });
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!lightbox) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {

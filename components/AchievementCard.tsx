@@ -1,8 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { Calendar, MapPin, Award, ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import {
+    Calendar,
+    MapPin,
+    Award,
+    ExternalLink,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    Download,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { Achievement } from "@/types/Achievements";
 
 interface AchievementCardProps {
@@ -16,8 +25,14 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
 
+    const [lightbox, setLightbox] = useState<{
+        achievementId: string;
+        index: number;
+    } | null>(null);
+    const [isImagesAnimating, setIsImagesAnimating] = useState(false);
+
     const mainImage = achievement.images[0];
-    
+
     const tField = (
         th: string | null | undefined,
         en: string | null | undefined,
@@ -40,7 +55,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {
                 year: "numeric",
                 month: "long",
-                day: "numeric"
+                day: "numeric",
             }
         );
         return formatter.format(d);
@@ -49,14 +64,16 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
     const openModal = () => {
         setIsAnimating(true);
         setIsModalOpen(true);
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
     };
 
     const closeModal = () => {
         setIsAnimating(false);
         setTimeout(() => {
             setIsModalOpen(false);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
+            // reset index ถ้าอยากให้เปิดใหม่เริ่มรูปแรก
+            // setCurrentImageIndex(0);
         }, 200);
     };
 
@@ -71,6 +88,59 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             prev === 0 ? achievement.images.length - 1 : prev - 1
         );
     };
+
+    const activeImages = achievement?.images ?? [];
+    const currentIndex = lightbox?.index ?? 0;
+    const selectedImage =
+        lightbox && activeImages.length > 0 && currentIndex >= 0
+            ? activeImages[currentIndex]
+            : null;
+
+    const openLightbox = (achievementId: string, index: number) => {
+        setIsImagesAnimating(true);
+        setLightbox({ achievementId, index });
+        document.body.style.overflow = "hidden";
+    };
+
+    const closeLightbox = () => {
+        setIsImagesAnimating(false);
+        setTimeout(() => {
+            setLightbox(null);
+            // ถ้า modal ยังเปิดอยู่ ให้คง hidden ไม่งั้นคืน scroll
+            document.body.style.overflow = isModalOpen ? "hidden" : "unset";
+        }, 200);
+    };
+
+    const goToNext = () => {
+        if (!lightbox || activeImages.length === 0) return;
+        const nextIndex = (lightbox.index + 1) % activeImages.length;
+        setLightbox({ ...lightbox, index: nextIndex });
+    };
+
+    const goToPrev = () => {
+        if (!lightbox || activeImages.length === 0) return;
+        const prevIndex = (lightbox.index - 1 + activeImages.length) % activeImages.length;
+        setLightbox({ ...lightbox, index: prevIndex });
+    };
+
+    useEffect(() => {
+        if (!lightbox) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') goToNext();
+            if (e.key === 'ArrowLeft') goToPrev();
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'unset';
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lightbox, activeImages.length]);
 
     return (
         <>
@@ -110,12 +180,10 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                 {/* Content Section */}
                 <div className="p-6">
-                    {/* Title */}
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                         {title}
                     </h3>
 
-                    {/* Given By */}
                     {given_by && (
                         <div className="mb-4">
                             <div className="flex items-center gap-2 mb-1">
@@ -129,14 +197,12 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         </div>
                     )}
 
-                    {/* Description */}
                     {description && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
                             {description}
                         </p>
                     )}
 
-                    {/* Location */}
                     {location && (
                         <div className="flex items-center gap-2 mb-5">
                             <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700">
@@ -148,7 +214,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         </div>
                     )}
 
-                    {/* Call to Action */}
                     <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors">
@@ -168,30 +233,20 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                     </div>
                 </div>
 
-                {/* Bottom Accent Line */}
                 <div className="h-1 bg-linear-to-r from-red-500 via-red-600 to-red-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </div>
 
             {/* Modal */}
             {isModalOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center 
-    cursor-pointer backdrop-blur-md bg-black/40 
-    md:p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer backdrop-blur-md bg-black/40 md:p-4"
                     onClick={closeModal}
                     style={{
                         animation: isAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
                     }}
                 >
                     <div
-                        className="
-      cursor-default relative 
-      w-full h-full              
-      md:w-full md:max-w-4xl     
-      md:h-auto md:max-h-[95vh]  
-      bg-white dark:bg-gray-900 
-      md:rounded-3xl shadow-2xl 
-      overflow-hidden"
+                        className="cursor-default relative w-full h-full md:w-full md:max-w-4xl md:h-auto md:max-h-[95vh] bg-white dark:bg-gray-900 md:rounded-3xl shadow-2xl overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                         style={{
                             animation: isAnimating ? "modalSlideIn 0.3s ease-out" : "modalSlideOut 0.2s ease-in",
@@ -210,36 +265,79 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             {achievement.images.length > 0 && (
                                 <div className="relative bg-gray-50 dark:bg-gray-800">
                                     {/* Main Image */}
-                                    <div className="relative h-[400px]">
+                                    {/* Main Image */}
+                                    <div className="relative h-[400px] group">
                                         <Image
                                             src={achievement.images[currentImageIndex].url}
-                                            alt={tField(
-                                                achievement.images[currentImageIndex].altText_th,
-                                                achievement.images[currentImageIndex].altText_en,
-                                                locale
-                                            ) || title}
+                                            alt={
+                                                tField(
+                                                    achievement.images[currentImageIndex].altText_th,
+                                                    achievement.images[currentImageIndex].altText_en,
+                                                    locale
+                                                ) || title
+                                            }
                                             fill
-                                            className="object-contain p-8"
+                                            className="object-contain p-8 cursor-zoom-in select-none transition-transform duration-300 group-hover:scale-[1.01]"
                                             key={currentImageIndex}
+                                            onClick={() => openLightbox(achievement.id, currentImageIndex)}
                                         />
+
+                                        {/* Hover Overlay: บ่งบอกว่าคลิกดูภาพเต็มได้ */}
+                                        <div
+                                            className="
+      pointer-events-none absolute inset-0
+      opacity-0 group-hover:opacity-100
+      transition-opacity duration-200
+    "
+                                        >
+                                            {/* gradient ช่วยให้อ่านตัวหนังสือได้ */}
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10 to-transparent" />
+
+                                            {/* badge */}
+                                            <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-sm">
+                                                {/* ใช้ SVG แว่นขยาย (ไม่ต้อง import เพิ่ม) */}
+                                                <svg
+                                                    className="w-4 h-4 text-white"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                >
+                                                    <circle cx="11" cy="11" r="8" />
+                                                    <path d="M21 21l-4.3-4.3" />
+                                                </svg>
+
+                                                <span className="text-white text-sm font-medium">
+                                                    {locale === "th" ? "คลิกเพื่อดูภาพเต็ม" : "Click to view full size"}
+                                                </span>
+                                            </div>
+                                        </div>
 
                                         {/* Navigation Buttons */}
                                         {achievement.images.length > 1 && (
                                             <>
                                                 <button
-                                                    onClick={prevImage}
-                                                    className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        prevImage();
+                                                    }}
+                                                    className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition"
                                                 >
-                                                    <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                                                </button>
-                                                <button
-                                                    onClick={nextImage}
-                                                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors"
-                                                >
-                                                    <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                                    <ChevronLeft className="w-5 h-5" />
                                                 </button>
 
-                                                {/* Image Counter */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        nextImage();
+                                                    }}
+                                                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition"
+                                                >
+                                                    <ChevronRight className="w-5 h-5" />
+                                                </button>
+
                                                 <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/70 text-white text-sm rounded-lg">
                                                     {currentImageIndex + 1} / {achievement.images.length}
                                                 </div>
@@ -247,17 +345,37 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                         )}
                                     </div>
 
-                                    {/* Image Thumbnails */}
+                                    {tField(
+                                        achievement.images[currentImageIndex].altText_th,
+                                        achievement.images[currentImageIndex].altText_en,
+                                        locale
+                                    ) && (
+                                            <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+                                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                    {tField(
+                                                        achievement.images[currentImageIndex].altText_th,
+                                                        achievement.images[currentImageIndex].altText_en,
+                                                        locale
+                                                    )}
+                                                </p>
+                                            </div>
+                                        )}
+
+                                    {/* Thumbnails */}
                                     {achievement.images.length > 1 && (
-                                        <div className="px-6 pb-4">
-                                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                                        <div className="px-6 py-4">
+                                            <div className="flex gap-2 overflow-x-auto">
                                                 {achievement.images.map((image, index) => (
                                                     <button
                                                         key={index}
-                                                        onClick={() => setCurrentImageIndex(index)}
-                                                        className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${currentImageIndex === index
-                                                                ? 'border-gray-900 dark:border-gray-100'
-                                                                : 'border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100'
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCurrentImageIndex(index);
+                                                        }}
+                                                        className={`relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition
+                              ${currentImageIndex === index
+                                                                ? "border-gray-900 dark:border-gray-100"
+                                                                : "border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100"
                                                             }`}
                                                     >
                                                         <Image
@@ -276,7 +394,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                             {/* Content */}
                             <div className="p-8">
-                                {/* Badges */}
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {awardLevel && (
                                         <span className="px-4 py-2 bg-amber-600 text-white text-sm font-bold rounded-md shadow-lg">
@@ -293,12 +410,10 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     ))}
                                 </div>
 
-                                {/* Title */}
                                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
                                     {title}
                                 </h2>
 
-                                {/* Meta Info */}
                                 <div className="space-y-3 mb-6 text-gray-600 dark:text-gray-400">
                                     {achievement.receivedAt && (
                                         <div className="flex items-center gap-3">
@@ -320,7 +435,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     )}
                                 </div>
 
-                                {/* Description */}
                                 {description && (
                                     <div className="mb-6">
                                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
@@ -329,7 +443,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                     </div>
                                 )}
 
-                                {/* Links */}
                                 {achievement.links.length > 0 && (
                                     <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                                         <div className="flex flex-wrap gap-2">
@@ -350,6 +463,133 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Lightbox (Full Image) */}
+                        {selectedImage && (
+                            <div
+                                className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40"
+                                onClick={closeLightbox}
+                                style={{
+                                    animation: isImagesAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
+                                }}
+                            >
+                                {/* Close Button */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        closeLightbox();
+                                    }}
+                                    className="cursor-pointer absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                                    title="ปิด (ESC)"
+                                >
+                                    <X className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
+                                </button>
+
+                                {/* Previous Button */}
+                                {activeImages.length > 1 && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            goToPrev();
+                                        }}
+                                        className="cursor-pointer absolute left-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                                        title="ก่อนหน้า (←)"
+                                    >
+                                        <ChevronLeft className="w-6 h-6 text-white group-hover:-translate-x-1 transition-transform duration-200" />
+                                    </button>
+                                )}
+
+                                {/* Next Button */}
+                                {activeImages.length > 1 && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            goToNext();
+                                        }}
+                                        className="cursor-pointer absolute right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
+                                        title="ถัดไป (→)"
+                                    >
+                                        <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform duration-200" />
+                                    </button>
+                                )}
+
+                                {/* Image Container */}
+                                <div
+                                    className="relative max-w-7xl w-full mx-4 h-[80vh]"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <Image
+                                        fill
+                                        src={selectedImage.url}
+                                        alt={
+                                            tField(selectedImage.altText_th, selectedImage.altText_en, locale) ||
+                                            tField(achievement.title_th, achievement.title_en, locale)
+                                        }
+                                        className="object-contain rounded-lg shadow-2xl"
+                                        sizes="90vw"
+                                    />
+
+                                    {/* Image Info Bar */}
+                                    <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6 rounded-b-lg">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <p className="text-white font-semibold text-lg mb-1">
+                                                    {tField(selectedImage.altText_th, selectedImage.altText_en, locale) ||
+                                                        (locale === "th" ? "ไม่มีคำอธิบาย" : "No description")}
+                                                </p>
+                                                <p className="text-white/70 text-sm">
+                                                    {locale === "th"
+                                                        ? `รูปที่ ${currentIndex + 1} จาก ${activeImages.length}`
+                                                        : `Image ${currentIndex + 1} of ${activeImages.length}`}
+                                                </p>
+                                            </div>
+
+                                            <a
+                                                href={selectedImage.url}
+                                                download
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-white font-medium"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                                {locale === "th" ? "ดาวน์โหลด" : "Download"}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Thumbnail Strip */}
+                                {activeImages.length > 1 && (
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-4xl w-full px-4">
+                                        <div className="flex gap-2 justify-center overflow-x-auto pb-2 scrollbar-hide">
+                                            {activeImages.map((image, index) => (
+                                                <button
+                                                    key={image.id}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setLightbox({ achievementId: achievement.id, index });
+                                                    }}
+                                                    className={`cursor-pointer relative shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-200 ${index === currentIndex
+                                                        ? "ring-4 ring-white scale-110"
+                                                        : "ring-2 ring-white/30 hover:ring-white/60 opacity-60 hover:opacity-100"
+                                                        }`}
+                                                >
+                                                    <Image
+                                                        fill
+                                                        src={image.url}
+                                                        alt={
+                                                            tField(image.altText_th, image.altText_en, locale) ||
+                                                            `Image ${index + 1}`
+                                                        }
+                                                        className="object-cover"
+                                                        sizes="64px"
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
