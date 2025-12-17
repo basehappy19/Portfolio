@@ -18,7 +18,7 @@ import {
     MapPin,
     Trash2,
     ZoomIn,
-    X, // ✅ เพิ่มเข้ามาเพื่อใช้ในปุ่มปิด lightbox
+    X,
 } from 'lucide-react';
 import DeleteModal from './Modal/AchievementDelete';
 import { Achievement } from '@/types/Achievements';

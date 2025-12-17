@@ -12,11 +12,6 @@ const nextConfig: NextConfig = {
             },
         ],
     },
-    experimental: {
-        serverActions: {
-            bodySizeLimit: "20mb",
-        },
-    },
 };
 
 const withNextIntl = createNextIntlPlugin();
