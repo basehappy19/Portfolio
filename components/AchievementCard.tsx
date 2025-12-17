@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Achievement } from "@/types/Achievements";
+import { downloadImage } from "@/lib/download";
 
 interface AchievementCardProps {
     achievement: Achievement;
@@ -20,6 +21,7 @@ interface AchievementCardProps {
 }
 
 const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
+    const [isDownloading, setIsDownloading] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -72,8 +74,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
         setTimeout(() => {
             setIsModalOpen(false);
             document.body.style.overflow = "unset";
-            // reset index ถ้าอยากให้เปิดใหม่เริ่มรูปแรก
-            // setCurrentImageIndex(0);
         }, 200);
     };
 
@@ -277,12 +277,11 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 ) || title
                                             }
                                             fill
-                                            className="object-contain p-8 cursor-zoom-in select-none transition-transform duration-300 group-hover:scale-[1.01]"
+                                            className="cursor-pointer object-contain p-8 select-none transition-transform duration-300 group-hover:scale-[1.01]"
                                             key={currentImageIndex}
                                             onClick={() => openLightbox(achievement.id, currentImageIndex)}
                                         />
 
-                                        {/* Hover Overlay: บ่งบอกว่าคลิกดูภาพเต็มได้ */}
                                         <div
                                             className="
       pointer-events-none absolute inset-0
@@ -372,7 +371,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                             e.stopPropagation();
                                                             setCurrentImageIndex(index);
                                                         }}
-                                                        className={`relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition
+                                                        className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition
                               ${currentImageIndex === index
                                                                 ? "border-gray-900 dark:border-gray-100"
                                                                 : "border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100"
@@ -544,15 +543,43 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 </p>
                                             </div>
 
-                                            <a
-                                                href={selectedImage.url}
-                                                download
-                                                onClick={(e) => e.stopPropagation()}
-                                                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-white font-medium"
+                                            <button
+                                                type="button"
+                                                disabled={isDownloading}
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+
+                                                    if (isDownloading) return;
+
+                                                    setIsDownloading(true);
+
+                                                    try {
+                                                        await downloadImage(
+                                                            selectedImage.url,
+                                                            `img-${crypto.randomUUID().slice(0, 12)}.jpg`
+                                                        );
+                                                    } finally {
+                                                        setTimeout(() => {
+                                                            setIsDownloading(false);
+                                                        }, 800);
+                                                    }
+                                                }}
+                                                className={`
+    flex items-center gap-2 px-4 py-2 rounded-lg font-medium
+    backdrop-blur-sm transition-all duration-200
+    ${isDownloading
+                                                        ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                                        : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+                                                    }
+  `}
                                             >
-                                                <Download className="w-4 h-4" />
-                                                {locale === "th" ? "ดาวน์โหลด" : "Download"}
-                                            </a>
+                                                <Download
+                                                    className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
+                                                />
+                                                {isDownloading
+                                                    ? (locale === "th" ? "กำลังดาวน์โหลด..." : "Downloading...")
+                                                    : (locale === "th" ? "ดาวน์โหลด" : "Download")}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

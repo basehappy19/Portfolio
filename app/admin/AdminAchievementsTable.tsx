@@ -30,12 +30,14 @@ import {
     toggleAchievementStatus,
 } from './services/achievements';
 import toast from 'react-hot-toast';
+import { downloadImage } from '@/lib/download';
 
 type Props = {
     achievements: Achievement[];
 };
 
 export const AdminAchievementsTable = ({ achievements }: Props) => {
+    const [isDownloading, setIsDownloading] = useState(false);
     const [localAchievements, setLocalAchievements] = useState(achievements);
     const [isPending, startTransition] = useTransition();
     const [workingId, setWorkingId] = useState<string | null>(null);
@@ -839,15 +841,44 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                             รูปที่ {currentIndex + 1} จาก {activeImages.length}
                                         </p>
                                     </div>
-                                    <a
-                                        href={selectedImage.url}
-                                        download
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all duration-200 text-white font-medium"
+                                    <button
+                                        type="button"
+                                        disabled={isDownloading}
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+
+                                            if (isDownloading) return;
+
+                                            setIsDownloading(true);
+
+                                            try {
+                                                await downloadImage(
+                                                    selectedImage.url,
+                                                    `img-${crypto.randomUUID().slice(0, 12)}.jpg`
+                                                );
+                                            } finally {
+                                                setTimeout(() => {
+                                                    setIsDownloading(false);
+                                                }, 800);
+                                            }
+                                        }}
+                                        className={`
+                                        flex items-center gap-2 px-4 py-2 rounded-lg font-medium
+                                        backdrop-blur-sm transition-all duration-200
+                                        ${isDownloading
+                                                ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                                : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+                                            }
+                                      `}
                                     >
-                                        <Download className="w-4 h-4" />
-                                        ดาวน์โหลด
-                                    </a>
+                                        <Download
+                                            className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
+                                        />
+                                        {isDownloading
+                                            ? "กำลังดาวน์โหลด..."
+                                            : "ดาวน์โหลด"}
+                                    </button>
+
                                 </div>
                             </div>
                         </div>
