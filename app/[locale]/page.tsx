@@ -1,12 +1,12 @@
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Footer from '@/components/Layout/Footer';
 import Navbar from '@/components/Layout/Navbar';
+import ScrollToAnchor from '@/components/ScrollToAnchor';
 import About from '@/components/Section/About';
 import Achievement from '@/components/Section/Achievement';
 import Contact from '@/components/Section/Contact';
 import Home from '@/components/Section/Home';
 import Skills from '@/components/Section/Skills';
-import ThemeSwitch from '@/components/ThemeSwitch';
 import type { Metadata } from "next";
 
 import { getLocale } from "next-intl/server";
@@ -94,14 +94,18 @@ export default async function IndexPage(props: {
 
   return (
     <>
+      <ScrollToAnchor />
       {/* GLOBAL BACKGROUND */}
       <div className="min-h-screen font-sans bg-rose-50 dark:bg-[#181b22]">
 
         {/* SECTION 1 */}
         <section id='Home' className="w-full bg-rose-50 dark:bg-[#20232b]">
           <div className="max-w-6xl mx-auto px-4 md:px-6 md:pt-8">
-            <div className="md:hidden flex items-center justify-center pt-16">
-              <LanguageSwitcher />
+
+            <div className="md:hidden fixed top-0 left-0 w-full z-50 flex items-center justify-center pt-6 pointer-events-none">
+              <div className="pointer-events-auto">
+                <LanguageSwitcher />
+              </div>
             </div>
             <Home />
             <Navbar />
@@ -109,28 +113,28 @@ export default async function IndexPage(props: {
         </section>
 
         {/* SECTION 2 */}
-        <section id='About' className="w-full bg-white dark:bg-[#181b22]">
+        <section id='About' className="w-full bg-white dark:bg-[#181b22] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
             <About />
           </div>
         </section>
 
         {/* SECTION 3 */}
-        <section id='Skills' className="w-full bg-slate-50 dark:bg-[#20232b]">
+        <section id='Skills' className="w-full bg-slate-50 dark:bg-[#20232b] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
             <Skills />
           </div>
         </section>
 
         {/* SECTION 4 */}
-        <section id="Achievements" className="w-full bg-white dark:bg-[#181b22]">
+        <section id="Achievements" className="w-full bg-white dark:bg-[#181b22] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
             <Achievement slug={categorySlug} />
           </div>
         </section>
 
         {/* SECTION 5 */}
-        <section id='Contact' className="w-full bg-slate-50 dark:bg-[#20232b]">
+        <section id='Contact' className="w-full bg-slate-50 dark:bg-[#20232b] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
             <Contact />
           </div>
