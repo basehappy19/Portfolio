@@ -605,15 +605,56 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                                                                     <div className="w-1 h-4 bg-blue-600 rounded" />
                                                                     คำอธิบาย
                                                                 </h4>
-                                                                <div className="space-y-2">
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
-                                                                        <span className="font-medium">TH:</span>{" "}
-                                                                        {achievement.description_th || "-"}
-                                                                    </p>
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 wrap-break-word whitespace-pre-wrap">
-                                                                        <span className="font-medium">EN:</span>{" "}
-                                                                        {achievement.description_en || "-"}
-                                                                    </p>
+                                                                <div className="space-y-4"> {/* เปลี่ยน space-y-2 เป็น 4 ให้ห่างกันนิดนึง */}
+
+                                                                    {/* ส่วนภาษาไทย */}
+                                                                    <div>
+                                                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 block">
+                                                                            TH:
+                                                                        </span>
+                                                                        {achievement.description_th ? (
+                                                                            <div
+                                                                                className="
+                        text-sm text-gray-600 dark:text-gray-400 
+                        prose prose-sm dark:prose-invert max-w-none
+                        [&_ul]:list-disc [&_ul]:pl-5 
+                        [&_ol]:list-decimal [&_ol]:pl-5
+                        [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-2
+                        [&_h3]:text-base [&_h3]:font-semibold
+                        [&_p]:mb-1
+                    "
+                                                                                dangerouslySetInnerHTML={{ __html: achievement.description_th }}
+                                                                            />
+                                                                        ) : (
+                                                                            <span className="text-sm text-gray-500">-</span>
+                                                                        )}
+                                                                    </div>
+
+                                                                    <div className="border-t border-gray-100 dark:border-gray-800" />
+
+                                                                    {/* ส่วนภาษาอังกฤษ */}
+                                                                    <div>
+                                                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1 block">
+                                                                            EN:
+                                                                        </span>
+                                                                        {achievement.description_en ? (
+                                                                            <div
+                                                                                className="
+                        text-sm text-gray-600 dark:text-gray-400 
+                        prose prose-sm dark:prose-invert max-w-none
+                        [&_ul]:list-disc [&_ul]:pl-5 
+                        [&_ol]:list-decimal [&_ol]:pl-5
+                        [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-2
+                        [&_h3]:text-base [&_h3]:font-semibold
+                        [&_p]:mb-1
+                    "
+                                                                                dangerouslySetInnerHTML={{ __html: achievement.description_en }}
+                                                                            />
+                                                                        ) : (
+                                                                            <span className="text-sm text-gray-500">-</span>
+                                                                        )}
+                                                                    </div>
+
                                                                 </div>
                                                             </div>
 

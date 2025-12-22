@@ -199,7 +199,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                     {description && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
-                            {description}
+                            {description.replace(/<[^>]+>/g, ' ')}
                         </p>
                     )}
 
@@ -264,7 +264,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             {/* Image Gallery */}
                             {achievement.images.length > 0 && (
                                 <div className="relative bg-gray-50 dark:bg-gray-800">
-                                    {/* Main Image */}
                                     {/* Main Image */}
                                     <div className="relative h-[400px] group">
                                         <Image
@@ -436,9 +435,27 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                                 {description && (
                                     <div className="mb-6">
-                                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                                            {description}
-                                        </p>
+                                        <div
+                                            className="
+                text-gray-700 dark:text-gray-300 leading-relaxed
+                prose prose-sm sm:prose-base dark:prose-invert max-w-none
+                
+                {/* จัดการ List (Bullet points & Numbers) */}
+                [&_ul]:list-disc [&_ul]:pl-5 
+                [&_ol]:list-decimal [&_ol]:pl-5
+                
+                {/* จัดการหัวข้อ (Headings) */}
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3
+                [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2
+                
+                {/* จัดการ Link */}
+                [&_a]:text-sky-600 [&_a]:underline hover:[&_a]:text-sky-700
+                
+                {/* จัดการ Paragraph */}
+                [&_p]:mb-3
+            "
+                                            dangerouslySetInnerHTML={{ __html: description }}
+                                        />
                                     </div>
                                 )}
 
