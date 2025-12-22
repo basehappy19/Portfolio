@@ -15,9 +15,6 @@ type Props = {
     handleLinkDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragOver: (e: DragEvent<HTMLDivElement>, index: number) => void;
     handleLinkDragEnd: () => void;
-    // ❌ เดิม: handleLinkThaiBlur
-    // handleLinkThaiBlur: (index: number) => void;
-    // ✅ ใหม่: ปุ่มแปล
     handleTranslateLink: (index: number) => void;
     translatingLink?: Record<number, boolean>;
 };
@@ -108,7 +105,7 @@ export const AchievementLinksSection: React.FC<Props> = ({
                         w-full px-3 py-2 text-sm rounded border shadow-sm
                         bg-white text-gray-900 placeholder-gray-400
                         focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                        pr-28
+                        pr-12 
                         dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
                         ${isTranslating
                                                     ? 'border-red-400 animate-pulse'
@@ -121,29 +118,21 @@ export const AchievementLinksSection: React.FC<Props> = ({
                                             type="button"
                                             onClick={() => handleTranslateLink(index)}
                                             disabled={isTranslating}
-                                            className={`
-                        absolute right-2 top-1/2 -translate-y-1/2
-                        inline-flex items-center justify-center
-                        px-3 py-1.5
-                        text-xs font-medium
-                        rounded-lg
-                        border border-sky-500/70
-                        bg-sky-50 text-sky-700
-                        hover:bg-sky-100 hover:border-sky-600
-                        dark:bg-sky-900/20 dark:text-sky-200 dark:border-sky-500/60
-                        dark:hover:bg-sky-900/40
-                        disabled:opacity-60 disabled:cursor-not-allowed
+                                            className="
+                        cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 z-10 
+                        p-1.5 rounded-md 
+                        bg-white/80 dark:bg-gray-800/80 
+                        hover:bg-sky-50 text-sky-600 
+                        border border-gray-200 shadow-sm backdrop-blur-sm 
                         transition-all
-                        active:scale-[0.97]
-                      `}
+                        disabled:opacity-50
+                      "
+                                            title="Translate to English"
                                         >
                                             {isTranslating ? (
-                                                <span className="flex items-center gap-1">
-                                                    <span className="w-3 h-3 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
-                                                    กำลังแปล...
-                                                </span>
+                                                <span className="w-4 h-4 block rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
                                             ) : (
-                                                <span>แปลเป็นอังกฤษ</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="m22 22-5-10-5 10" /><path d="M14 18h6" /></svg>
                                             )}
                                         </button>
                                     </div>
