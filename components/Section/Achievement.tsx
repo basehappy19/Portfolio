@@ -17,11 +17,9 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab slugCurrentCategory={slug} />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-                    <Suspense fallback={<AchievementGridSkeleton />}>
-                        <AchievementsList slug={slug} locale={locale} />
-                    </Suspense>
-                </div>
+                <Suspense fallback={<AchievementGridSkeleton />}>
+                    <AchievementsList slug={slug} locale={locale} />
+                </Suspense>
             </div>
         </div>
     );

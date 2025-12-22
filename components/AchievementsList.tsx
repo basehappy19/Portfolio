@@ -1,6 +1,6 @@
 import { Achievement as AchievementType } from "@/types/Achievements";
-import AchievementCard from "./AchievementCard";
 import { getTranslations } from "next-intl/server";
+import AchievementGrid from "./AchievementGrid";
 
 async function getData(slug?: string) {
     const qs = slug ? `?category=${encodeURIComponent(slug)}` : "";
@@ -33,7 +33,6 @@ export default async function AchievementsList({
                 className="
                 col-span-full flex flex-col items-center justify-center p-12 rounded-xl text-center
                 transition-all
-
                 bg-gray-100 border border-gray-300
                 text-gray-700
                 dark:bg-white/5 dark:border-white/10 dark:text-white
@@ -86,14 +85,9 @@ export default async function AchievementsList({
     }
 
     return (
-        <>
-            {achievements.map((achievement, idx) => (
-                <AchievementCard
-                    key={idx}
-                    achievement={achievement}
-                    locale={locale}
-                />
-            ))}
-        </>
+        <AchievementGrid
+            achievements={achievements}
+            locale={locale}
+        />
     );
 }

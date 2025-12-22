@@ -13,9 +13,7 @@ type Props = {
     required?: boolean;
     error?: string;
     touched?: boolean;
-    /** ขนาดของ input: ใช้ 'lg' สำหรับช่องใหญ่ (ไทย), 'md' สำหรับช่องปกติ (EN) */
     size?: 'md' | 'lg';
-    /** ถ้าอยาก override class ของ container */
     containerClassName?: string;
     isTranslating?: boolean;
     onTranslate?: () => void;
@@ -39,7 +37,7 @@ export const AchievementTextField: React.FC<Props> = ({
     const hasError = Boolean(error && touched);
 
     const baseInputClass = [
-        'w-full px-4 py-3.5 rounded-xl border-2 transition-all duration-200',
+        'w-full rounded-xl border-2 transition-all duration-200',
         'bg-white text-gray-900 placeholder-gray-400 hover:border-red-300 hover:bg-white',
         'dark:hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500',
         'shadow-sm',
@@ -48,8 +46,8 @@ export const AchievementTextField: React.FC<Props> = ({
 
     const sizeClass =
         size === 'lg'
-            ? 'px-4 py-3 rounded-xl transition-all duration-200'
-            : 'px-3 py-2 rounded-lg';
+            ? 'px-4 py-3.5' // ปรับ padding ให้สมดุล
+            : 'px-3 py-2.5';
 
     const borderClass = hasError
         ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
@@ -60,7 +58,8 @@ export const AchievementTextField: React.FC<Props> = ({
             ? 'animate-pulse border-red-400 shadow-[0_0_0_1px_rgba(59,130,246,0.4)]'
             : '';
 
-    const paddingRightClass = onTranslate ? 'pr-28' : '';
+    // ลด padding ขวาลงเพื่อให้พอดีกับปุ่ม Icon (เดิม pr-28 กว้างไป)
+    const paddingRightClass = onTranslate ? 'pr-12' : '';
 
     return (
         <div className={`${hasError ? 'error-field' : ''} ${containerClassName}`}>
@@ -85,30 +84,22 @@ export const AchievementTextField: React.FC<Props> = ({
                         type="button"
                         onClick={onTranslate}
                         disabled={isTranslating}
-                        className={`
-                            cursor-pointer
-                            absolute right-2
-                            inline-flex items-center justify-center
-                            px-3 py-1.5
-                            text-xs font-medium
-                            rounded-lg
-                            border border-sky-500/70
-                            bg-sky-50 text-sky-700
-                            hover:bg-sky-100 hover:border-sky-600
-                            dark:bg-sky-900/20 dark:text-sky-200 dark:border-sky-500/60
-                            dark:hover:bg-sky-900/40
-                            disabled:opacity-60 disabled:cursor-not-allowed
+                        // แก้ไขตำแหน่ง: ใช้ top-1/2 -translate-y-1/2 เพื่อจัดกึ่งกลางแนวตั้ง
+                        className="
+                            cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 z-10 
+                            p-1.5 rounded-md 
+                            bg-white/80 dark:bg-gray-800/80 
+                            hover:bg-sky-50 text-sky-600 
+                            border border-gray-200 shadow-sm backdrop-blur-sm 
                             transition-all
-                            active:scale-[0.97]
-                        `}
+                            disabled:opacity-50
+                        "
+                        title="Translate to English"
                     >
                         {isTranslating ? (
-                            <span className="flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
-                                กำลังแปล...
-                            </span>
+                            <span className="w-4 h-4 block rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
                         ) : (
-                            <span>แปลเป็นอังกฤษ</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="m22 22-5-10-5 10" /><path d="M14 18h6" /></svg>
                         )}
                     </button>
                 )}

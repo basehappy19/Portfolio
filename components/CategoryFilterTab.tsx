@@ -61,7 +61,7 @@ const CategoryFilterTab = async ({
     });
 
     return (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 mb:mb-0 mb-6">
             <AllButton
                 TotalAchievements={totalAchievements}
                 AllButtonLabel={AllButtonLabel}

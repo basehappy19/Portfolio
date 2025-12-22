@@ -10,6 +10,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Download,
+    Trophy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Achievement } from "@/types/Achievements";
@@ -165,14 +166,21 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         </div>
                     )}
 
-                    {/* linear Overlay for Better Text Readability */}
                     <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
 
                     {/* Award Level Badge */}
                     {awardLevel && (
-                        <div className="absolute top-4 left-4">
-                            <div className="px-4 py-1.5 bg-amber-600 text-white text-xs font-bold rounded-md shadow-lg border border-white/20">
-                                {awardLevel}
+                        <div className="absolute top-4 left-4 z-10">
+                            <div className="
+            flex items-center gap-1.5 px-4 py-1.5 
+            bg-amber-600
+            text-white text-xs font-bold uppercase tracking-wider
+            rounded-full shadow-[0_4px_12px_rgba(245,158,11,0.5)] 
+            border border-yellow-200/40
+            bg-size-[200%_auto] animate-shine
+        ">
+                                <Trophy size={14} className="text-yellow-100" />
+                                <span>{awardLevel}</span>
                             </div>
                         </div>
                     )}
@@ -199,7 +207,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                     {description && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
-                            {description}
+                            {description.replace(/<[^>]+>/g, ' ')}
                         </p>
                     )}
 
@@ -264,7 +272,6 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             {/* Image Gallery */}
                             {achievement.images.length > 0 && (
                                 <div className="relative bg-gray-50 dark:bg-gray-800">
-                                    {/* Main Image */}
                                     {/* Main Image */}
                                     <div className="relative h-[400px] group">
                                         <Image
@@ -436,9 +443,27 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                                 {description && (
                                     <div className="mb-6">
-                                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                                            {description}
-                                        </p>
+                                        <div
+                                            className="
+                text-gray-700 dark:text-gray-300 leading-relaxed
+                prose prose-sm sm:prose-base dark:prose-invert max-w-none
+                
+                {/* จัดการ List (Bullet points & Numbers) */}
+                [&_ul]:list-disc [&_ul]:pl-5 
+                [&_ol]:list-decimal [&_ol]:pl-5
+                
+                {/* จัดการหัวข้อ (Headings) */}
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3
+                [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2
+                
+                {/* จัดการ Link */}
+                [&_a]:text-sky-600 [&_a]:underline hover:[&_a]:text-sky-700
+                
+                {/* จัดการ Paragraph */}
+                [&_p]:mb-3
+            "
+                                            dangerouslySetInnerHTML={{ __html: description }}
+                                        />
                                     </div>
                                 )}
 

@@ -19,15 +19,20 @@ const navItems: NavItem[] = [
     { id: 'Contact', label_en: 'Contact', label_th: 'ติดต่อ', icon: Mail }
 ];
 
+// ปรับปรุงฟังก์ชันนี้
 export const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
+        // 1. เปลี่ยน URL โดยไม่ Refresh หน้าและไม่ขัดขวาง Smooth Scroll
+        window.history.pushState(null, '', `#${sectionId}`);
+        
+        // 2. สั่งเลื่อนหน้าจอ
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 };
 
 const Navbar = () => {
-    const [activeSection, setActiveSection] = useState('Home'); // ให้ตรงกับ id
+    const [activeSection, setActiveSection] = useState('Home');
     const [isScrolled, setIsScrolled] = useState(false);
     const locale = useLocale();
     const isThai = locale === 'th';
@@ -51,7 +56,9 @@ const Navbar = () => {
         };
 
         window.addEventListener('scroll', handleScroll);
-        handleScroll();
+        // เรียกครั้งแรกเผื่อมีการ Reload หน้าแล้ว URL มี Hash อยู่แล้ว
+        handleScroll(); 
+        
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -88,7 +95,10 @@ const Navbar = () => {
                             return (
                                 <button
                                     key={item.id}
-                                    onClick={() => scrollToSection(item.id)}
+                                    onClick={() => {
+                                        scrollToSection(item.id);
+                                        setActiveSection(item.id); // เปลี่ยนสีปุ่มทันทีที่กด ไม่ต้องรอ Scroll
+                                    }}
                                     className={`
                                         cursor-pointer relative px-4 py-2 text-nowrap rounded-full
                                         flex items-center gap-2
