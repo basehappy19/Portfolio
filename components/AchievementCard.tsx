@@ -10,6 +10,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Download,
+    Trophy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Achievement } from "@/types/Achievements";
@@ -165,14 +166,21 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                         </div>
                     )}
 
-                    {/* linear Overlay for Better Text Readability */}
                     <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
 
                     {/* Award Level Badge */}
                     {awardLevel && (
-                        <div className="absolute top-4 left-4">
-                            <div className="px-4 py-1.5 bg-amber-600 text-white text-xs font-bold rounded-md shadow-lg border border-white/20">
-                                {awardLevel}
+                        <div className="absolute top-4 left-4 z-10">
+                            <div className="
+            flex items-center gap-1.5 px-4 py-1.5 
+            bg-amber-600
+            text-white text-xs font-bold uppercase tracking-wider
+            rounded-full shadow-[0_4px_12px_rgba(245,158,11,0.5)] 
+            border border-yellow-200/40
+            bg-size-[200%_auto] animate-shine
+        ">
+                                <Trophy size={14} className="text-yellow-100" />
+                                <span>{awardLevel}</span>
                             </div>
                         </div>
                     )}
