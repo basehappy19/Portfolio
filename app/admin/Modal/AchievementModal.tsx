@@ -18,10 +18,10 @@ import { AchievementTextField } from '../AchievementTextField';
 import { useRouter } from 'next/navigation';
 import { createAchievement, deleteAchievement, updateAchievement } from '../services/achievements';
 import toast from 'react-hot-toast';
-import { AchievementTextarea } from '../AchievementTextarea';
 import { useAchievementTextTranslation } from '../hooks/useAchievementTextTranslation';
 import { useLinkTranslation } from '../hooks/useLinkTranslation';
 import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
+import { AchievementRichText } from '../AchievementRichText';
 
 
 export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
@@ -118,7 +118,7 @@ const AchievementModalInner = ({
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
     (editData?.images
         ?.slice()
-        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)) 
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
         .map((img, idx) => ({
             id: img.id,
             file: undefined,
@@ -346,6 +346,9 @@ const AchievementModalInner = ({
         }
     };
 
+    const handleRichChange = (name: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
     return (
         <div
@@ -458,24 +461,22 @@ const AchievementModalInner = ({
                                 size="md"
                             />
 
-                            <AchievementTextarea
+                            <AchievementRichText
                                 label="รายละเอียด (ไทย)"
                                 name="description_th"
                                 value={formData.description_th}
-                                onChange={handleInputChange}
+                                onChange={handleRichChange}
                                 placeholder="อธิบายรายละเอียดผลงาน..."
-                                rows={4}
                                 isTranslating={!!translating.description_th}
                                 onTranslate={() => handleTranslate("description_th")}
                             />
 
-                            <AchievementTextarea
+                            <AchievementRichText
                                 label="รายละเอียด (English)"
                                 name="description_en"
                                 value={formData.description_en}
-                                onChange={handleInputChange}
+                                onChange={handleRichChange}
                                 placeholder="Describe your project..."
-                                rows={4}
                             />
                         </div>
 
