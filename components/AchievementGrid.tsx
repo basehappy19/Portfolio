@@ -18,7 +18,7 @@ export default function AchievementGrid({ achievements, locale }: AchievementGri
                 <button
                     onClick={() => setCols(2)}
                     className={`
-            p-2 rounded-lg border transition-all flex items-center gap-2
+            cursor-pointer p-2 rounded-lg border transition-all flex items-center gap-2
             ${cols === 2
                             ? "bg-gray-200 border-gray-400 dark:bg-white/20 dark:border-white/30"
                             : "bg-transparent border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"}
@@ -36,7 +36,7 @@ export default function AchievementGrid({ achievements, locale }: AchievementGri
                 <button
                     onClick={() => setCols(3)}
                     className={`
-            p-2 rounded-lg border transition-all flex items-center gap-2
+            cursor-pointer p-2 rounded-lg border transition-all flex items-center gap-2
             ${cols === 3
                             ? "bg-gray-200 border-gray-400 dark:bg-white/20 dark:border-white/30"
                             : "bg-transparent border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"}
