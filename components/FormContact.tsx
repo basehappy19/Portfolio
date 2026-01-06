@@ -4,6 +4,7 @@ import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';
+import { saveMessage } from '@/app/actions/message';
 
 type FormState = {
     name: string;
@@ -131,13 +132,9 @@ const FormContact = () => {
         setIsSubmitting(true);
 
         try {
-            const res = await fetch('/api/message', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+            const res = await saveMessage(formData);
 
-            if (!res.ok) {
+            if (!res.success) {
                 throw new Error('Failed to send');
             }
 
