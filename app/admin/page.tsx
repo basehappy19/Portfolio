@@ -182,12 +182,12 @@ export default async function AdminPage(props: {
                     updatedAt: true,
                 },
                 orderBy: {
-                    sortOrder: "asc",    
+                    sortOrder: "asc",
                 },
             },
             links: {
                 orderBy: {
-                    sortOrder: "asc",   
+                    sortOrder: "asc",
                 },
             },
             createdAt: true,
@@ -195,7 +195,7 @@ export default async function AdminPage(props: {
         },
 
         orderBy: {
-            sortOrder: "desc", 
+            sortOrder: "desc",
         },
     });
 
@@ -211,9 +211,10 @@ export default async function AdminPage(props: {
         }
     });
 
-    const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
-    const draftCount = achievements.filter(a => a.status === 'DRAFT').length;
-    const totalImages = achievements.reduce((sum, a) => sum + a.images.length, 0);
+    const publicCount = achievements.filter((a: any) => a.status === 'PUBLIC').length;
+    const draftCount = achievements.filter((a: any) => a.status === 'DRAFT').length;
+
+    const totalImages = achievements.reduce((sum: number, a: any) => sum + a.images.length, 0);
     const sortOrderAgg = await prisma.achievement.aggregate({
         _max: {
             sortOrder: true,
