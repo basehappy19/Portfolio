@@ -206,6 +206,9 @@ export default async function AdminPage(props: {
             name_en: true,
             slug: true,
         },
+        orderBy: {
+            id: "asc",
+        }
     });
 
     const publicCount = achievements.filter(a => a.status === 'PUBLIC').length;
