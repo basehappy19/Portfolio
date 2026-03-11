@@ -7,10 +7,8 @@ import AchievementGridSkeleton from "../Loading/AchievementGridSkeleton";
 
 const Achievement = async ({
     slug,
-    page,
 }: {
     slug: string | undefined;
-    page: number;
 }) => {
     const locale = await getLocale();
     const t = await getTranslations("Index");
@@ -21,8 +19,8 @@ const Achievement = async ({
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab slugCurrentCategory={slug} />
 
-                <Suspense fallback={<AchievementGridSkeleton />}>
-                    <AchievementsList slug={slug} locale={locale} page={page} />
+                <Suspense fallback={<AchievementGridSkeleton />} key={slug ?? "all"}>
+                    <AchievementsList slug={slug} locale={locale} />
                 </Suspense>
             </div>
         </div>

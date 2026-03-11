@@ -136,7 +136,7 @@ export default async function IndexPage(props: {
         {/* SECTION 4 */}
         <section id="Achievements" className="w-full bg-white dark:bg-[#181b22] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
-            <Achievement slug={categorySlug} page={page} />
+            <Achievement slug={categorySlug} />
           </div>
         </section>
 

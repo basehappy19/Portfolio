@@ -6,17 +6,15 @@ const prisma = new PrismaClient({ adapter });
 
 type GetAchievementsParams = {
     category?: string;
-    page?: number;
+    offset?: number;
     limit?: number;
 };
 
 export async function getAchievements({
     category,
-    page = 1,
-    limit = 10,
+    offset = 0,
+    limit = 9,
 }: GetAchievementsParams) {
-    const skip = (page - 1) * limit;
-
     const baseSelect = {
         id: true,
         title_th: true,
@@ -84,10 +82,9 @@ export async function getAchievements({
             orderBy: {
                 sortOrder: "desc",
             },
-            skip,
+            skip: offset,
             take: limit,
         }),
-
         prisma.achievement.count({
             where,
         }),
@@ -96,8 +93,7 @@ export async function getAchievements({
     return {
         achievements,
         total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        hasMore: offset + achievements.length < total,
+        nextOffset: offset + achievements.length,
     };
 }
