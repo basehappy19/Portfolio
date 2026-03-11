@@ -62,6 +62,7 @@ export default function AchievementGrid({ achievements, locale }: AchievementGri
                         key={idx}
                         achievement={achievement}
                         locale={locale}
+                        priorityImage={idx < 3}
                     />
                 ))}
             </div>

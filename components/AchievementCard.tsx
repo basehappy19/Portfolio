@@ -19,9 +19,10 @@ import { downloadImage } from "@/lib/download";
 interface AchievementCardProps {
     achievement: Achievement;
     locale: string;
+    priorityImage?: boolean;
 }
 
-const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
+const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCardProps) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -157,6 +158,9 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                             src={mainImage.url}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
+                            priority={priorityImage}
+                            loading={priorityImage ? "eager" : "lazy"}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={() => setImageError(true)}
                         />
@@ -284,6 +288,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 ) || title
                                             }
                                             fill
+                                            sizes="(max-width: 768px) 100vw, 80vw"
                                             className="cursor-pointer object-contain p-8 select-none transition-transform duration-300 group-hover:scale-[1.01]"
                                             key={currentImageIndex}
                                             onClick={() => openLightbox(achievement.id, currentImageIndex)}
