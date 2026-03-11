@@ -4,15 +4,14 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import CategoryButton from './Button/CategoryButton';
 import AllButton from './Button/AllButton';
 
-
 export type UiCategory = {
     id: number;
-    name: string;              
+    name: string;
     slug: string;
     totalAchievements: number;
 };
 
-export type slugCurrentCategory = string | null
+export type slugCurrentCategory = string | null;
 
 const CategoryFilterTab = async ({
     slugCurrentCategory,
@@ -24,6 +23,10 @@ const CategoryFilterTab = async ({
     const AllButtonLabel = t('Achievement.Buttons.AllButtonLabel');
 
     const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+        throw new Error('DATABASE_URL is not defined');
+    }
+
     const adapter = new PrismaPg({ connectionString });
     const prisma = new PrismaClient({ adapter });
 
@@ -60,21 +63,36 @@ const CategoryFilterTab = async ({
         },
     });
 
-    return (
-        <div className="flex flex-wrap gap-3 mb:mb-0 mb-6">
-            <AllButton
-                TotalAchievements={totalAchievements}
-                AllButtonLabel={AllButtonLabel}
-                slugCurrentCategory={slugCurrentCategory}
-            />
+    const currentCategory =
+        categories.find((cat) => cat.slug === slugCurrentCategory) ?? null;
 
-            {categories.map((category, idx) => (
-                <CategoryButton
-                    key={idx}
+    const currentFilterText = currentCategory
+        ? locale === 'th'
+            ? `กำลังค้นหาหมวด: ${currentCategory.name}`
+            : `Current category: ${currentCategory.name}`
+        : ``
+
+    return (
+        <div className="space-y-3">
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                {currentFilterText}
+            </div>
+
+            <div className="flex flex-wrap gap-3 mb:mb-0 mb-6">
+                <AllButton
+                    TotalAchievements={totalAchievements}
+                    AllButtonLabel={AllButtonLabel}
                     slugCurrentCategory={slugCurrentCategory}
-                    category={category}
                 />
-            ))}
+
+                {categories.map((category) => (
+                    <CategoryButton
+                        key={category.id}
+                        slugCurrentCategory={slugCurrentCategory}
+                        category={category}
+                    />
+                ))}
+            </div>
         </div>
     );
 };
