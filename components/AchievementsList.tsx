@@ -2,20 +2,27 @@ import { Achievement as AchievementType } from "@/types/Achievements";
 import { getTranslations } from "next-intl/server";
 import AchievementGrid from "./AchievementGrid";
 import { getAchievements } from "@/lib/achievements";
+import Link from "next/link";
 
-async function getData(slug?: string): Promise<AchievementType[]> {
-    return (await getAchievements(slug)) as AchievementType[];
+async function getData(slug?: string, page = 1) {
+    return await getAchievements({
+        category: slug,
+        page,
+        limit: 10,
+    });
 }
 
 export default async function AchievementsList({
     slug,
     locale,
+    page = 1,
 }: {
     slug?: string;
     locale: string;
+    page?: number;
 }) {
     const t = await getTranslations("Index");
-    const achievements = await getData(slug);
+    const { achievements, totalPages } = await getData(slug, page);
 
     if (!achievements || achievements.length === 0) {
         return (
@@ -59,5 +66,59 @@ export default async function AchievementsList({
         );
     }
 
-    return <AchievementGrid achievements={achievements} locale={locale} />;
+    const buildPageHref = (targetPage: number) => {
+        const params = new URLSearchParams();
+        if (slug) params.set("category", slug);
+        params.set("page", String(targetPage));
+        return `?${params.toString()}`;
+    };
+
+    return (
+        <div className="space-y-8">
+            <AchievementGrid
+                achievements={achievements as AchievementType[]}
+                locale={locale}
+            />
+
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <Link
+                        href={buildPageHref(Math.max(1, page - 1))}
+                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                            page <= 1
+                                ? "pointer-events-none opacity-50 border-gray-200 text-gray-400 dark:border-gray-700 dark:text-gray-500"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                        }`}
+                    >
+                        {locale === "th" ? "ก่อนหน้า" : "Previous"}
+                    </Link>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <Link
+                            key={p}
+                            href={buildPageHref(p)}
+                            className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                                p === page
+                                    ? "bg-red-600 text-white border-red-600"
+                                    : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                            }`}
+                        >
+                            {p}
+                        </Link>
+                    ))}
+
+                    <Link
+                        href={buildPageHref(Math.min(totalPages, page + 1))}
+                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition ${
+                            page >= totalPages
+                                ? "pointer-events-none opacity-50 border-gray-200 text-gray-400 dark:border-gray-700 dark:text-gray-500"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                        }`}
+                    >
+                        {locale === "th" ? "ถัดไป" : "Next"}
+                    </Link>
+                </div>
+            )}
+        </div>
+    );
 }

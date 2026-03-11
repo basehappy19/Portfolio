@@ -4,7 +4,19 @@ const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-export async function getAchievements(category?: string) {
+type GetAchievementsParams = {
+    category?: string;
+    page?: number;
+    limit?: number;
+};
+
+export async function getAchievements({
+    category,
+    page = 1,
+    limit = 10,
+}: GetAchievementsParams) {
+    const skip = (page - 1) * limit;
+
     const baseSelect = {
         id: true,
         title_th: true,
@@ -26,8 +38,23 @@ export async function getAchievements(category?: string) {
         updatedAt: true,
     };
 
-    if (category) {
-        return prisma.achievement.findMany({
+    const where = {
+        status: "PUBLIC" as const,
+        ...(category
+            ? {
+                  categories: {
+                      some: {
+                          category: {
+                              slug: category,
+                          },
+                      },
+                  },
+              }
+            : {}),
+    };
+
+    const [achievements, total] = await Promise.all([
+        prisma.achievement.findMany({
             select: {
                 ...baseSelect,
                 images: {
@@ -53,53 +80,24 @@ export async function getAchievements(category?: string) {
                     },
                 },
             },
-            where: {
-                status: "PUBLIC",
-                categories: {
-                    some: {
-                        category: {
-                            slug: category,
-                        },
-                    },
-                },
-            },
+            where,
             orderBy: {
                 sortOrder: "desc",
             },
-        });
-    }
+            skip,
+            take: limit,
+        }),
 
-    return prisma.achievement.findMany({
-        select: {
-            ...baseSelect,
-            images: {
-                orderBy: {
-                    sortOrder: "asc",
-                },
-            },
-            links: {
-                orderBy: {
-                    sortOrder: "asc",
-                },
-            },
-            categories: {
-                select: {
-                    category: {
-                        select: {
-                            id: true,
-                            name_en: true,
-                            name_th: true,
-                            slug: true,
-                        },
-                    },
-                },
-            },
-        },
-        where: {
-            status: "PUBLIC",
-        },
-        orderBy: {
-            sortOrder: "desc",
-        },
-    });
+        prisma.achievement.count({
+            where,
+        }),
+    ]);
+
+    return {
+        achievements,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+    };
 }

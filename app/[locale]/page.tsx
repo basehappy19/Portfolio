@@ -85,12 +85,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function IndexPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const searchParams = await props.searchParams;
-  const categorySlug = typeof searchParams.category === "string"
-    ? searchParams.category
-    : undefined;
+    const searchParams = await props.searchParams;
+
+    const categorySlug =
+        typeof searchParams.category === "string"
+            ? searchParams.category
+            : undefined;
+
+    const page =
+        typeof searchParams.page === "string"
+            ? Math.max(1, Number(searchParams.page) || 1)
+            : 1;
 
   return (
     <>
@@ -129,7 +136,7 @@ export default async function IndexPage(props: {
         {/* SECTION 4 */}
         <section id="Achievements" className="w-full bg-white dark:bg-[#181b22] scroll-mt-20">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
-            <Achievement slug={categorySlug} />
+            <Achievement slug={categorySlug} page={page} />
           </div>
         </section>
 

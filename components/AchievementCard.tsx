@@ -277,7 +277,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                             {achievement.images.length > 0 && (
                                 <div className="relative bg-gray-50 dark:bg-gray-800">
                                     {/* Main Image */}
-                                    <div className="relative h-[400px] group">
+                                    <div className="relative h-100 group">
                                         <Image
                                             src={achievement.images[currentImageIndex].url}
                                             alt={
