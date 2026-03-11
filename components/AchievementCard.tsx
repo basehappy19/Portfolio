@@ -148,100 +148,113 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {/* Card */}
             <div
                 onClick={openModal}
-                className="cursor-pointer group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600"
+                className="group relative cursor-pointer overflow-hidden rounded-3xl border border-gray-200/70 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:border-gray-700/70 dark:bg-gray-900"
             >
+                {/* Top glow / accent */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-red-500/10 via-amber-400/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
                 {/* Image Section */}
-                <div className="relative h-56 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
+                <div className="relative h-60 overflow-hidden bg-linear-to-br from-gray-100 via-gray-50 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-900">
                     {mainImage && !imageError ? (
                         <Image
                             src={mainImage.url}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
                             onError={() => setImageError(true)}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <Award className="w-20 h-20 text-gray-300 dark:text-gray-600" />
+                        <div className="flex h-full w-full items-center justify-center">
+                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/70 shadow-inner dark:bg-gray-800/80">
+                                <Award className="h-12 w-12 text-gray-300 dark:text-gray-500" />
+                            </div>
                         </div>
                     )}
 
-                    <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-transparent" />
 
                     {/* Award Level Badge */}
                     {awardLevel && (
-                        <div className="absolute top-4 left-4 z-10">
-                            <div className="
-            flex items-center gap-1.5 px-4 py-1.5 
-            bg-amber-600
-            text-white text-xs font-bold uppercase tracking-wider
-            rounded-full shadow-[0_4px_12px_rgba(245,158,11,0.5)] 
-            border border-yellow-200/40
-            bg-size-[200%_auto] animate-shine
-        ">
+                        <div className="absolute left-4 top-4 z-10">
+                            <div className="inline-flex items-center gap-2 rounded-xl border border-amber-200/40 bg-linear-to-r from-amber-600 to-yellow-600 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white shadow-lg backdrop-blur-md">
                                 <Trophy size={14} className="text-yellow-100" />
                                 <span>{awardLevel}</span>
                             </div>
                         </div>
                     )}
+
+                    {/* Bottom title on image */}
+                    <div className="absolute inset-x-0 bottom-0 z-10 p-5">
+                        <h3 className="line-clamp-2 text-xl font-bold leading-tight text-white drop-shadow-sm">
+                            {title}
+                        </h3>
+                    </div>
                 </div>
 
                 {/* Content Section */}
                 <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                        {title}
-                    </h3>
-
-                    {given_by && (
-                        <div className="mb-4">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                    <div className="space-y-4">
+                        {given_by && (
+                            <div>
+                                <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400">
                                     {locale === "th" ? "มอบโดย" : "Awarded By"}
+                                </p>
+                                <p className="line-clamp-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {given_by}
+                                </p>
+                            </div>
+                        )}
+
+                        {description && (
+                            <p className="line-clamp-3 text-sm leading-7 text-gray-600 dark:text-gray-400">
+                                {description.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
+                            </p>
+                        )}
+
+                        {location && (
+                            <div className="flex items-start gap-2 rounded-2xl bg-gray-50 px-3 py-2.5 dark:bg-gray-800/80">
+                                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-700">
+                                    <MapPin className="h-4 w-4 text-red-500 dark:text-red-400" />
+                                </div>
+                                <span className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {location}
                                 </span>
                             </div>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
-                                {given_by}
+                        )}
+                    </div>
+
+                    {/* Footer CTA */}
+                    <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <div>
+                            <p className="text-sm font-semibold text-red-600 transition-colors duration-300 group-hover:text-red-700 dark:text-red-400 dark:group-hover:text-red-300">
+                                {locale === "th" ? "ดูรายละเอียด" : "View Details"}
+                            </p>
+                            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                                {locale === "th" ? "คลิกเพื่ออ่านเพิ่มเติม" : "Click to explore more"}
                             </p>
                         </div>
-                    )}
 
-                    {description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
-                            {description.replace(/<[^>]+>/g, ' ')}
-                        </p>
-                    )}
-
-                    {location && (
-                        <div className="flex items-center gap-2 mb-5">
-                            <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700">
-                                <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                            </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                                {location}
-                            </span>
-                        </div>
-                    )}
-
-                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors">
-                                {locale === "th" ? "ดูรายละเอียด" : "View Details"}
-                            </span>
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
-                                <svg
-                                    className="w-4 h-4 text-red-600 dark:text-red-400 group-hover:translate-x-0.5 transition-transform"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50 transition-all duration-300 group-hover:translate-x-1 group-hover:bg-red-100 dark:bg-red-900/20 dark:group-hover:bg-red-900/40">
+                            <svg
+                                className="h-4 w-4 text-red-600 dark:text-red-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
                         </div>
                     </div>
                 </div>
 
-                <div className="h-1 bg-linear-to-r from-red-500 via-red-600 to-red-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                {/* Bottom accent line */}
+                <div className="h-1 w-full origin-left scale-x-0 bg-linear-to-r from-amber-400 via-red-500 to-red-700 transition-transform duration-500 group-hover:scale-x-100" />
             </div>
 
             {/* Modal */}
