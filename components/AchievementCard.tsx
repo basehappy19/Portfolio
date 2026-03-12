@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { Achievement } from "@/types/Achievements";
 import { downloadImage } from "@/lib/download";
+import { useSessionContext } from "@/app/contexts/SessionContext";
 
 interface AchievementCardProps {
     achievement: Achievement;
@@ -28,6 +29,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+    const { session, loading } = useSessionContext();
 
     const [lightbox, setLightbox] = useState<{
         achievementId: string;
@@ -574,9 +576,14 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
 
                                             <button
                                                 type="button"
-                                                disabled={isDownloading}
+                                                disabled={isDownloading || !session}
                                                 onClick={async (e) => {
                                                     e.stopPropagation();
+
+                                                    if (!session) {
+                                                        alert(locale === "th" ? "กรุณาเข้าสู่ระบบก่อนดาวน์โหลด" : "Please login to download");
+                                                        return;
+                                                    }
 
                                                     if (isDownloading) return;
 
@@ -594,20 +601,23 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                                     }
                                                 }}
                                                 className={`
-    flex items-center gap-2 px-4 py-2 rounded-lg font-medium
-    backdrop-blur-sm transition-all duration-200
-    ${isDownloading
-                                                        ? "bg-white/10 text-white/60 cursor-not-allowed"
-                                                        : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+flex items-center gap-2 px-4 py-2 rounded-lg font-medium
+backdrop-blur-sm transition-all duration-200
+${!session
+                                                        ? "bg-white/10 text-white/40 cursor-not-allowed"
+                                                        : isDownloading
+                                                            ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                                            : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
                                                     }
-  `}
+`}
                                             >
-                                                <Download
-                                                    className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
-                                                />
-                                                {isDownloading
-                                                    ? (locale === "th" ? "กำลังดาวน์โหลด..." : "Downloading...")
-                                                    : (locale === "th" ? "ดาวน์โหลด" : "Download")}
+                                                <Download className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`} />
+
+                                                {!session
+                                                    ? (locale === "th" ? "เข้าสู่ระบบเพื่อดาวน์โหลด" : "Login to download")
+                                                    : isDownloading
+                                                        ? (locale === "th" ? "กำลังดาวน์โหลด..." : "Downloading...")
+                                                        : (locale === "th" ? "ดาวน์โหลด" : "Download")}
                                             </button>
                                         </div>
                                     </div>
