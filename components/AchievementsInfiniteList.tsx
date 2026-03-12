@@ -4,6 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Achievement as AchievementType } from "@/types/Achievements";
 import AchievementGrid from "./AchievementGrid";
 
+type LoadMoreResponse = {
+    achievements: AchievementType[];
+    hasMore: boolean;
+    nextOffset: number;
+};
+
 type Props = {
     initialAchievements: AchievementType[];
     initialHasMore: boolean;
@@ -24,7 +30,42 @@ export default function AchievementsInfiniteList({
     const [offset, setOffset] = useState(initialOffset);
     const [loading, setLoading] = useState(false);
 
+    const [prefetchedData, setPrefetchedData] = useState<LoadMoreResponse | null>(null);
+    const [isPrefetching, setIsPrefetching] = useState(false);
+
     const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+    const fetchBatch = useCallback(async (targetOffset: number) => {
+        const params = new URLSearchParams();
+        if (slug) params.set("category", slug);
+        params.set("offset", String(targetOffset));
+        params.set("limit", "9");
+
+        const res = await fetch(`/api/achievements?${params.toString()}`, {
+            method: "GET",
+            cache: "no-store",
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to fetch more achievements");
+        }
+
+        return (await res.json()) as LoadMoreResponse;
+    }, [slug]);
+
+    const prefetchMore = useCallback(async () => {
+        if (!hasMore || isPrefetching || prefetchedData) return;
+
+        setIsPrefetching(true);
+        try {
+            const data = await fetchBatch(offset);
+            setPrefetchedData(data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsPrefetching(false);
+        }
+    }, [fetchBatch, hasMore, isPrefetching, offset, prefetchedData]);
 
     const loadMore = useCallback(async () => {
         if (loading || !hasMore) return;
@@ -32,22 +73,15 @@ export default function AchievementsInfiniteList({
         setLoading(true);
 
         try {
-            const params = new URLSearchParams();
-            if (slug) params.set("category", slug);
-            params.set("offset", String(offset));
-            params.set("limit", "9");
-
-            const res = await fetch(`/api/achievements?${params.toString()}`, {
-                method: "GET",
-                cache: "no-store",
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to fetch more achievements");
+            if (prefetchedData) {
+                setItems((prev) => [...prev, ...prefetchedData.achievements]);
+                setHasMore(prefetchedData.hasMore);
+                setOffset(prefetchedData.nextOffset);
+                setPrefetchedData(null);
+                return;
             }
 
-            const data = await res.json();
-
+            const data = await fetchBatch(offset);
             setItems((prev) => [...prev, ...data.achievements]);
             setHasMore(data.hasMore);
             setOffset(data.nextOffset);
@@ -56,8 +90,16 @@ export default function AchievementsInfiniteList({
         } finally {
             setLoading(false);
         }
-    }, [hasMore, loading, offset, slug]);
+    }, [fetchBatch, hasMore, loading, offset, prefetchedData]);
 
+    // prefetch รอบแรกทันทีหลัง mount ถ้ายังมีข้อมูลต่อ
+    useEffect(() => {
+        if (hasMore) {
+            prefetchMore();
+        }
+    }, [hasMore, prefetchMore]);
+
+    // observer สำหรับ “โหลดจริง”
     useEffect(() => {
         const el = sentinelRef.current;
         if (!el || !hasMore) return;
@@ -70,7 +112,7 @@ export default function AchievementsInfiniteList({
                 }
             },
             {
-                rootMargin: "300px",
+                rootMargin: "500px",
             }
         );
 
@@ -79,10 +121,19 @@ export default function AchievementsInfiniteList({
         return () => observer.disconnect();
     }, [hasMore, loadMore]);
 
+    // หลังจาก offset เปลี่ยนแล้ว ให้ prefetch ชุดถัดไปต่อ
+    useEffect(() => {
+        if (hasMore && !prefetchedData) {
+            prefetchMore();
+        }
+    }, [hasMore, offset, prefetchedData, prefetchMore]);
+
+    // reset เมื่อเปลี่ยนหมวด
     useEffect(() => {
         setItems(initialAchievements);
         setHasMore(initialHasMore);
         setOffset(initialOffset);
+        setPrefetchedData(null);
     }, [initialAchievements, initialHasMore, initialOffset, slug]);
 
     return (
@@ -105,7 +156,6 @@ export default function AchievementsInfiniteList({
                     )}
                 </div>
             )}
-
         </div>
     );
 }
