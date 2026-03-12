@@ -1,3 +1,4 @@
+import AchievementCarousel from '@/components/AchievementCarousel';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Footer from '@/components/Layout/Footer';
 import Navbar from '@/components/Layout/Navbar';
@@ -7,6 +8,7 @@ import Achievement from '@/components/Section/Achievement';
 import Contact from '@/components/Section/Contact';
 import Home from '@/components/Section/Home';
 import Skills from '@/components/Section/Skills';
+import { getAchievementFirstImages } from '@/lib/achievement-carousel';
 import type { Metadata } from "next";
 
 import { getLocale } from "next-intl/server";
@@ -85,19 +87,36 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function IndexPage(props: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const searchParams = await props.searchParams;
+  const searchParams = await props.searchParams;
+  const locale = await getLocale();
 
-    const categorySlug =
-        typeof searchParams.category === "string"
-            ? searchParams.category
-            : undefined;
+  const categorySlug =
+    typeof searchParams.category === "string"
+      ? searchParams.category
+      : undefined;
 
-    const page =
-        typeof searchParams.page === "string"
-            ? Math.max(1, Number(searchParams.page) || 1)
-            : 1;
+  const images = await getAchievementFirstImages();
+  function shuffleArray<T>(array: T[]): T[] {
+    const arr = [...array];
+
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    return arr;
+  }
+
+  const mappedImages = shuffleArray(images).map((image) => ({
+    id: image.id,
+    url: image.url,
+    alt:
+      locale === "th"
+        ? image.alt_th || undefined
+        : image.alt_en || undefined,
+  }));
 
   return (
     <>
@@ -135,6 +154,10 @@ export default async function IndexPage(props: {
 
         {/* SECTION 4 */}
         <section id="Achievements" className="w-full bg-white dark:bg-[#181b22] scroll-mt-20">
+          <AchievementCarousel
+            images={mappedImages}
+            locale={locale}
+          />
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-16">
             <Achievement slug={categorySlug} />
           </div>

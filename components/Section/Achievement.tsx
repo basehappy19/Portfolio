@@ -18,7 +18,6 @@ const Achievement = async ({
             <div className="max-w-6xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab slugCurrentCategory={slug} />
-
                 <Suspense fallback={<AchievementGridSkeleton />} key={slug ?? "all"}>
                     <AchievementsList slug={slug} locale={locale} />
                 </Suspense>
