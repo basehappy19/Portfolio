@@ -279,7 +279,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                             {achievement.images.length > 0 && (
                                 <div className="relative bg-gray-50 dark:bg-gray-800">
                                     {/* Main Image */}
-                                    <div className="relative h-[400px] group">
+                                    <div className="relative h-100 group">
                                         <Image
                                             src={achievement.images[currentImageIndex].url}
                                             alt={
@@ -379,21 +379,31 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                             <div className="flex gap-2 overflow-x-auto">
                                                 {achievement.images.map((image, index) => (
                                                     <button
-                                                        key={index}
+                                                        key={image.id}
+                                                        type="button"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setCurrentImageIndex(index);
                                                         }}
-                                                        className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition
-                              ${currentImageIndex === index
+                                                        aria-label={
+                                                            locale === "th"
+                                                                ? `ดูรูปที่ ${index + 1}`
+                                                                : `View image ${index + 1}`
+                                                        }
+                                                        className={`relative shrink-0 overflow-hidden rounded-lg border-2 transition cursor-pointer w-20 h-20
+                        ${currentImageIndex === index
                                                                 ? "border-gray-900 dark:border-gray-100"
                                                                 : "border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100"
                                                             }`}
                                                     >
                                                         <Image
                                                             src={image.url}
-                                                            alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
+                                                            alt={
+                                                                tField(image.altText_th, image.altText_en, locale) ||
+                                                                `Image ${index + 1}`
+                                                            }
                                                             fill
+                                                            sizes="80px"
                                                             className="object-cover"
                                                         />
                                                     </button>
