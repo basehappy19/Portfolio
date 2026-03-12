@@ -48,6 +48,9 @@ const CategoryFilterTab = async ({
                 },
             },
         },
+        orderBy: {
+            id: "asc",
+        }
     });
 
     const categories: UiCategory[] = categoriesRaw.map((cat) => ({
