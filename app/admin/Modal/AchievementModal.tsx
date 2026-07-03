@@ -22,6 +22,7 @@ import { useAchievementTextTranslation } from '../hooks/useAchievementTextTransl
 import { useLinkTranslation } from '../hooks/useLinkTranslation';
 import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
 import { AchievementRichText } from '../AchievementRichText';
+import { useFormDraft } from '../hooks/useFormDraft';
 
 
 export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
@@ -88,6 +89,7 @@ const AchievementModalInner = ({
         createInitialFormState(editData, defaultSortOrder)
     );
 
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -153,6 +155,34 @@ const AchievementModalInner = ({
             sortOrder: link.sortOrder ?? idx + 1,
         })) ?? []
     );
+
+    const draftKey = editData ? `achievement_draft_${editData.id}` : 'achievement_draft_new';
+    const { hasDraft, draftTime, restoreDraft, clearDraft } = useFormDraft(
+        draftKey,
+        formData,
+        links,
+        true
+    );
+
+    const handleRestoreDraft = () => {
+        const recovered = restoreDraft();
+        if (recovered) {
+            setFormData(recovered.formData);
+            setLinks(recovered.links);
+            toast.success('กู้คืนข้อมูลที่พิมพ์ค้างไว้เรียบร้อยแล้ว');
+        }
+    };
+
+    const handleSafeClose = () => {
+        const isDirty = formData.title_th.trim() !== '' || formData.title_en.trim() !== '' || formData.description_th.trim() !== '';
+        if (isDirty && !editData) {
+            if (window.confirm('คุณมีข้อมูลที่กำลังพิมพ์ค้างไว้ (ระบบบันทึก Draft ให้อัตโนมัติแล้ว) ต้องการปิดหน้าต่างหรือไม่?')) {
+                close();
+            }
+        } else {
+            close();
+        }
+    };
 
     const { translating, handleTranslate } = useAchievementTextTranslation({
         editData,
@@ -324,6 +354,7 @@ const AchievementModalInner = ({
             await updateAchievement(achievementId!, finalPayload);
 
             toast.success(editData ? "แก้ไขผลงานเรียบร้อย" : "เพิ่มผลงานเรียบร้อย");
+            clearDraft();
             router.refresh();
 
             if (!editData) {
@@ -357,7 +388,7 @@ const AchievementModalInner = ({
     backdrop-blur-sm
     bg-black/30 dark:bg-black/60
   "
-            onClick={close}
+            onClick={handleSafeClose}
             style={{
                 animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
             }}
@@ -387,7 +418,8 @@ const AchievementModalInner = ({
                             </p>
                         </div>
                         <button
-                            onClick={close}
+                            onClick={handleSafeClose}
+                            type="button"
                             className="
             cursor-pointer w-10 h-10 flex items-center justify-center rounded-full
             text-gray-500 hover:bg-gray-100
@@ -399,6 +431,31 @@ const AchievementModalInner = ({
                         </button>
                     </div>
                 </div>
+
+                {hasDraft && (
+                    <div className="mx-8 mt-4 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-800 dark:text-amber-300">
+                        <div className="flex items-center gap-2 font-medium">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                            <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime} (กันเผลอกดปิด)</span>
+                        </div>
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <button
+                                type="button"
+                                onClick={handleRestoreDraft}
+                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg shadow-sm transition"
+                            >
+                                กู้คืนข้อมูล (Restore)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={clearDraft}
+                                className="px-3 py-1.5 bg-transparent hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 font-medium rounded-lg transition"
+                            >
+                                ลบร่าง
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Body */}
                 <div className="overflow-y-auto flex-1 px-8 py-6 bg-white dark:bg-[#1e222a]">

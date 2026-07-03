@@ -1,5 +1,4 @@
-import { PrismaClient } from '@/app/generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import prisma from '@/lib/prisma';
 import { getLocale, getTranslations } from 'next-intl/server';
 import CategoryButton from './Button/CategoryButton';
 import AllButton from './Button/AllButton';
@@ -23,9 +22,6 @@ const CategoryFilterTab = async ({
     const t = await getTranslations('Index');
     const AllButtonLabel = t('Achievement.Buttons.AllButtonLabel');
 
-    const connectionString = process.env.DATABASE_URL;
-    const adapter = new PrismaPg({ connectionString });
-    const prisma = new PrismaClient({ adapter });
 
     const categoriesRaw = await prisma.category.findMany({
         select: {

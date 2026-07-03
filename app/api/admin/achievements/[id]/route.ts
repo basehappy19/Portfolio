@@ -1,14 +1,10 @@
-import { Prisma, PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { Prisma } from "@/app/generated/prisma/client";
+import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { ApiImage, ApiLink } from "@/types/Api";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { supabaseServerClient } from "@/lib/supabaseServer";
-
-const connectionString = process.env.DATABASE_URL;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
 
 export async function PUT(
     req: NextRequest,

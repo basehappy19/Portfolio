@@ -1,5 +1,4 @@
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@/app/generated/prisma/client';
+import prisma from '@/lib/prisma';
 import { Status } from '@/types/Achievements';
 import { CategoriesProvider } from '@/app/contexts/CategoriesContext';
 import AddAchievement from './Button/AddAchievement';
@@ -110,9 +109,6 @@ export default async function AdminPage(props: {
         ? searchParams.search
         : undefined;
 
-    const connectionString = process.env.DATABASE_URL;
-    const adapter = new PrismaPg({ connectionString });
-    const prisma = new PrismaClient({ adapter });
 
     const statusValue: Status | undefined =
         typeof searchParams.status === "string" &&

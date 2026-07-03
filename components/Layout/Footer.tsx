@@ -5,91 +5,65 @@ import { SignInButton } from "../Button/SignInButton";
 import { getTranslations } from "next-intl/server";
 import Copyright from "./Copyright";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 
 export default async function Footer() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-    const t = await getTranslations("Index.Footer");
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const t = await getTranslations("Index.Footer");
 
-    return (
-        <footer
-            className="
-                relative
-                bg-white text-gray-900
-                dark:bg-gray-900 dark:text-white
-            "
-        >
-            {/* Decorative top border */}
-            <div className="h-1 bg-linear-to-r from-transparent via-red-600 to-transparent"></div>
+  return (
+    <footer className="relative bg-white/90 dark:bg-[#12141c]/90 text-zinc-800 dark:text-zinc-100 border-t border-rose-200/60 dark:border-zinc-800 pb-24 md:pb-8 pt-12 transition-colors duration-500">
+      {/* Decorative vibrant top border */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-rose-500 to-amber-500 opacity-80" />
 
-            <div className="w-full max-w-2xl md:max-w-6xl mx-auto px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                    <div className="md:col-span-2 text-center md:text-left flex flex-col items-center md:items-start">
-                        <h3
-                            className="
-                                text-2xl font-bold mb-4
-                                bg-linear-to-r from-red-500 to-red-700
-                                dark:from-red-400 dark:to-red-600
-                                bg-clip-text text-transparent
-                            "
-                        >
-                            {t("Heading")}
-                        </h3>
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
+          <div className="text-center md:text-left flex flex-col items-center md:items-start">
+            <h3 className="text-2xl sm:text-3xl font-bold mb-3 bg-gradient-to-r from-rose-600 via-amber-500 to-rose-500 dark:from-rose-400 dark:to-amber-300 bg-clip-text text-transparent">
+              {t("Heading")}
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm">
+              Creative portfolio built with modern enterprise standards, responsive design, and bright aesthetics.
+            </p>
+          </div>
 
-                        {session ? (
-                            <div
-                                className="
-                                    flex flex-col md:flex-row items-center gap-4 px-4 py-2 rounded-lg
-                                    bg-gray-100/80 border border-gray-200
-                                    dark:bg-gray-800/60 dark:border-gray-700 dark:backdrop-blur-sm
-                                "
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/30"></span>
-
-                                        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                                            {session.user.email}
-                                        </span>
-                                    </div>
-
-                                    <Link
-                                        href="/admin"
-                                        className="
-                                            text-xs px-3 py-1 rounded-full font-medium border transition
-                                            bg-blue-600/10 text-blue-700 border-blue-500/30 hover:bg-blue-600/20
-                                            dark:bg-blue-600/20 dark:text-blue-300 dark:hover:bg-blue-600/30
-                                        "
-                                    >
-                                        หน้าแอดมิน
-                                    </Link>
-                                </div>
-
-                                <div>
-                                    <SignOutButton />
-                                </div>
-                            </div>
-                        ) : (
-                            <SignInButton />
-                        )}
-                    </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            {session ? (
+              <div className="flex flex-col sm:flex-row items-center gap-3 px-5 py-3 rounded-2xl bg-rose-50/80 dark:bg-zinc-800/80 border border-rose-200/80 dark:border-zinc-700 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-sm shadow-emerald-500/50" />
+                  <span className="text-xs sm:text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                    {session.user.email}
+                  </span>
                 </div>
 
-                {/* Bottom Bar */}
-                <div
-                    className="
-                        border-t flex flex-col md:flex-row items-center gap-4
-                        border-gray-200
-                        dark:border-gray-800
-                    "
-                >
-                    <Copyright copyright_text={t("copyright")} />
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-full font-semibold transition bg-rose-600 text-white shadow-sm hover:bg-rose-700 hover:shadow"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>หน้าแอดมิน</span>
+                  </Link>
+                  <SignOutButton />
                 </div>
-            </div>
+              </div>
+            ) : (
+              <SignInButton />
+            )}
+          </div>
+        </div>
 
-            {/* Decorative linear orb */}
-            <div className="hidden md:block absolute bottom-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
-        </footer>
-    );
+        {/* Bottom Bar */}
+        <div className="pt-6 border-t border-rose-100 dark:border-zinc-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+          <Copyright copyright_text={t("copyright")} />
+        </div>
+      </div>
+
+      {/* Subtle bright ambient orb */}
+      <div className="absolute bottom-0 right-10 w-72 h-72 bg-amber-400/10 dark:bg-rose-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+    </footer>
+  );
 }

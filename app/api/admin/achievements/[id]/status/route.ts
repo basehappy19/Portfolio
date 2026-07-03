@@ -1,12 +1,7 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
-const connectionString = process.env.DATABASE_URL;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
 
 export async function PUT(
     req: NextRequest,

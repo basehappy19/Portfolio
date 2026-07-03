@@ -1,11 +1,7 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
 
 export async function PATCH(
     req: NextRequest,

@@ -1,7 +1,6 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { ApiLink } from "@/types/Api";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,9 +13,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
 
-    const connectionString = process.env.DATABASE_URL;
-    const adapter = new PrismaPg({ connectionString });
-    const prisma = new PrismaClient({ adapter });
 
     try {
         const body = await req.json();

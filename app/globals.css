@@ -1,16 +1,27 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 * {
     box-sizing: border-box;
     font-family: "Prompt", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 html,
 body {
     height: 100%;
     margin: 0;
-    overflow: auto;
+    overflow-x: hidden;
+    color: #1e293b;
+}
+
+.dark body {
+    color: #f1f5f9;
 }
 body {
     height: auto;

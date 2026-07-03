@@ -1,10 +1,5 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-
-const connectionString = process.env.DATABASE_URL;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
 
 export async function GET(req: Request) {
     try {

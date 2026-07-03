@@ -1,70 +1,68 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Achievement as AchievementType } from "@/types/Achievements";
-import AchievementCard from "./AchievementCard";
+import { useState } from 'react';
+import { Achievement as AchievementType } from '@/types/Achievements';
+import AchievementCard from './AchievementCard';
+import { Grid2X2, Grid3X3 } from 'lucide-react';
 
 interface AchievementGridProps {
-    achievements: AchievementType[];
-    locale: string;
+  achievements: AchievementType[];
+  locale: string;
 }
 
-export default function AchievementGrid({ achievements, locale }: AchievementGridProps) {
-    const [cols, setCols] = useState<2 | 3>(3);
+export default function AchievementGrid({
+  achievements,
+  locale,
+}: AchievementGridProps) {
+  const [cols, setCols] = useState<2 | 3>(3);
 
-    return (
-        <div className="w-full">
-            <div className="hidden md:flex justify-center mb-6 gap-2">
-                <button
-                    onClick={() => setCols(2)}
-                    className={`
-            cursor-pointer p-2 rounded-lg border transition-all flex items-center gap-2
-            ${cols === 2
-                            ? "bg-gray-200 border-gray-400 dark:bg-white/20 dark:border-white/30"
-                            : "bg-transparent border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"}
-          `}
-                    title="2 Columns"
-                >
-                    {/* Icon 2 Columns */}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-                    </svg>
-                    <span className="text-sm font-medium">2 Cols</span>
-                </button>
+  return (
+    <div className="w-full">
+      {/* Column Switcher Controls */}
+      <div className="hidden md:flex justify-end mb-6 gap-2">
+        <button
+          onClick={() => setCols(2)}
+          aria-label="View as 2 columns"
+          className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            cols === 2
+              ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-sm'
+              : 'bg-white/80 dark:bg-zinc-800/80 border-rose-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-rose-50'
+          }`}
+          title="2 Columns Layout"
+        >
+          <Grid2X2 className="w-4 h-4" />
+          <span>2 Cols</span>
+        </button>
 
-                <button
-                    onClick={() => setCols(3)}
-                    className={`
-            cursor-pointer p-2 rounded-lg border transition-all flex items-center gap-2
-            ${cols === 3
-                            ? "bg-gray-200 border-gray-400 dark:bg-white/20 dark:border-white/30"
-                            : "bg-transparent border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"}
-          `}
-                    title="3 Columns"
-                >
-                    {/* Icon 3 Columns */}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <path d="M9 3v18" /><path d="M15 3v18" /><path d="M3 9h18" /><path d="M3 15h18" />
-                    </svg>
-                    <span className="text-sm font-medium">3 Cols</span>
-                </button>
-            </div>
+        <button
+          onClick={() => setCols(3)}
+          aria-label="View as 3 columns"
+          className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            cols === 3
+              ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-sm'
+              : 'bg-white/80 dark:bg-zinc-800/80 border-rose-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-rose-50'
+          }`}
+          title="3 Columns Layout"
+        >
+          <Grid3X3 className="w-4 h-4" />
+          <span>3 Cols</span>
+        </button>
+      </div>
 
-            <div className={`
-        grid gap-6 
-        grid-cols-1 
-        ${cols === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}
-      `}>
-                {achievements.map((achievement, idx) => (
-                    <AchievementCard
-                        key={idx}
-                        achievement={achievement}
-                        locale={locale}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+      {/* Grid Layout: 1 col on mobile portrait, 2 cols on mobile landscape/tablet, selected cols on desktop */}
+      <div
+        className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${
+          cols === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'
+        }`}
+      >
+        {achievements.map((achievement, idx) => (
+          <AchievementCard
+            key={idx}
+            achievement={achievement}
+            locale={locale}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
