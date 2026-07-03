@@ -35,11 +35,11 @@ const Skills = async () => {
           {Expertise.map((e, i) => (
             <div
               key={i}
-              className="rounded-3xl p-6 md:p-8 transition-all duration-300 bg-white/90 dark:bg-zinc-800/60 border border-rose-100 dark:border-zinc-700/80 hover:border-rose-300 dark:hover:border-rose-500/80 shadow-sm hover:shadow-lg"
+              className="rounded-lg p-6 md:p-8 transition-all duration-300 bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500/80 shadow-xs hover:shadow-md"
             >
               {/* Category Heading */}
               <h3 className="text-lg md:text-2xl font-bold mb-6 flex items-center gap-3 text-zinc-800 dark:text-zinc-100">
-                <span className="w-2 h-7 rounded-full bg-gradient-to-b from-rose-500 via-amber-500 to-sky-500" />
+                <span className="w-1.5 h-6 rounded-xs bg-gradient-to-b from-rose-500 via-amber-500 to-sky-500" />
                 <span>{e.Heading}</span>
               </h3>
 

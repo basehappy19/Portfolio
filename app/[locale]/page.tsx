@@ -133,7 +133,7 @@ export default async function IndexPage(props: {
         </section>
 
         {/* SECTION 2: ABOUT */}
-        <section id="About" className="w-full bg-white/70 dark:bg-[#181b22]/70 backdrop-blur-sm scroll-mt-24 border-y border-rose-100/50 dark:border-zinc-800/60 transition-colors duration-500">
+        <section id="About" className="w-full bg-white dark:bg-[#181b22] scroll-mt-24 border-y border-rose-100/50 dark:border-zinc-800/60 transition-colors duration-500">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
             <About />
           </div>
@@ -147,7 +147,7 @@ export default async function IndexPage(props: {
         </section>
 
         {/* SECTION 4: ACHIEVEMENTS */}
-        <section id="Achievements" className="w-full bg-white/80 dark:bg-[#161821]/80 backdrop-blur-sm scroll-mt-24 border-y border-rose-100/60 dark:border-zinc-800/60 transition-colors duration-500">
+        <section id="Achievements" className="w-full bg-white dark:bg-[#161821] scroll-mt-24 border-y border-rose-100/60 dark:border-zinc-800/60 transition-colors duration-500">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
             <Achievement slug={categorySlug} />
           </div>

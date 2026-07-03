@@ -13,6 +13,7 @@ import {
     Trophy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Achievement } from "@/types/Achievements";
 import { downloadImage } from "@/lib/download";
 
@@ -27,6 +28,11 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const [lightbox, setLightbox] = useState<{
         achievementId: string;
@@ -148,7 +154,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {/* Card */}
             <div
                 onClick={openModal}
-                className="cursor-pointer group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600"
+                className="cursor-pointer group bg-white dark:bg-gray-800 rounded-lg shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200/80 dark:border-gray-700 hover:border-rose-400 dark:hover:border-rose-500"
             >
                 {/* Image Section */}
                 <div className="relative h-56 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
@@ -244,20 +250,20 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                 <div className="h-1 bg-linear-to-r from-red-500 via-red-600 to-red-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </div>
 
-            {/* Modal */}
-            {isModalOpen && (
+            {/* Modal - Rendered via Portal directly to body */}
+            {mounted && isModalOpen && createPortal(
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer backdrop-blur-md bg-black/40 md:p-4"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center cursor-pointer backdrop-blur-md bg-black/50 p-2 sm:p-4"
                     onClick={closeModal}
                     style={{
                         animation: isAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
                     }}
                 >
                     <div
-                        className="cursor-default relative w-full h-full md:w-full md:max-w-4xl md:h-auto md:max-h-[95vh] bg-white dark:bg-gray-900 md:rounded-3xl shadow-2xl overflow-hidden"
+                        className="cursor-default relative w-full h-full sm:w-full sm:max-w-4xl sm:h-auto sm:max-h-[92vh] bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl shadow-2xl overflow-hidden flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            animation: isAnimating ? "modalSlideIn 0.3s ease-out" : "modalSlideOut 0.2s ease-in",
+                            animation: isAnimating ? "modalSlideIn 0.25s ease-out" : "modalSlideOut 0.2s ease-in",
                         }}
                     >
                         {/* Close Button */}
@@ -487,21 +493,25 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                 )}
                             </div>
                         </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
-                        {/* Lightbox (Full Image) */}
-                        {selectedImage && (
-                            <div
-                                className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40"
-                                onClick={closeLightbox}
-                                style={{
-                                    animation: isImagesAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
-                                }}
-                            >
-                                {/* Close Button */}
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        closeLightbox();
+            {/* Lightbox (Full Image) - Rendered via Portal */}
+            {mounted && selectedImage && createPortal(
+                <div
+                    className="fixed inset-0 z-[10000] flex items-center justify-center backdrop-blur-md bg-black/80"
+                    onClick={closeLightbox}
+                    style={{
+                        animation: isImagesAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
+                    }}
+                >
+                    {/* Close Button */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            closeLightbox();
                                     }}
                                     className="cursor-pointer absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 group z-50"
                                     title="ปิด (ESC)"
@@ -640,10 +650,8 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                         </div>
                                     </div>
                                 )}
-                            </div>
-                        )}
-                    </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );

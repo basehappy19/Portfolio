@@ -69,12 +69,12 @@ const Contact = async () => {
               return (
                 <div
                   key={index}
-                  className="group rounded-2xl p-5 transition-all duration-300 bg-white/90 dark:bg-zinc-800/60 border border-rose-100 dark:border-zinc-700/80 hover:border-rose-300 dark:hover:border-rose-500 shadow-sm hover:shadow-md"
+                  className="group rounded-lg p-5 transition-all duration-300 bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500 shadow-xs hover:shadow-md"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div
-                        className={`p-3.5 rounded-2xl shadow-md bg-gradient-to-br ${gradientClass} text-white group-hover:scale-105 transition-transform duration-300`}
+                        className={`p-3.5 rounded-md shadow-sm bg-gradient-to-br ${gradientClass} text-white group-hover:scale-105 transition-transform duration-300`}
                       >
                         <Icon className="w-6 h-6" />
                       </div>
@@ -118,7 +118,7 @@ const Contact = async () => {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group relative p-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br ${colorClass} text-white flex flex-col items-center justify-center`}
+                      className={`group relative p-4 rounded-lg transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${colorClass} text-white flex flex-col items-center justify-center`}
                     >
                       <Icon className="w-7 h-7 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
                       <p className="text-xs font-semibold text-center truncate w-full">
@@ -131,7 +131,7 @@ const Contact = async () => {
             </div>
           </div>
 
-          <div className="bg-white/90 dark:bg-zinc-800/60 p-6 sm:p-8 rounded-3xl border border-rose-100 dark:border-zinc-700/80 shadow-md">
+          <div className="bg-white dark:bg-zinc-800/60 p-6 sm:p-8 rounded-lg border border-gray-200/80 dark:border-zinc-700/80 shadow-xs">
             <FormContact />
           </div>
         </div>

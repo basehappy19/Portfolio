@@ -23,10 +23,10 @@ export default function AchievementGrid({
         <button
           onClick={() => setCols(2)}
           aria-label="View as 2 columns"
-          className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-semibold transition-all flex items-center gap-1.5 ${
+          className={`cursor-pointer px-3 py-1.5 rounded-md border text-xs font-semibold transition flex items-center gap-1.5 ${
             cols === 2
-              ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-sm'
-              : 'bg-white/80 dark:bg-zinc-800/80 border-rose-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-rose-50'
+              ? 'bg-rose-500 text-white border-rose-500 shadow-2xs'
+              : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-rose-400'
           }`}
           title="2 Columns Layout"
         >
@@ -37,10 +37,10 @@ export default function AchievementGrid({
         <button
           onClick={() => setCols(3)}
           aria-label="View as 3 columns"
-          className={`cursor-pointer px-3 py-1.5 rounded-full border text-xs font-semibold transition-all flex items-center gap-1.5 ${
+          className={`cursor-pointer px-3 py-1.5 rounded-md border text-xs font-semibold transition flex items-center gap-1.5 ${
             cols === 3
-              ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white border-transparent shadow-sm'
-              : 'bg-white/80 dark:bg-zinc-800/80 border-rose-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-rose-50'
+              ? 'bg-rose-500 text-white border-rose-500 shadow-2xs'
+              : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-rose-400'
           }`}
           title="3 Columns Layout"
         >

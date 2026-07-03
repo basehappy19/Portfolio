@@ -168,8 +168,8 @@ const FormContact = () => {
     return (
         <div
             className="
-                rounded-2xl p-8
-                bg-white border border-gray-200 shadow-sm
+                rounded-lg p-8
+                bg-white border border-gray-200 shadow-xs
                 dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-md
             "
         >
@@ -191,7 +191,7 @@ const FormContact = () => {
                         onChange={handleInputChange}
                         onBlur={() => handleBlur('name')}
                         className={`
-                            w-full px-4 py-3 rounded-xl transition-all
+                            w-full px-4 py-2.5 rounded-md transition-all
                             border text-gray-900 placeholder-gray-400
                             focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
                             dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
@@ -226,7 +226,7 @@ const FormContact = () => {
                         onChange={handleInputChange}
                         onBlur={() => handleBlur('email')}
                         className={`
-                            w-full px-4 py-3 rounded-xl transition-all
+                            w-full px-4 py-2.5 rounded-md transition-all
                             border text-gray-900 placeholder-gray-400
                             focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
                             dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
@@ -259,7 +259,7 @@ const FormContact = () => {
                         onBlur={() => handleBlur('message')}
                         rows={5}
                         className={`
-                            w-full px-4 py-3 rounded-xl transition-all resize-none
+                            w-full px-4 py-2.5 rounded-md transition-all resize-none
                             border text-gray-900 placeholder-gray-400
                             focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
                             dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
@@ -289,10 +289,10 @@ const FormContact = () => {
                     onClick={handleSubmit}
                     disabled={isSubmitting || !isFormValid}
                     className="
-                        cursor-pointer w-full py-4 rounded-xl font-semibold
+                        cursor-pointer w-full py-3.5 rounded-md font-semibold
                         flex items-center justify-center gap-2 group
-                        bg-red-500 text-white
-                        hover:shadow-2xl hover:shadow-red-500/50
+                        bg-rose-500 text-white
+                        hover:shadow-lg hover:shadow-rose-500/30
                         transition-all duration-300
                         disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none
                         relative overflow-hidden

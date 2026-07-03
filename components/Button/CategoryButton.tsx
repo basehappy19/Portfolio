@@ -31,20 +31,15 @@ const CategoryButton = ({ slugCurrentCategory, category }: CategoryButtonProps) 
             prefetch
             className={`
                 inline-flex items-center justify-center
-                cursor-pointer px-6 py-2.5 rounded-full font-medium
+                cursor-pointer px-5 py-2 rounded-md font-medium text-sm
                 transition-all duration-200
 
                 ${isActive
                     ? `
-                        bg-red-600 text-white
-                        shadow-lg shadow-red-500/30
-                        dark:bg-red-500 dark:text-black
-                        dark:shadow-red-400/30
+                        bg-rose-500 text-white shadow-xs border border-rose-500
                       `
                     : `
-                        bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md
-                        dark:bg-white/10 dark:text-gray-200
-                        dark:hover:bg-white/20 dark:hover:shadow-lg
+                        bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:border-rose-400 dark:hover:border-rose-500
                       `
                 }
             `}

@@ -63,7 +63,7 @@ const About = async () => {
           {statuses.map((stat, index) => (
             <div
               key={index}
-              className="group flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-white/90 dark:bg-zinc-800/60 border border-rose-100 dark:border-zinc-700/80 hover:border-rose-300 dark:hover:border-rose-500 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+              className="group flex flex-col items-center justify-center text-center p-6 rounded-lg bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300"
             >
               <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-amber-500 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">
                 {stat.number}

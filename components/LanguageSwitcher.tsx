@@ -1,71 +1,55 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 
 const LanguageSwitcher = () => {
     const locale = useLocale();
+    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [isPending, startTransition] = useTransition();
 
-    const queryString = searchParams.toString();
-    const query = queryString ? `?${queryString}` : "";
+    const switchLanguage = (newLocale: "th" | "en") => {
+        if (newLocale === locale || isPending) return;
 
-    const pathWithoutLocale = pathname.replace(/^\/(th|en)(?=\/|$)/, "");
-    const normalizedPath = pathWithoutLocale === "" ? "/" : pathWithoutLocale;
+        const queryString = searchParams.toString();
+        const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+
+        startTransition(() => {
+            router.replace(fullPath, { locale: newLocale });
+        });
+    };
 
     return (
-        <div
-            className="
-                inline-flex items-center rounded-full border p-1 transition
-                bg-gray-200/60 border-gray-400/40
-                dark:bg-white/10 dark:border-white/15
-            "
-        >
+        <div className={`inline-flex items-center rounded-md border p-0.5 transition bg-white/90 border-gray-200 dark:bg-zinc-800/90 dark:border-zinc-700 shadow-2xs ${isPending ? "opacity-60 pointer-events-none" : ""}`}>
             {/* TH Button */}
-            <Link
-                href={`${normalizedPath}${query}`}
-                locale="th"
-                scroll={false}
-                className={`
-                    px-3 py-1 text-xs font-medium rounded-full transition
-                    ${locale === "th"
-                        ? `
-                            bg-gray-900 text-white
-                            dark:bg-white dark:text-black
-                          `
-                        : `
-                            text-gray-700 hover:text-black
-                            dark:text-gray-300 dark:hover:text-white
-                          `
-                    }
-                `}
+            <button
+                type="button"
+                onClick={() => switchLanguage("th")}
+                className={`cursor-pointer px-2.5 py-1 text-xs font-semibold rounded transition ${
+                    locale === "th"
+                        ? "bg-rose-500 text-white shadow-2xs"
+                        : "text-zinc-600 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white"
+                }`}
             >
                 ไทย
-            </Link>
+            </button>
 
             {/* EN Button */}
-            <Link
-                href={`${normalizedPath}${query}`}
-                locale="en"
-                scroll={false}
-                className={`
-                    px-3 py-1 text-xs font-medium rounded-full transition
-                    ${locale === "en"
-                        ? `
-                            bg-gray-900 text-white
-                            dark:bg-white dark:text-black
-                          `
-                        : `
-                            text-gray-700 hover:text-black
-                            dark:text-gray-300 dark:hover:text-white
-                          `
-                    }
-                `}
+            <button
+                type="button"
+                onClick={() => switchLanguage("en")}
+                className={`cursor-pointer px-2.5 py-1 text-xs font-semibold rounded transition ${
+                    locale === "en"
+                        ? "bg-rose-500 text-white shadow-2xs"
+                        : "text-zinc-600 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white"
+                }`}
             >
                 EN
-            </Link>
+            </button>
         </div>
     );
 };

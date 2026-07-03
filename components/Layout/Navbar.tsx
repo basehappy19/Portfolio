@@ -64,19 +64,19 @@ const Navbar = () => {
       <header
         role="navigation"
         aria-label="Main navigation"
-        className="hidden md:flex fixed top-6 left-0 right-0 z-50 justify-center px-4 transition-all duration-300 pointer-events-none"
+        className="hidden md:flex fixed top-4 left-0 right-0 z-50 justify-center px-4 transition-all duration-300 pointer-events-none"
       >
         <div
           className={`
-            pointer-events-auto flex items-center justify-between gap-3 px-6 py-2.5 rounded-full border transition-all duration-300 shadow-xl
+            pointer-events-auto flex items-center justify-between gap-3 px-5 py-2 rounded-lg border transition-all duration-300 shadow-md
             ${isScrolled
-              ? 'bg-white/90 dark:bg-zinc-900/90 border-rose-200/80 dark:border-zinc-700 backdrop-blur-xl shadow-rose-500/10 dark:shadow-black/50'
-              : 'bg-white/70 dark:bg-zinc-900/70 border-rose-100 dark:border-zinc-800 backdrop-blur-md'
+              ? 'bg-white/95 dark:bg-zinc-900/95 border-rose-200/80 dark:border-zinc-700 backdrop-blur-md shadow-rose-500/10'
+              : 'bg-white/85 dark:bg-zinc-900/85 border-rose-100 dark:border-zinc-800 backdrop-blur-sm'
             }
           `}
         >
           {/* Navigation Links */}
-          <div className="flex items-center gap-1 lg:gap-2">
+          <div className="flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;
@@ -90,21 +90,21 @@ const Navbar = () => {
                   }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`
-                    group relative px-4 py-2 text-sm font-medium rounded-full flex items-center gap-2 transition-all duration-300
+                    group relative px-3.5 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 transition-all duration-200
                     ${isActive
-                      ? 'bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-md shadow-rose-500/20 scale-105'
+                      ? 'bg-rose-500 text-white shadow-xs'
                       : 'text-zinc-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-amber-400 hover:bg-rose-50 dark:hover:bg-zinc-800/60'
                     }
                   `}
                 >
-                  <Icon className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white animate-bounce' : ''}`} />
+                  <Icon className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110`} />
                   <span>{isThai ? item.label_th : item.label_en}</span>
                 </button>
               );
             })}
           </div>
 
-          <div className="h-6 w-px bg-rose-200 dark:bg-zinc-700 mx-1" />
+          <div className="h-5 w-px bg-rose-200 dark:bg-zinc-700 mx-1" />
 
           {/* Theme & Language Controls */}
           <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ const Navbar = () => {
 
       {/* MOBILE & TABLET PORTRAIT / LANDSCAPE FLOATING BOTTOM NAVIGATION */}
       <div className="md:hidden fixed bottom-4 left-0 right-0 z-50 flex flex-col items-center gap-2 px-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-between w-full max-w-sm px-4 py-2.5 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-rose-200/80 dark:border-zinc-700 rounded-full shadow-2xl shadow-rose-500/20">
+        <div className="pointer-events-auto flex items-center justify-between w-full max-w-sm px-4 py-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-rose-200/80 dark:border-zinc-700 rounded-lg shadow-xl">
           <div className="flex items-center justify-around flex-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -132,9 +132,9 @@ const Navbar = () => {
                   aria-label={isThai ? item.label_th : item.label_en}
                   title={isThai ? item.label_th : item.label_en}
                   className={`
-                    p-2.5 rounded-full flex items-center justify-center transition-all duration-300
+                    p-2 rounded-md flex items-center justify-center transition-all duration-200
                     ${isActive
-                      ? 'bg-gradient-to-tr from-rose-500 to-amber-500 text-white shadow-md scale-110 -translate-y-1'
+                      ? 'bg-rose-500 text-white shadow-xs'
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-rose-500'
                     }
                   `}
@@ -144,7 +144,7 @@ const Navbar = () => {
               );
             })}
           </div>
-          <div className="h-6 w-px bg-rose-200 dark:bg-zinc-700 mx-2" />
+          <div className="h-5 w-px bg-rose-200 dark:bg-zinc-700 mx-2" />
           <ThemeSwitch />
         </div>
       </div>
