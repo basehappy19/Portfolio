@@ -2,7 +2,6 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import SectionHeader from '../SectionHeader';
 import WarpToAchievement from '../Button/WarpToAchievement';
 import WarpToContact from '../Button/WarpToContact';
-import ProfileImageSection from '../ProfileImageSection';
 
 const About = async () => {
   type Status = {
@@ -28,51 +27,48 @@ const About = async () => {
 
   return (
     <div className="w-full text-slate-800 py-2">
-      <div className="max-w-5xl mx-auto">
+      <div className="w-full">
         {/* Header */}
         <SectionHeader text={t('About.Heading')} />
 
         {/* Content Grid */}
-        <div className="grid md:grid-cols-12 gap-8 items-center mb-8">
-          {/* Image Section */}
-          <div className="md:col-span-4 flex justify-center">
-            <ProfileImageSection />
-          </div>
-
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Text Section */}
-          <div className="md:col-span-8 space-y-4">
-            <div className="space-y-3">
-              <p className="text-base md:text-lg leading-relaxed text-slate-800 font-medium">
+          <div className="lg:col-span-7 space-y-6">
+            <div className="space-y-4">
+              <p className="text-base sm:text-lg md:text-xl leading-relaxed text-slate-900 font-semibold">
                 {t('About.Introduce_1')}
               </p>
-              <p className="text-sm md:text-base leading-relaxed text-slate-600">
+              <p className="text-sm sm:text-base md:text-lg leading-relaxed text-slate-600">
                 {t('About.Introduce_2')}
               </p>
             </div>
 
             {/* Call to Action Buttons */}
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="flex flex-wrap gap-3.5 pt-2">
               <WarpToContact text={t('About.Buttons.Contact')} />
               <WarpToAchievement text={t('About.Buttons.Achievements')} />
             </div>
           </div>
-        </div>
 
-        {/* Status Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statuses.map((stat, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center justify-center text-center p-4 rounded-lg bg-white border border-slate-200 shadow-2xs transition-all duration-200"
-            >
-              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1">
-                {stat.number}
-              </div>
-              <div className="text-xs sm:text-sm font-medium text-slate-500">
-                {stat.label}
-              </div>
+          {/* Status Cards Section */}
+          <div className="lg:col-span-5">
+            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+              {statuses.map((stat, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center justify-center text-center p-6 sm:p-7 rounded-xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-rose-500/50 transition-all duration-200 group"
+                >
+                  <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-2 group-hover:text-rose-600 transition-colors">
+                    {stat.number}
+                  </div>
+                  <div className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

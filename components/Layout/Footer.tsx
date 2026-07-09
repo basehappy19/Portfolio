@@ -15,7 +15,7 @@ export default async function Footer() {
 
   return (
     <footer className="relative bg-white text-slate-800 border-t border-slate-200/80 pb-24 md:pb-8 pt-10">
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
           <div className="text-center md:text-left flex flex-col items-center md:items-start">
             <h3 className="text-xl sm:text-2xl font-bold mb-1.5 text-slate-900 tracking-tight">

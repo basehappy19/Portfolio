@@ -27,7 +27,7 @@ const Skills = async () => {
 
   return (
     <div className="w-full text-slate-800 py-2">
-      <div className="max-w-5xl mx-auto">
+      <div className="w-full">
         {/* Header */}
         <SectionHeader text={t('Skill.Heading')} />
 

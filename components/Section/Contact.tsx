@@ -41,7 +41,7 @@ const Contact = async () => {
 
   return (
     <div className="w-full text-slate-800 py-2">
-      <div className="max-w-5xl mx-auto relative z-10">
+      <div className="w-full relative z-10">
         {/* Header */}
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-2.5 text-slate-900 tracking-tight">
