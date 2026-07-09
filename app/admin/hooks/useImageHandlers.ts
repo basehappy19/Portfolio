@@ -56,12 +56,12 @@ export const useImageHandlers = ({
         );
     };
 
-    const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+    const handleDragStart = (e: DragEvent<HTMLElement>, index: number) => {
         setDraggedIndex(index);
         e.dataTransfer.effectAllowed = "move";
     };
 
-    const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
+    const handleDragOver = (e: DragEvent<HTMLElement>, index: number) => {
         e.preventDefault();
         if (draggedIndex === null || draggedIndex === index) return;
 

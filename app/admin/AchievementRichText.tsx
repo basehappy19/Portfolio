@@ -1,6 +1,5 @@
 'use client';
 
-// 1. เพิ่ม useState
 import { useEffect, useState } from 'react';
 import Link from '@tiptap/extension-link';
 import { TextStyle } from '@tiptap/extension-text-style';
@@ -16,8 +15,6 @@ type Props = {
     onChange: (name: string, value: string) => void;
     placeholder?: string;
     errorMessage?: string;
-    isTranslating?: boolean;
-    onTranslate?: () => void;
 };
 
 export function AchievementRichText({
@@ -27,12 +24,8 @@ export function AchievementRichText({
     onChange,
     placeholder,
     errorMessage,
-    isTranslating = false,
-    onTranslate,
 }: Props) {
     const hasError = Boolean(errorMessage);
-
-    // 2. สร้างตัวแปร State หลอกๆ เพื่อใช้บังคับให้ Component อัปเดต
     const [, forceUpdate] = useState(0);
 
     const editor = useEditor({
@@ -46,7 +39,7 @@ export function AchievementRichText({
                 autolink: true,
                 linkOnPaste: true,
                 HTMLAttributes: {
-                    class: 'text-sky-600 underline underline-offset-2',
+                    class: 'text-rose-600 underline underline-offset-2',
                     rel: 'noopener noreferrer nofollow',
                     target: '_blank',
                 },
@@ -60,31 +53,28 @@ export function AchievementRichText({
         editorProps: {
             attributes: {
                 class: [
-                    'min-h-[140px] w-full rounded-xl border-2 px-4 py-3.5 resize-y overflow-auto',
-                    'bg-white text-gray-900 shadow-sm',
+                    'min-h-[140px] w-full rounded-md border px-3.5 py-3 resize-y overflow-auto text-sm',
+                    'bg-white text-gray-900 shadow-2xs',
                     'placeholder:text-gray-400',
-                    'focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500',
-                    'dark:bg-gray-800 dark:text-white dark:border-gray-700',
-                    'prose prose-sm sm:prose-base dark:prose-invert max-w-none',
+                    'focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500',
+                    'dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700 dark:focus:border-rose-500',
+                    'prose prose-sm dark:prose-invert max-w-none',
                     '[&_ul]:list-disc [&_ul]:pl-5',
                     '[&_ol]:list-decimal [&_ol]:pl-5',
-                    '[&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2',
-                    '[&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1',
+                    '[&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1',
+                    '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1',
                     '[&_p]:mb-2',
                     '[&_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.is-editor-empty:first-child::before]:text-gray-400 [&_.is-editor-empty:first-child::before]:float-left [&_.is-editor-empty:first-child::before]:pointer-events-none',
-                    hasError ? 'border-red-400 bg-red-50 dark:bg-red-900/20' : 'border-gray-200',
+                    hasError ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20' : 'border-gray-200 dark:border-zinc-700',
                 ].join(' '),
             },
         },
-        // 3. เมื่อเนื้อหาเปลี่ยน (พิมพ์)
         onUpdate({ editor }) {
             onChange(name, editor.getHTML());
         },
-        // 4. เพิ่ม: เมื่อมีการเลือกข้อความ หรือขยับ Cursor ให้บังคับ Render ใหม่ทันที
         onSelectionUpdate() {
             forceUpdate((prev) => prev + 1);
         },
-        // 5. เพิ่ม: เมื่อมีการเปลี่ยนแปลงใดๆ (เช่น Focus) ให้บังคับ Render ใหม่ทันที
         onTransaction() {
             forceUpdate((prev) => prev + 1);
         },
@@ -111,21 +101,20 @@ export function AchievementRichText({
         editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     };
 
-    const btnBase = 'px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all active:scale-[0.97] whitespace-nowrap';
-    const btn = 'border-gray-200 bg-white hover:bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 dark:hover:bg-gray-800';
+    const btnBase = 'px-2.5 py-1 text-xs font-medium rounded border transition active:scale-[0.97] whitespace-nowrap cursor-pointer';
+    const btn = 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700 dark:bg-zinc-800 dark:text-gray-200 dark:border-zinc-700 dark:hover:bg-zinc-700';
 
     const isActive = (type: string, opts?: Record<string, unknown>) =>
-        editor?.isActive(type, opts) ? 'ring-2 ring-red-500/30 bg-red-50 dark:bg-red-900/10' : '';
+        editor?.isActive(type, opts) ? 'ring-1 ring-rose-500 bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400' : '';
 
     return (
         <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
                 {label}
             </label>
 
             <div className="relative">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                    {/* Bold (Ctrl+B) */}
+                <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
                     <button
                         type="button"
                         className={`${btnBase} ${btn} ${isActive('bold')}`}
@@ -136,7 +125,6 @@ export function AchievementRichText({
                         <b>B</b>
                     </button>
 
-                    {/* Italic (Ctrl+I) */}
                     <button
                         type="button"
                         className={`${btnBase} ${btn} ${isActive('italic')}`}
@@ -147,7 +135,6 @@ export function AchievementRichText({
                         <i>I</i>
                     </button>
 
-                    {/* Underline (Ctrl+U) */}
                     <button
                         type="button"
                         className={`${btnBase} ${btn} ${isActive('underline')}`}
@@ -158,7 +145,7 @@ export function AchievementRichText({
                         <u>U</u>
                     </button>
 
-                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1"></div>
+                    <div className="w-px h-5 bg-gray-200 dark:bg-zinc-700 mx-0.5"></div>
 
                     <button
                         type="button"
@@ -198,7 +185,7 @@ export function AchievementRichText({
 
                     <button
                         type="button"
-                        className={`${btnBase} ${btn} text-red-500 ml-auto`}
+                        className={`${btnBase} ${btn} text-red-500 hover:text-red-600 ml-auto`}
                         onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}
                         disabled={!editor}
                     >
@@ -207,24 +194,8 @@ export function AchievementRichText({
                 </div>
 
                 <EditorContent editor={editor} />
-
-                {onTranslate && (
-                    <button
-                        type="button"
-                        onClick={onTranslate}
-                        disabled={isTranslating}
-                        className="cursor-pointer absolute right-2 top-14 z-10 p-1.5 rounded-md bg-white/80 dark:bg-gray-800/80 hover:bg-sky-50 text-sky-600 border border-gray-200 shadow-sm backdrop-blur-sm transition-all"
-                        title="Translate to English"
-                    >
-                        {isTranslating ? (
-                            <span className="w-4 h-4 block rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="m22 22-5-10-5 10" /><path d="M14 18h6" /></svg>
-                        )}
-                    </button>
-                )}
             </div>
-            {hasError && <div className="mt-2 text-sm text-red-600">{errorMessage}</div>}
+            {hasError && <div className="mt-1 text-xs text-red-600 dark:text-red-400">{errorMessage}</div>}
         </div>
     );
 }

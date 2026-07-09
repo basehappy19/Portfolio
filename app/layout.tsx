@@ -9,12 +9,12 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html suppressHydrationWarning>
-            <body>
+        <html suppressHydrationWarning className="light">
+            <body className="bg-slate-50 text-slate-900 antialiased">
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="system"
-                    enableSystem
+                    defaultTheme="light"
+                    forcedTheme="light"
                     disableTransitionOnChange
                 >
                     <NextTopLoader color={`#ed4a4a`} />

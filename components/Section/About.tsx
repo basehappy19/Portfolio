@@ -27,31 +27,31 @@ const About = async () => {
     (messages as unknown as AboutMessages).Index.About.data.statuses;
 
   return (
-    <div className="w-full text-zinc-800 dark:text-zinc-100 py-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="w-full text-slate-800 py-2">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <SectionHeader text={t('About.Heading')} />
 
         {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="grid md:grid-cols-12 gap-8 items-center mb-8">
           {/* Image Section */}
-          <div className="flex justify-center">
+          <div className="md:col-span-4 flex justify-center">
             <ProfileImageSection />
           </div>
 
           {/* Text Section */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <p className="text-lg md:text-xl leading-relaxed text-zinc-700 dark:text-zinc-200">
+          <div className="md:col-span-8 space-y-4">
+            <div className="space-y-3">
+              <p className="text-base md:text-lg leading-relaxed text-slate-800 font-medium">
                 {t('About.Introduce_1')}
               </p>
-              <p className="text-base md:text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm md:text-base leading-relaxed text-slate-600">
                 {t('About.Introduce_2')}
               </p>
             </div>
 
             {/* Call to Action Buttons */}
-            <div className="flex flex-wrap gap-4 pt-4">
+            <div className="flex flex-wrap gap-3 pt-2">
               <WarpToContact text={t('About.Buttons.Contact')} />
               <WarpToAchievement text={t('About.Buttons.Achievements')} />
             </div>
@@ -59,16 +59,16 @@ const About = async () => {
         </div>
 
         {/* Status Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statuses.map((stat, index) => (
             <div
               key={index}
-              className="group flex flex-col items-center justify-center text-center p-6 rounded-lg bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+              className="flex flex-col items-center justify-center text-center p-4 rounded-lg bg-white border border-slate-200 shadow-2xs transition-all duration-200"
             >
-              <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-amber-500 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1">
                 {stat.number}
               </div>
-              <div className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <div className="text-xs sm:text-sm font-medium text-slate-500">
                 {stat.label}
               </div>
             </div>

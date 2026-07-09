@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { Sparkles, ArrowRight, FileText } from 'lucide-react';
+import { Sparkles, FileText } from 'lucide-react';
 import AnimatedRole from '../AnimatedRole';
 import WrapToAchievement from '../WrapToAchievement';
 
@@ -10,43 +10,43 @@ const Home = async () => {
   const roles = t.raw('Home.Roles') as string[];
 
   return (
-    <div className="min-h-[90vh] w-full flex flex-col items-center justify-center relative py-12 md:py-20">
-      <div className="max-w-4xl mx-auto px-4 text-center relative z-10 flex flex-col items-center">
+    <div className="w-full flex flex-col items-center justify-center relative py-8 md:py-12">
+      <div className="max-w-3xl mx-auto px-4 text-center relative z-10 flex flex-col items-center">
         
-        {/* Lively Sparkle Badge */}
-        <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-sky-500/10 dark:from-amber-400/15 dark:to-rose-400/15 backdrop-blur-md rounded-full border border-rose-200/80 dark:border-zinc-700/80 text-rose-600 dark:text-rose-300 shadow-sm mb-6 animate-pulse">
-          <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400" />
-          <span className="text-sm md:text-base font-semibold tracking-wide">
+        {/* Subtle Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-slate-700 shadow-2xs mb-5">
+          <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+          <span className="text-xs md:text-sm font-semibold tracking-wide">
             {t('Home.Welcome')}
           </span>
         </div>
 
         {/* Greeting */}
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-600 dark:text-zinc-300 mb-2">
+        <h2 className="text-lg sm:text-xl font-medium text-slate-500 mb-1.5">
           {t('Home.Greeting')}
         </h2>
 
         {/* Name */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-rose-600 via-amber-500 to-rose-500 dark:from-rose-400 dark:via-amber-300 dark:to-sky-400 bg-clip-text text-transparent drop-shadow-sm">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4 text-slate-900">
           {t('Home.Name')}
         </h1>
 
         {/* Animated Role Component */}
-        <div className="mb-6 w-full flex justify-center">
+        <div className="mb-5 w-full flex justify-center text-slate-700 font-bold">
           <AnimatedRole roles={roles} />
         </div>
 
         {/* Description */}
-        <p className="text-base sm:text-lg md:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed mb-3">
+        <p className="text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed mb-2">
           {t('Home.Description')}
         </p>
 
-        <p className="text-sm sm:text-base md:text-lg text-zinc-500 dark:text-zinc-400 max-w-xl leading-relaxed mb-10">
+        <p className="text-xs sm:text-sm text-slate-500 max-w-lg leading-relaxed mb-8">
           {t('Home.Description_2')}
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
           <div className="w-full sm:w-auto">
             <WrapToAchievement text={viewAchievementsText} />
           </div>
@@ -55,9 +55,9 @@ const Home = async () => {
             href="https://drive.google.com/file/d/1OgnztJxGqy76u6Za3BI1nZAgVOe71vcP/view?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full font-semibold text-zinc-800 dark:text-zinc-100 bg-white dark:bg-zinc-800/80 hover:bg-rose-50 dark:hover:bg-zinc-700 border border-rose-200 dark:border-zinc-700 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs transition-all duration-200"
           >
-            <FileText className="w-4 h-4 text-rose-500" />
+            <FileText className="w-4 h-4 text-rose-600" />
             <span>{t('Home.Buttons.Resume')}</span>
           </a>
         </div>

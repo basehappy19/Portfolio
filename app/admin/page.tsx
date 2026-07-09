@@ -274,19 +274,18 @@ export default async function AdminPage(props: {
                     <div className="max-w-7xl mx-auto p-4 md:p-8">
                         {/* Header Section with Stats */}
                         <div className="mb-6">
-                            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                                {/* Gradient Header */}
-                                <div className="bg-red-500 p-6 md:p-8">
+                            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-zinc-800">
+                                {/* Header */}
+                                <div className="bg-rose-600 dark:bg-rose-700 p-6 md:p-8">
                                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                         <div className="text-white">
-                                            <div className="flex items-center gap-3 mb-2">
-
+                                            <div className="flex items-center gap-3 mb-1">
                                                 <div>
-                                                    <h1 className="text-3xl md:text-4xl font-bold">
+                                                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
                                                         จัดการผลงาน
                                                     </h1>
-                                                    <p className="text-red-100 text-sm mt-1">
-                                                        ระบบจัดการและติดตามผลงานรางวัล
+                                                    <p className="text-rose-100 text-xs md:text-sm mt-1">
+                                                        ระบบหลังบ้านสำหรับจัดการและติดตามผลงานและรางวัลของคุณ
                                                     </p>
                                                 </div>
                                             </div>
@@ -296,77 +295,77 @@ export default async function AdminPage(props: {
                                 </div>
 
                                 {/* Stats Cards - Mobile View */}
-                                <div className="md:hidden grid grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800">
-                                    <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-lg">
-                                        <div className="text-xl font-bold text-red-600 dark:text-red-400">
+                                <div className="md:hidden grid grid-cols-3 gap-3 p-4 bg-gray-50/50 dark:bg-zinc-800/40">
+                                    <div className="text-center p-3 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-2xs">
+                                        <div className="text-lg font-bold text-rose-600 dark:text-rose-400">
                                             {achievements.length}
                                         </div>
-                                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">ทั้งหมด</div>
+                                        <div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">ทั้งหมด</div>
                                     </div>
-                                    <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-lg">
-                                        <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                                    <div className="text-center p-3 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-2xs">
+                                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                                             {publicCount}
                                         </div>
-                                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">เผยแพร่</div>
+                                        <div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">เผยแพร่</div>
                                     </div>
-                                    <div className="text-center p-3 bg-white dark:bg-gray-900 rounded-lg">
-                                        <div className="text-xl font-bold text-gray-600 dark:text-gray-400">
+                                    <div className="text-center p-3 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-2xs">
+                                        <div className="text-lg font-bold text-gray-600 dark:text-gray-400">
                                             {draftCount}
                                         </div>
-                                        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">แบบร่าง</div>
+                                        <div className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">แบบร่าง</div>
                                     </div>
                                 </div>
 
                                 {/* Additional Stats */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 border-t border-gray-200 dark:border-gray-800">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 border-t border-gray-200 dark:border-zinc-800">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <Award className="w-6 h-6 text-white" />
+                                        <div className="w-10 h-10 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-md flex items-center justify-center">
+                                            <Award className="w-5 h-5 text-rose-600 dark:text-rose-400" />
                                         </div>
                                         <div>
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <div className="text-xl font-bold text-gray-900 dark:text-white">
                                                 {achievements.length}
                                             </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">ผลงานทั้งหมด</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">ผลงานทั้งหมด</div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-md flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <div className="text-xl font-bold text-gray-900 dark:text-white">
                                                 {publicCount}
                                             </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">เผยแพร่แล้ว</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">เผยแพร่แล้ว</div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="w-10 h-10 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-md flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <div className="text-xl font-bold text-gray-900 dark:text-white">
                                                 {totalImages}
                                             </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">รูปภาพ</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">รูปภาพ</div>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <div className="w-10 h-10 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-md flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                            <div className="text-xl font-bold text-gray-900 dark:text-white">
                                                 {categories.length}
                                             </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">หมวดหมู่</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">หมวดหมู่</div>
                                         </div>
                                     </div>
                                 </div>
@@ -374,7 +373,7 @@ export default async function AdminPage(props: {
                         </div>
 
                         {/* Filters Section */}
-                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-gray-800">
+                        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-5 mb-6 border border-gray-200 dark:border-zinc-800">
                             <div className="flex items-center gap-2 mb-4">
                                 <Filter className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">

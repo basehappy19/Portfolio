@@ -322,10 +322,10 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
 
     return (
         <>
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-zinc-800">
                 <div className="overflow-x-auto">
                     <table className="w-full">
-                        <thead className="bg-linear-to-r from-red-50 to-rose-50 dark:from-gray-800 dark:to-gray-800 border-b-2 border-red-200 dark:border-gray-700">
+                        <thead className="bg-gray-50 dark:bg-zinc-800/60 border-b border-gray-200 dark:border-zinc-800">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     ผลงาน

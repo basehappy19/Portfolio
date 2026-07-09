@@ -18,12 +18,8 @@ import { AchievementTextField } from '../AchievementTextField';
 import { useRouter } from 'next/navigation';
 import { createAchievement, deleteAchievement, updateAchievement } from '../services/achievements';
 import toast from 'react-hot-toast';
-import { useAchievementTextTranslation } from '../hooks/useAchievementTextTranslation';
-import { useLinkTranslation } from '../hooks/useLinkTranslation';
-import { useImageAltTranslation } from '../hooks/useImageAltTranslation';
 import { AchievementRichText } from '../AchievementRichText';
 import { useFormDraft } from '../hooks/useFormDraft';
-
 
 export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
@@ -41,7 +37,6 @@ export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: numbe
     );
 };
 
-
 const AchievementModalInner = ({
     editData,
     close,
@@ -50,7 +45,7 @@ const AchievementModalInner = ({
 }: {
     editData: EditData | null;
     close: () => void;
-    isAnimating: boolean
+    isAnimating: boolean;
     defaultSortOrder: number;
 }) => {
     const createInitialFormState = (
@@ -88,7 +83,6 @@ const AchievementModalInner = ({
     const [formData, setFormData] = useState<FormState>(() =>
         createInitialFormState(editData, defaultSortOrder)
     );
-
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -184,29 +178,12 @@ const AchievementModalInner = ({
         }
     };
 
-    const { translating, handleTranslate } = useAchievementTextTranslation({
-        editData,
-        formData,
-        setFormData,
-    });
-
-    const { translatingLink, handleTranslateLink } = useLinkTranslation({
-        links,
-        setLinks,
-    });
-
-    const { translatingImageAlt, handleTranslateImageAlt } = useImageAltTranslation({
-        editData,
-        imagePreview,
-        setImagePreview,
-    });
-
-    const handleLinkDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+    const handleLinkDragStart = (e: DragEvent<HTMLElement>, index: number) => {
         setDraggedLinkIndex(index);
         e.dataTransfer.effectAllowed = 'move';
     };
 
-    const handleLinkDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
+    const handleLinkDragOver = (e: DragEvent<HTMLElement>, index: number) => {
         e.preventDefault();
         if (draggedLinkIndex === null || draggedLinkIndex === index) return;
 
@@ -250,7 +227,7 @@ const AchievementModalInner = ({
                 label_th: '',
                 label_en: '',
                 url: '',
-                sortOrder: prev.length + 1, // 👈 +1
+                sortOrder: prev.length + 1,
             },
         ]);
     };
@@ -283,7 +260,6 @@ const AchievementModalInner = ({
             ...link,
             sortOrder: idx + 1,
         }));
-
 
         let achievementId: string | null = editData?.id ?? null;
 
@@ -382,91 +358,96 @@ const AchievementModalInner = ({
     };
 
     return (
-        <div
-            className="
-    fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer
-    backdrop-blur-sm
-    bg-black/30 dark:bg-black/60
-  "
-            onClick={handleSafeClose}
-            style={{
-                animation: isAnimating ? 'modalFadeIn 0.2s ease-out' : 'modalFadeOut 0.2s ease-in'
-            }}
-        >
+        <div className="fixed inset-0 z-50 overflow-hidden">
+            {/* Backdrop */}
             <div
-                style={{
-                    animation: isAnimating ? 'modalSlideIn 0.3s ease-out' : 'modalSlideOut 0.2s ease-in'
-                }}
-                onClick={(e) => e.stopPropagation()}
-                className="
-      max-w-5xl w-full max-h-[90vh]
-      overflow-hidden flex flex-col
-      rounded-2xl shadow-2xl border
-      bg-white border-gray-200
-      dark:bg-[#1e222a] dark:border-gray-800
-    "
-            >
-                {/* Header */}
-                <div className="px-8 py-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-[#1e222a]">
-                    <div className="flex items-center justify-between">
+                className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ${
+                    isAnimating ? 'opacity-100' : 'opacity-0'
+                }`}
+                onClick={handleSafeClose}
+            />
+
+            {/* Slide-over Studio Drawer Panel */}
+            <div className="fixed inset-y-0 right-0 max-w-4xl w-full flex pl-10">
+                <div
+                    className={`w-full bg-white dark:bg-zinc-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-zinc-800 ${
+                        isAnimating ? 'translate-x-0' : 'translate-x-full'
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Sticky Top Header Bar */}
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between sticky top-0 z-20">
                         <div>
-                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                                {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {editData ? 'บรรณาธิการผลงาน (Edit Achievement)' : 'เพิ่มผลงานใหม่ (Studio Editor)'}
                             </h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                กรอกข้อมูลผลงานของคุณ
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                จัดการรายละเอียด หมวดหมู่ รูปภาพ และลิงก์ที่เกี่ยวข้อง
                             </p>
                         </div>
-                        <button
-                            onClick={handleSafeClose}
-                            type="button"
-                            className="
-            cursor-pointer w-10 h-10 flex items-center justify-center rounded-full
-            text-gray-500 hover:bg-gray-100
-            dark:text-gray-400 dark:hover:bg-gray-800
-            transition-colors
-          "
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-                </div>
-
-                {hasDraft && (
-                    <div className="mx-8 mt-4 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-800 dark:text-amber-300">
-                        <div className="flex items-center gap-2 font-medium">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                            <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime} (กันเผลอกดปิด)</span>
-                        </div>
-                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <div className="flex items-center gap-2">
                             <button
-                                type="button"
-                                onClick={handleRestoreDraft}
-                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg shadow-sm transition"
+                                onClick={handleSubmit}
+                                disabled={isSubmitting || !isFormValid}
+                                className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 rounded-md font-medium text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-2xs transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                กู้คืนข้อมูล (Restore)
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>กำลังบันทึก...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        <span>{editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}</span>
+                                    </>
+                                )}
                             </button>
                             <button
+                                onClick={handleSafeClose}
                                 type="button"
-                                onClick={clearDraft}
-                                className="px-3 py-1.5 bg-transparent hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 font-medium rounded-lg transition"
+                                className="cursor-pointer p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 dark:hover:text-gray-300 transition"
+                                title="ปิดหน้าต่าง"
                             >
-                                ลบร่าง
+                                <X size={20} />
                             </button>
                         </div>
                     </div>
-                )}
 
-                {/* Body */}
-                <div className="overflow-y-auto flex-1 px-8 py-6 bg-white dark:bg-[#1e222a]">
-                    <div className="max-w-3xl mx-auto space-y-8">
+                    {/* Draft Banner */}
+                    {hasDraft && (
+                        <div className="mx-6 mt-4 px-4 py-2.5 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between gap-3 text-xs text-amber-800 dark:text-amber-300 shrink-0">
+                            <div className="flex items-center gap-2 font-medium">
+                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                                <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime} (กันเผลอกดปิด)</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={handleRestoreDraft}
+                                    className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded shadow-2xs transition cursor-pointer"
+                                >
+                                    กู้คืนข้อมูล
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={clearDraft}
+                                    className="px-2.5 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 font-medium rounded transition cursor-pointer"
+                                >
+                                    ลบร่าง
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
+                    {/* Scrollable Body */}
+                    <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
                         {/* ข้อมูลหลัก */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                    ข้อมูลหลัก
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
+                                <div className="w-1 h-4 bg-rose-500 rounded-full"></div>
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                    ข้อมูลทั่วไป (General Info)
                                 </h3>
                             </div>
 
@@ -476,13 +457,11 @@ const AchievementModalInner = ({
                                 value={formData.title_th}
                                 onChange={handleInputChange}
                                 onBlur={() => handleBlur("title_th")}
-                                placeholder="ชื่อผลงาน"
+                                placeholder="ชื่อผลงานภาษาไทย"
                                 required
                                 size="lg"
                                 error={errors.title_th}
                                 touched={touched.title_th}
-                                isTranslating={!!translating.title_th}
-                                onTranslate={() => handleTranslate("title_th")}
                             />
 
                             <AchievementTextField
@@ -491,41 +470,39 @@ const AchievementModalInner = ({
                                 value={formData.title_en}
                                 onChange={handleInputChange}
                                 onBlur={() => handleBlur('title_en')}
-                                placeholder="Title"
+                                placeholder="Achievement Title"
                                 required
                                 size="md"
                                 error={errors.title_en}
                                 touched={touched.title_en}
                             />
 
-                            <AchievementTextField
-                                label="มอบโดย"
-                                name="given_by_th"
-                                value={formData.given_by_th}
-                                onChange={handleInputChange}
-                                placeholder="มอบโดย"
-                                size="md"
-                                isTranslating={!!translating.given_by_th}
-                                onTranslate={() => handleTranslate("given_by_th")}
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <AchievementTextField
+                                    label="มอบโดย (ไทย)"
+                                    name="given_by_th"
+                                    value={formData.given_by_th}
+                                    onChange={handleInputChange}
+                                    placeholder="ชื่อองค์กร / สถาบัน"
+                                    size="md"
+                                />
 
-                            <AchievementTextField
-                                label="มอบโดย (English)"
-                                name="given_by_en"
-                                value={formData.given_by_en}
-                                onChange={handleInputChange}
-                                placeholder="Given by"
-                                size="md"
-                            />
+                                <AchievementTextField
+                                    label="มอบโดย (English)"
+                                    name="given_by_en"
+                                    value={formData.given_by_en}
+                                    onChange={handleInputChange}
+                                    placeholder="Organization / Institution"
+                                    size="md"
+                                />
+                            </div>
 
                             <AchievementRichText
                                 label="รายละเอียด (ไทย)"
                                 name="description_th"
                                 value={formData.description_th}
                                 onChange={handleRichChange}
-                                placeholder="อธิบายรายละเอียดผลงาน..."
-                                isTranslating={!!translating.description_th}
-                                onTranslate={() => handleTranslate("description_th")}
+                                placeholder="อธิบายรายละเอียดของผลงาน รางวัล หรือโครงการนี้..."
                             />
 
                             <AchievementRichText
@@ -533,16 +510,16 @@ const AchievementModalInner = ({
                                 name="description_en"
                                 value={formData.description_en}
                                 onChange={handleRichChange}
-                                placeholder="Describe your project..."
+                                placeholder="Describe the achievement, competition, or project details..."
                             />
                         </div>
 
-                        {/* ข้อมูลรางวัล */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-1 h-6 bg-amber-500 rounded-full"></div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                    ข้อมูลรางวัล
+                        {/* ข้อมูลรางวัลและสถานที่ */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
+                                <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                    ระดับรางวัล & สถานที่
                                 </h3>
                             </div>
 
@@ -552,10 +529,8 @@ const AchievementModalInner = ({
                                     name="awardLevel_th"
                                     value={formData.awardLevel_th}
                                     onChange={handleInputChange}
-                                    placeholder="ประเทศ | จังหวัด | เขต"
+                                    placeholder="เช่น ระดับประเทศ / ระดับภาค"
                                     size="md"
-                                    isTranslating={!!translating.awardLevel_th}
-                                    onTranslate={() => handleTranslate("awardLevel_th")}
                                 />
 
                                 <AchievementTextField
@@ -563,7 +538,7 @@ const AchievementModalInner = ({
                                     name="awardLevel_en"
                                     value={formData.awardLevel_en}
                                     onChange={handleInputChange}
-                                    placeholder="Country | Province | District"
+                                    placeholder="e.g. National / Regional"
                                     size="md"
                                 />
                             </div>
@@ -574,10 +549,8 @@ const AchievementModalInner = ({
                                     name="location_th"
                                     value={formData.location_th}
                                     onChange={handleInputChange}
-                                    placeholder="สถานที่"
+                                    placeholder="สถานที่จัดงาน / เมือง"
                                     size="md"
-                                    isTranslating={!!translating.location_th}
-                                    onTranslate={() => handleTranslate("location_th")}
                                 />
 
                                 <AchievementTextField
@@ -585,82 +558,54 @@ const AchievementModalInner = ({
                                     name="location_en"
                                     value={formData.location_en}
                                     onChange={handleInputChange}
-                                    placeholder="Location"
+                                    placeholder="Location / City"
                                     size="md"
                                 />
                             </div>
 
-                            <div className="group">
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                            <div>
+                                <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
                                     วันที่ได้รับ
                                 </label>
-                                <div className="relative">
-                                    <input
-                                        type="date"
-                                        name="receivedAt"
-                                        value={formData.receivedAt}
-                                        onChange={handleInputChange}
-                                        className="
-                    w-full px-4 py-3.5 rounded-xl border-gray-300 border-2 transition-all duration-200
-                    bg-white text-gray-900 placeholder-gray-400 hover:border-red-300 hover:bg-white
-                    dark:hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500
-                    shadow-sm dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-red-500
-                  "
-                                    />
-                                </div>
+                                <input
+                                    type="date"
+                                    name="receivedAt"
+                                    value={formData.receivedAt}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 rounded-md border text-sm bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
+                                />
                             </div>
                         </div>
 
-                        {/* การจัดการ */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                    การจัดการ
+                        {/* การตั้งค่าและหมวดหมู่ */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
+                                <div className="w-1 h-4 bg-emerald-500 rounded-full"></div>
+                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                                    หมวดหมู่และการเผยแพร่
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* Categories - Enhanced Multi-Select */}
-                                <div className="lg:col-span-2">
-                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
-                                        <Grid3x3 className="w-4 h-4 text-red-500" />
-                                        หมวดหมู่
-                                        <span className="text-red-500">*</span>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
+                                        <Grid3x3 className="w-3.5 h-3.5 text-rose-500" />
+                                        เลือกหมวดหมู่
+                                        <span className="text-rose-500">*</span>
                                     </label>
 
-                                    <div className={`
-                  rounded-xl border-2 transition-all duration-200 overflow-hidden
-                  ${errors.categorySlugs && touched.categorySlugs
-                                            ? 'border-red-400 bg-red-50/50 dark:bg-red-950/20 dark:border-red-500'
-                                            : 'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700'
-                                        }
-                `}>
+                                    <div className={`rounded-md border overflow-hidden transition ${
+                                        errors.categorySlugs && touched.categorySlugs
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20'
+                                            : 'border-gray-200 bg-white dark:bg-zinc-800/80 dark:border-zinc-700'
+                                    }`}>
                                         <select
                                             multiple
                                             name="categorySlugs"
                                             value={formData.categorySlugs}
                                             onChange={handleCategoryChange}
                                             onBlur={() => handleBlur('categorySlugs')}
-                                            className="
-  w-full min-h-[200px] border-2 px-4 py-3
-  text-sm sm:text-base
-  bg-white text-gray-900 border-gray-200 shadow-sm
-  focus:outline-none
-
-  dark:bg-gray-900 dark:text-gray-50 dark:border-gray-700 dark:shadow-sm
-
-  [&>option]:bg-white [&>option]:text-gray-900 [&>option]:border [&>option]:border-gray-200
-  [&>option]:py-2.5 [&>option]:px-3 [&>option]:my-1 [&>option]:rounded-lg
-
-  [&>option:hover]:bg-gray-100 [&>option:hover]:cursor-pointer
-
-  [&>option:checked]:bg-red-500 [&>option:checked]:text-white
-
-  dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100 dark:[&>option]:border-gray-600
-  dark:[&>option:hover]:bg-gray-700
-  dark:[&>option:checked]:bg-red-500 dark:[&>option:checked]:text-white
-"
+                                            className="w-full min-h-[160px] border-none p-2 text-xs bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none [&>option]:py-2 [&>option]:px-2.5 [&>option]:my-0.5 [&>option]:rounded [&>option:checked]:bg-rose-600 [&>option:checked]:text-white"
                                         >
                                             {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.slug}>
@@ -669,120 +614,79 @@ const AchievementModalInner = ({
                                             ))}
                                         </select>
 
-                                        <div className="cursor-default px-4 py-3 bg-gray-50 border-t border-gray-200 dark:bg-gray-900/50 dark:border-gray-700">
-                                            <div className="flex items-center justify-between gap-4">
-                                                <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                                                    <span>💡</span>
-                                                    <span>
-                                                        กด <kbd className="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Ctrl</kbd>
-                                                        {' '}/{' '}
-                                                        <kbd className="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Cmd</kbd>
-                                                        {' '}ค้างไว้เพื่อเลือกหลายหมวดหมู่
-                                                    </span>
-                                                </p>
-
-                                                {formData.categorySlugs.length > 0 && (
-                                                    <div className="flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                                                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                        <span className="text-xs font-medium text-green-700 dark:text-green-300">
-                                                            {formData.categorySlugs.length} หมวดหมู่
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className="px-3 py-2 bg-gray-50 border-t border-gray-200 dark:bg-zinc-900/60 dark:border-zinc-700 flex items-center justify-between">
+                                            <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                                                💡 กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายรายการ
+                                            </span>
+                                            {formData.categorySlugs.length > 0 && (
+                                                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                    <CheckCircle2 size={12} />
+                                                    {formData.categorySlugs.length} หมวดหมู่
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
-
-
                                     {errors.categorySlugs && touched.categorySlugs && (
-                                        <div className="flex items-center gap-2 mt-3 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                                            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
-                                            <span className="text-sm text-red-600 dark:text-red-400 font-medium">{errors.categorySlugs}</span>
+                                        <div className="flex items-center gap-1.5 mt-1 text-xs text-red-600 dark:text-red-400">
+                                            <AlertCircle size={14} />
+                                            <span>{errors.categorySlugs}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Sort Order - Enhanced */}
-                                <div className="lg:col-span-2">
-                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
-                                        ลำดับการแสดงผล
-                                    </label>
-                                    <div className="flex items-center gap-4">
-                                        <input
-                                            type="number"
-                                            name="sortOrder"
-                                            value={formData.sortOrder}
-                                            onChange={handleInputChange}
-                                            min={1}
-                                            className="
-                      flex-1 px-4 py-3.5 rounded-xl border-2 transition-all duration-200
-                      bg-gray-50 text-gray-900 border-gray-200
-                      hover:border-red-300 hover:bg-white
-                      focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 focus:bg-white
-                      dark:bg-gray-900/50 dark:text-white dark:border-gray-700
-                      dark:hover:border-red-400 dark:hover:bg-gray-900
-                      dark:focus:border-red-500
-                    "
-                                        />
-                                        <div className="flex gap-2">
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
+                                            ลำดับการแสดงผล
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                name="sortOrder"
+                                                value={formData.sortOrder}
+                                                onChange={handleInputChange}
+                                                min={1}
+                                                className="w-full px-3 py-2 rounded-md border text-sm bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
+                                            />
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, sortOrder: Math.max(1, prev.sortOrder - 1) }))}
-                                                className="cursor-pointer p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                                className="cursor-pointer px-3 py-2 rounded-md border border-gray-200 hover:bg-gray-100 font-bold dark:border-zinc-700 dark:hover:bg-zinc-800 transition"
                                             >
-                                                <span className="text-lg font-bold text-gray-700 dark:text-gray-300">−</span>
+                                                −
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setFormData(prev => ({ ...prev, sortOrder: prev.sortOrder + 1 }))}
-                                                className="cursor-pointer p-3 rounded-lg border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-red-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-all"
+                                                className="cursor-pointer px-3 py-2 rounded-md border border-gray-200 hover:bg-gray-100 font-bold dark:border-zinc-700 dark:hover:bg-zinc-800 transition"
                                             >
-                                                <span className="text-lg font-bold text-gray-700 dark:text-gray-300">+</span>
+                                                +
                                             </button>
                                         </div>
                                     </div>
+
+                                    <div className="flex items-center gap-2.5 p-3 rounded-md border border-gray-200 bg-gray-50/50 dark:border-zinc-700 dark:bg-zinc-800/40">
+                                        <input
+                                            type="checkbox"
+                                            id="isPublished"
+                                            name="isPublished"
+                                            checked={formData.isPublished}
+                                            onChange={handleInputChange}
+                                            className="w-4 h-4 cursor-pointer rounded text-rose-600 border-gray-300 focus:ring-rose-500"
+                                        />
+                                        <label
+                                            htmlFor="isPublished"
+                                            className="text-xs font-medium cursor-pointer text-gray-800 dark:text-gray-200 select-none"
+                                        >
+                                            เผยแพร่ผลงานนี้สู่สาธารณะทันทีหลังบันทึก
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div
-                                className="
-              flex items-center gap-3 p-4 rounded-xl border transition-all
-              bg-white border-gray-300
-              dark:bg-gray-800/30 dark:border-gray-800
-            "
-                            >
-                                <input
-                                    type="checkbox"
-                                    name="isPublished"
-                                    checked={formData.isPublished}
-                                    onChange={handleInputChange}
-                                    className="
-                w-5 h-5 cursor-pointer rounded
-                text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2
-              "
-                                />
-
-                                <label
-                                    className="
-                text-sm font-medium cursor-pointer select-none
-                text-gray-900
-                dark:text-gray-300
-              "
-                                >
-                                    เผยแพร่ผลงานนี้ทันทีหลังบันทึก
-                                </label>
                             </div>
                         </div>
 
-                        {/* Links Section */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-1 h-6 bg-violet-500 rounded-full"></div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                    ลิงก์ที่เกี่ยวข้อง
-                                </h3>
-                            </div>
-
+                        {/* ลิงก์และรูปภาพ */}
+                        <div className="space-y-6 pt-2">
                             <AchievementLinksSection
                                 links={links}
                                 draggedLinkIndex={draggedLinkIndex}
@@ -792,19 +696,7 @@ const AchievementModalInner = ({
                                 handleLinkDragStart={handleLinkDragStart}
                                 handleLinkDragOver={handleLinkDragOver}
                                 handleLinkDragEnd={handleLinkDragEnd}
-                                handleTranslateLink={handleTranslateLink}
-                                translatingLink={translatingLink}
                             />
-                        </div>
-
-                        {/* Images Section */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-1 h-6 bg-pink-500 rounded-full"></div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                    รูปภาพผลงาน
-                                </h3>
-                            </div>
 
                             <AchievementImagesSection
                                 imagePreview={imagePreview}
@@ -815,89 +707,35 @@ const AchievementModalInner = ({
                                 handleDragStart={handleDragStart}
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
-                                handleTranslateImageAlt={handleTranslateImageAlt}
-                                translatingImageAlt={translatingImageAlt}
                             />
                         </div>
                     </div>
-                </div>
 
-                {/* Footer */}
-                <div className="
-      px-8 py-5 border-t
-      border-gray-100 bg-gray-50/80
-      dark:border-gray-800 dark:bg-gray-900/30
-    ">
-
-                    <div className="max-w-3xl mx-auto flex justify-end gap-3">
+                    {/* Sticky Bottom Action Bar */}
+                    <div className="px-6 py-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-900/90 flex justify-end gap-3 sticky bottom-0 z-20">
                         <button
                             onClick={close}
-                            className="
-            cursor-pointer px-6 py-2.5 rounded-xl font-medium transition-all
-            border border-gray-200 text-gray-700 hover:bg-white
-            dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800
-        "
+                            type="button"
+                            className="cursor-pointer px-4 py-2 rounded-md font-medium text-xs border border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800 transition"
                         >
                             ยกเลิก
                         </button>
-
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || !isFormValid}
-                            className="
-            cursor-pointer px-6 py-2.5 rounded-xl font-medium
-            bg-blue-600 text-white
-            shadow-sm shadow-blue-600/20
-            transition-all
-            hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/30
-            disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none
-            relative overflow-hidden group
-        "
+                            className="cursor-pointer inline-flex items-center gap-1.5 px-5 py-2 rounded-md font-medium text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting && (
-                                <div
-                                    className="absolute inset-0 bg-linear-to-r from-blue-700 via-sky-400 to-blue-700"
-                                    style={{
-                                        backgroundSize: '200% 100%',
-                                        animation: 'shimmer 2s infinite linear',
-                                    }}
-                                />
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>กำลังบันทึกข้อมูล...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4" />
+                                    <span>{editData ? 'บันทึกการแก้ไข' : 'สร้างผลงานใหม่'}</span>
+                                </>
                             )}
-
-                            <div className="relative z-10 flex items-center gap-2">
-                                {isSubmitting ? (
-                                    <>
-                                        <div className="relative">
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                            <div className="absolute inset-0 w-5 h-5 rounded-full border-2 border-white/30 animate-ping" />
-                                        </div>
-                                        <span className="animate-pulse">
-                                            {editData ? 'กำลังบันทึกการแก้ไข...' : 'กำลังบันทึกผลงาน...'}
-                                        </span>
-                                        <div className="flex gap-1">
-                                            <div
-                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                                style={{ animationDelay: '0ms' }}
-                                            />
-                                            <div
-                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                                style={{ animationDelay: '150ms' }}
-                                            />
-                                            <div
-                                                className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                                style={{ animationDelay: '300ms' }}
-                                            />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>
-                                            {editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}
-                                        </span>
-                                        <Save className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </div>
                         </button>
                     </div>
                 </div>

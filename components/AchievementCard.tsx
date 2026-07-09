@@ -154,21 +154,23 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
             {/* Card */}
             <div
                 onClick={openModal}
-                className="cursor-pointer group bg-white dark:bg-gray-800 rounded-lg shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200/80 dark:border-gray-700 hover:border-rose-400 dark:hover:border-rose-500"
+                className="cursor-pointer group bg-white rounded-lg shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden border border-slate-200 hover:border-rose-500"
             >
                 {/* Image Section */}
-                <div className="relative h-56 bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
+                <div className="relative h-56 bg-slate-100 overflow-hidden">
                     {mainImage && !imageError ? (
                         <Image
                             src={mainImage.url}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            loading="lazy"
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={() => setImageError(true)}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                            <Award className="w-20 h-20 text-gray-300 dark:text-gray-600" />
+                            <Award className="w-20 h-20 text-slate-300" />
                         </div>
                     )}
 
@@ -290,6 +292,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 ) || title
                                             }
                                             fill
+                                            sizes="(max-width: 1024px) 100vw, 800px"
                                             className="cursor-pointer object-contain p-8 select-none transition-transform duration-300 group-hover:scale-[1.01]"
                                             key={currentImageIndex}
                                             onClick={() => openLightbox(achievement.id, currentImageIndex)}
@@ -394,6 +397,7 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                             src={image.url}
                                                             alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
                                                             fill
+                                                            sizes="80px"
                                                             className="object-cover"
                                                         />
                                                     </button>

@@ -112,18 +112,14 @@ export default async function IndexPage(props: {
       />
       <ScrollToAnchor />
       
-      {/* GLOBAL WRAPPER WITH BRIGHT, LIVELY GRADIENT */}
-      <main className="min-h-screen font-sans bg-gradient-to-b from-rose-50/90 via-amber-50/30 to-sky-50/50 dark:from-[#111318] dark:via-[#161821] dark:to-[#1b1e29] text-slate-800 dark:text-slate-100 selection:bg-rose-500 selection:text-white">
+      {/* WRAPPER WITH CLEAN MINIMALIST LIGHT THEME */}
+      <main className="min-h-screen font-sans bg-slate-50/60 text-slate-800 selection:bg-rose-600 selection:text-white">
 
         {/* SECTION 1: HOME & HERO */}
-        <section id="Home" className="w-full relative overflow-hidden bg-gradient-to-b from-rose-100/60 via-white/80 to-transparent dark:from-[#1b1f2b] dark:via-[#161821] dark:to-transparent pt-4 md:pt-10 transition-colors duration-500">
-          {/* Subtle lively ambient glow shapes */}
-          <div className="absolute top-10 left-1/4 w-72 h-72 bg-amber-300/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-          <div className="absolute top-20 right-10 w-80 h-80 bg-rose-300/20 dark:bg-rose-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-          
+        <section id="Home" className="w-full relative bg-white border-b border-slate-200/80 pt-6 pb-12 md:py-14 transition-colors">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="md:hidden fixed top-0 left-0 w-full z-50 flex items-center justify-center pt-4 pointer-events-none">
-              <div className="pointer-events-auto drop-shadow-md">
+              <div className="pointer-events-auto shadow-sm">
                 <LanguageSwitcher />
               </div>
             </div>
@@ -133,29 +129,29 @@ export default async function IndexPage(props: {
         </section>
 
         {/* SECTION 2: ABOUT */}
-        <section id="About" className="w-full bg-white dark:bg-[#181b22] scroll-mt-24 border-y border-rose-100/50 dark:border-zinc-800/60 transition-colors duration-500">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <section id="About" className="w-full bg-slate-50/60 scroll-mt-20 border-b border-slate-200/80 transition-colors">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
             <About />
           </div>
         </section>
 
         {/* SECTION 3: SKILLS */}
-        <section id="Skills" className="w-full bg-gradient-to-r from-amber-50/60 via-rose-50/40 to-sky-50/60 dark:from-[#1a1d26] dark:via-[#1c1f2b] dark:to-[#1a1d26] scroll-mt-24 transition-colors duration-500">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <section id="Skills" className="w-full bg-white scroll-mt-20 border-b border-slate-200/80 transition-colors">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
             <Skills />
           </div>
         </section>
 
         {/* SECTION 4: ACHIEVEMENTS */}
-        <section id="Achievements" className="w-full bg-white dark:bg-[#161821] scroll-mt-24 border-y border-rose-100/60 dark:border-zinc-800/60 transition-colors duration-500">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <section id="Achievements" className="w-full bg-slate-50/60 scroll-mt-20 border-b border-slate-200/80 transition-colors">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
             <Achievement slug={categorySlug} />
           </div>
         </section>
 
         {/* SECTION 5: CONTACT */}
-        <section id="Contact" className="w-full bg-gradient-to-b from-transparent via-rose-50/60 to-amber-50/70 dark:from-transparent dark:via-[#181b22] dark:to-[#14161d] scroll-mt-24 transition-colors duration-500">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <section id="Contact" className="w-full bg-white scroll-mt-20 transition-colors">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
             <Contact />
           </div>
         </section>

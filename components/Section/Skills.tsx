@@ -26,25 +26,25 @@ const Skills = async () => {
     (messages as unknown as ExpertiseMessage).Index.Skill.Expertise;
 
   return (
-    <div className="w-full text-zinc-800 dark:text-zinc-100 py-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="w-full text-slate-800 py-2">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <SectionHeader text={t('Skill.Heading')} />
 
-        <div className="space-y-8">
+        <div className="space-y-5">
           {Expertise.map((e, i) => (
             <div
               key={i}
-              className="rounded-lg p-6 md:p-8 transition-all duration-300 bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500/80 shadow-xs hover:shadow-md"
+              className="rounded-lg p-5 md:p-6 transition-all duration-200 bg-white border border-slate-200 shadow-2xs"
             >
               {/* Category Heading */}
-              <h3 className="text-lg md:text-2xl font-bold mb-6 flex items-center gap-3 text-zinc-800 dark:text-zinc-100">
-                <span className="w-1.5 h-6 rounded-xs bg-gradient-to-b from-rose-500 via-amber-500 to-sky-500" />
+              <h3 className="text-base md:text-xl font-bold mb-4 flex items-center gap-2.5 text-slate-900">
+                <span className="w-1 h-5 rounded-xs bg-rose-600" />
                 <span>{e.Heading}</span>
               </h3>
 
-              {/* Responsive Skills Grid: 2 cols phone portrait, 3-4 cols tablet landscape, 5-6 cols desktop */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* Responsive Skills Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {e.Skills.map((skill, idx) => (
                   <SkillGrid key={idx} skill={skill} />
                 ))}

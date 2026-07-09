@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ChangeEvent, DragEvent } from 'react';
-import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { ImagePreview } from '@/types/Form';
 
@@ -15,11 +15,9 @@ type Props = {
         value: string
     ) => void;
     handleRemoveImage: (index: number) => void;
-    handleDragStart: (e: DragEvent<HTMLDivElement>, index: number) => void;
-    handleDragOver: (e: DragEvent<HTMLDivElement>, index: number) => void;
+    handleDragStart: (e: DragEvent<HTMLElement>, index: number) => void;
+    handleDragOver: (e: DragEvent<HTMLElement>, index: number) => void;
     handleDragEnd: () => void;
-    handleTranslateImageAlt: (index: number) => void;
-    translatingImageAlt?: Record<number, boolean>;
 };
 
 export const AchievementImagesSection: React.FC<Props> = ({
@@ -31,155 +29,137 @@ export const AchievementImagesSection: React.FC<Props> = ({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
-    handleTranslateImageAlt,
-    translatingImageAlt,
 }) => {
+    const moveUp = (index: number) => {
+        if (index === 0) return;
+        const currentImg = imagePreview[index];
+        const prevImg = imagePreview[index - 1];
+        handleImageAltChange(index, 'altText_th', prevImg.altText_th);
+        handleImageAltChange(index, 'altText_en', prevImg.altText_en);
+        handleImageAltChange(index - 1, 'altText_th', currentImg.altText_th);
+        handleImageAltChange(index - 1, 'altText_en', currentImg.altText_en);
+    };
+
+    const moveDown = (index: number) => {
+        if (index === imagePreview.length - 1) return;
+        const currentImg = imagePreview[index];
+        const nextImg = imagePreview[index + 1];
+        handleImageAltChange(index, 'altText_th', nextImg.altText_th);
+        handleImageAltChange(index, 'altText_en', nextImg.altText_en);
+        handleImageAltChange(index + 1, 'altText_th', currentImg.altText_th);
+        handleImageAltChange(index + 1, 'altText_en', currentImg.altText_en);
+    };
+
     return (
         <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
-                รูปภาพ
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
+                รูปภาพผลงาน
             </label>
 
             {/* Dropzone */}
-            <div className="border-2 border-dashed rounded-lg p-4 bg-white border-gray-300 dark:bg-transparent dark:border-gray-600">
+            <div className="border border-dashed rounded-md p-4 bg-white dark:bg-zinc-800/40 border-gray-300 dark:border-zinc-700 hover:border-rose-400 dark:hover:border-rose-500 transition cursor-pointer">
                 <input
                     type="file"
-                    accept="image/*"
                     multiple
+                    accept="image/*"
                     onChange={handleImageUpload}
                     className="hidden"
                     id="image-upload"
                 />
                 <label
                     htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center cursor-pointer py-4"
+                    className="flex flex-col items-center justify-center cursor-pointer py-2"
                 >
-                    <Plus size={32} className="text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <Plus size={24} className="text-gray-400 mb-1" />
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                         คลิกเพื่อเลือกรูปภาพ (สามารถเลือกได้หลายรูป)
                     </span>
                 </label>
             </div>
 
             {imagePreview.length > 0 && (
-                <div className="mt-4 space-y-3">
-                    {imagePreview.map((img, index) => {
-                        const isTranslating = !!translatingImageAlt?.[index];
-
-                        return (
-                            <div
-                                key={index}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, index)}
-                                onDragOver={(e) => handleDragOver(e, index)}
-                                onDragEnd={handleDragEnd}
-                                className={`
-                  flex items-start gap-3 p-3 rounded-lg border cursor-move transition-all
-                  bg-white shadow-sm
-                  dark:bg-gray-800 dark:shadow-none
-                  ${draggedIndex === index
-                                        ? 'border-red-500'
-                                        : 'border-gray-200 dark:border-gray-700'
-                                    }
-                `}
-                            >
-                                <GripVertical
-                                    size={20}
-                                    className="text-gray-400 mt-2 shrink-0"
-                                />
-
-                                <Image
-                                    src={img.preview}
-                                    alt={img.altText_th || img.altText_en || 'achievement image'}
-                                    className="w-24 h-24 object-cover rounded shrink-0"
-                                    width={96}
-                                    height={96}
-                                />
-
-                                <div className="flex-1 space-y-2">
-                                    {/* Alt TH + ปุ่มแปล */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Alt text (ไทย)"
-                                            value={img.altText_th}
-                                            onChange={(e) =>
-                                                handleImageAltChange(index, 'altText_th', e.target.value)
-                                            }
-                                            className={`
-                        w-full px-3 py-2 text-sm rounded border shadow-sm
-                        bg-white text-gray-900 placeholder-gray-400
-                        focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                        pr-12 
-                        dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
-                        ${isTranslating
-                                                    ? 'border-red-400 animate-pulse'
-                                                    : 'border-gray-300 dark:border-gray-600'
-                                                }
-                      `}
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() => handleTranslateImageAlt(index)}
-                                            disabled={isTranslating}
-                                            className="
-                        cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 z-10 
-                        p-1.5 rounded-md 
-                        bg-white/80 dark:bg-gray-800/80 
-                        hover:bg-sky-50 text-sky-600 
-                        border border-gray-200 shadow-sm backdrop-blur-sm 
-                        transition-all
-                        disabled:opacity-50
-                      "
-                                            title="Translate to English"
-                                        >
-                                            {isTranslating ? (
-                                                <span className="w-4 h-4 block rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
-                                            ) : (
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" /><path d="m22 22-5-10-5 10" /><path d="M14 18h6" /></svg>
-                                            )}
-                                        </button>
-                                    </div>
-
-                                    {/* Alt EN */}
-                                    <input
-                                        type="text"
-                                        placeholder="Alt text (English)"
-                                        value={img.altText_en}
-                                        onChange={(e) =>
-                                            handleImageAltChange(index, 'altText_en', e.target.value)
-                                        }
-                                        className="
-                      w-full px-3 py-2 text-sm rounded border shadow-sm
-                      bg-white text-gray-900 placeholder-gray-400 border-gray-300
-                      focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500
-                      dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
-                    "
-                                    />
-
-                                    {isTranslating && (
-                                        <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
-                                            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                                            <span>AI กำลังแปล...</span>
-                                        </div>
-                                    )}
-
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        ลำดับ: {index + 1}
-                                    </div>
-                                </div>
-
+                <div className="mt-3 space-y-2.5">
+                    {imagePreview.map((img, index) => (
+                        <div
+                            key={index}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            className={`flex items-start gap-3 p-3 rounded-md border transition bg-white shadow-2xs dark:bg-zinc-800/80 dark:shadow-none ${
+                                draggedIndex === index
+                                    ? 'border-rose-500 ring-1 ring-rose-500'
+                                    : 'border-gray-200 dark:border-zinc-700'
+                            }`}
+                        >
+                            <div className="flex flex-col items-center gap-1 mt-1">
                                 <button
                                     type="button"
-                                    onClick={() => handleRemoveImage(index)}
-                                    className="cursor-pointer text-red-500 hover:text-red-700 shrink-0"
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, index)}
+                                    onDragEnd={handleDragEnd}
+                                    className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    title="ลากเพื่อเปลี่ยนลำดับ"
                                 >
-                                    <Trash2 size={20} />
+                                    <GripVertical size={16} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => moveUp(index)}
+                                    disabled={index === 0}
+                                    className="cursor-pointer p-0.5 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-zinc-700"
+                                    title="ย้ายขึ้น"
+                                >
+                                    <ChevronUp size={14} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => moveDown(index)}
+                                    disabled={index === imagePreview.length - 1}
+                                    className="cursor-pointer p-0.5 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-zinc-700"
+                                    title="ย้ายลง"
+                                >
+                                    <ChevronDown size={14} />
                                 </button>
                             </div>
-                        );
-                    })}
+
+                            <Image
+                                src={img.preview}
+                                alt={img.altText_th || img.altText_en || 'achievement image'}
+                                className="w-20 h-20 object-cover rounded border border-gray-200 dark:border-zinc-700 shrink-0"
+                                width={80}
+                                height={80}
+                            />
+
+                            <div className="flex-1 space-y-2">
+                                <input
+                                    type="text"
+                                    placeholder="คำอธิบายภาพ (ไทย)"
+                                    value={img.altText_th}
+                                    onChange={(e) =>
+                                        handleImageAltChange(index, 'altText_th', e.target.value)
+                                    }
+                                    className="w-full px-3 py-1.5 text-xs rounded-md border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
+                                />
+
+                                <input
+                                    type="text"
+                                    placeholder="คำอธิบายภาพ (English)"
+                                    value={img.altText_en}
+                                    onChange={(e) =>
+                                        handleImageAltChange(index, 'altText_en', e.target.value)
+                                    }
+                                    className="w-full px-3 py-1.5 text-xs rounded-md border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="cursor-pointer text-gray-400 hover:text-red-500 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition shrink-0"
+                                title="ลบรูปภาพ"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

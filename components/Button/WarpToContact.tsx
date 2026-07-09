@@ -6,7 +6,7 @@ const WarpToContact = ({ text }: { text: string }) => {
     return (
         <button
             onClick={() => scrollToSection("Contact")}
-            className="cursor-pointer flex-1 block text-center px-6 py-3 bg-red-400 hover:bg-red-500 text-white font-medium rounded-lg transition duration-300 shadow-lg hover:shadow-red-400/50 transform hover:-translate-y-0.5"
+            className="cursor-pointer flex-1 block text-center px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg shadow-xs transition duration-200"
         >
             {text}
         </button>

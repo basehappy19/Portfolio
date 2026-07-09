@@ -40,77 +40,71 @@ const Contact = async () => {
   }>;
 
   return (
-    <div className="w-full text-zinc-800 dark:text-zinc-100 py-4">
-      <div className="max-w-6xl mx-auto relative z-10">
+    <div className="w-full text-slate-800 py-2">
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-14">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 bg-gradient-to-r from-rose-600 via-amber-500 to-rose-500 dark:from-rose-400 dark:via-amber-300 dark:to-sky-400 bg-clip-text text-transparent">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-2.5 text-slate-900 tracking-tight">
             {t('Heading')}
-          </h1>
+          </h2>
 
-          <p className="text-base md:text-lg max-w-2xl mx-auto text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm md:text-base max-w-xl mx-auto text-slate-600">
             {t('Description')}
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
           {/* Contact Info Cards */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold mb-4 text-zinc-800 dark:text-zinc-100">
+          <div className="lg:col-span-5 space-y-6">
+            <h3 className="text-xl font-bold mb-3 text-slate-900">
               {t('ContactInfo')}
-            </h2>
+            </h3>
 
-            {contactInfo.map((info, index) => {
-              const Icon = iconMap[info.icon] || Mail;
-              const gradientClass = info.gradient
-                ? info.gradient.replace('from-', 'from-').replace('to-', 'to-')
-                : 'from-rose-500 to-amber-500';
+            <div className="space-y-3">
+              {contactInfo.map((info, index) => {
+                const Icon = iconMap[info.icon] || Mail;
 
-              return (
-                <div
-                  key={index}
-                  className="group rounded-lg p-5 transition-all duration-300 bg-white dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-700/80 hover:border-rose-400 dark:hover:border-rose-500 shadow-xs hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`p-3.5 rounded-md shadow-sm bg-gradient-to-br ${gradientClass} text-white group-hover:scale-105 transition-transform duration-300`}
-                      >
-                        <Icon className="w-6 h-6" />
+                return (
+                  <div
+                    key={index}
+                    className="rounded-lg p-4 transition-all duration-200 bg-white border border-slate-200 hover:border-slate-300 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="p-3 rounded-md bg-slate-100 text-rose-600 shrink-0">
+                        <Icon className="w-5 h-5" />
                       </div>
 
-                      <div>
-                        <p className="text-xs font-medium mb-1 text-zinc-500 dark:text-zinc-400">
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-500">
                           {info.label}
                         </p>
                         {info.href ? (
                           <a
                             href={info.href}
-                            className="text-base sm:text-lg font-semibold text-zinc-800 hover:text-rose-600 dark:text-zinc-100 dark:hover:text-amber-400 transition-colors break-all"
+                            className="text-sm sm:text-base font-semibold text-slate-900 hover:text-rose-600 transition-colors break-all block"
                           >
                             {info.value}
                           </a>
                         ) : (
-                          <p className="text-base sm:text-lg font-semibold text-zinc-800 dark:text-zinc-100 break-all">
+                          <p className="text-sm sm:text-base font-semibold text-slate-900 break-all">
                             {info.value}
                           </p>
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
 
             {/* Social Links */}
-            <div className="pt-4">
-              <h3 className="text-xl font-bold mb-4 text-zinc-800 dark:text-zinc-100">
+            <div className="pt-2">
+              <h3 className="text-lg font-bold mb-3 text-slate-900">
                 {t('SocialLink')}
               </h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2.5">
                 {socialLinks.map((social, index) => {
                   const Icon = iconMap[social.icon] || Mail;
-                  const colorClass = social.color || 'from-rose-500 to-amber-500';
 
                   return (
                     <Link
@@ -118,9 +112,9 @@ const Contact = async () => {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group relative p-4 rounded-lg transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-gradient-to-br ${colorClass} text-white flex flex-col items-center justify-center`}
+                      className="group p-3 rounded-lg transition-all duration-200 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 hover:text-slate-900 flex flex-col items-center justify-center shadow-2xs"
                     >
-                      <Icon className="w-7 h-7 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
+                      <Icon className="w-5 h-5 mx-auto mb-1.5 text-rose-600 group-hover:scale-105 transition-transform" />
                       <p className="text-xs font-semibold text-center truncate w-full">
                         {social.name}
                       </p>
@@ -131,7 +125,7 @@ const Contact = async () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-zinc-800/60 p-6 sm:p-8 rounded-lg border border-gray-200/80 dark:border-zinc-700/80 shadow-xs">
+          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-lg border border-slate-200 shadow-2xs">
             <FormContact />
           </div>
         </div>
