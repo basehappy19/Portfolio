@@ -67,10 +67,10 @@ const Navbar = () => {
       >
         <div
           className={`
-            pointer-events-auto flex items-center justify-between gap-3 px-5 py-2 rounded-lg border transition-all duration-300
+            pointer-events-auto flex items-center justify-between gap-3 px-5 py-2 rounded-2xl border transition-all duration-300
             ${isScrolled
-              ? 'bg-white/95 border-slate-200/90 backdrop-blur-md shadow-sm'
-              : 'bg-white/85 border-slate-200/70 backdrop-blur-sm shadow-2xs'
+              ? 'bg-white/50 border-white/70 backdrop-blur-2xl shadow-lg shadow-slate-900/5'
+              : 'bg-white/30 border-white/50 backdrop-blur-xl shadow-sm'
             }
           `}
         >
@@ -89,21 +89,21 @@ const Navbar = () => {
                   }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`
-                    group relative px-3.5 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 transition-all duration-200 cursor-pointer
+                    group relative px-3.5 py-1.5 text-sm font-bold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer
                     ${isActive
-                      ? 'bg-rose-600 text-white shadow-2xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-500/25 scale-102'
+                      : 'text-slate-700 hover:text-slate-950 hover:bg-white/60'
                     }
                   `}
                 >
-                  <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-105" />
+                  <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
                   <span>{isThai ? item.label_th : item.label_en}</span>
                 </button>
               );
             })}
           </div>
 
-          <div className="h-4 w-px bg-slate-200 mx-1" />
+          <div className="h-5 w-px bg-slate-300/60 mx-1.5" />
 
           {/* Language Control */}
           <div className="flex items-center gap-2">
@@ -114,7 +114,7 @@ const Navbar = () => {
 
       {/* MOBILE & TABLET FLOATING BOTTOM NAVIGATION */}
       <div className="md:hidden fixed bottom-4 left-0 right-0 z-50 flex flex-col items-center gap-2 px-3 pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-between w-full max-w-sm px-4 py-2.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg">
+        <div className="pointer-events-auto flex items-center justify-between w-full max-w-sm px-4 py-2.5 bg-white/55 backdrop-blur-2xl border border-white/70 rounded-2xl shadow-xl shadow-slate-900/10">
           <div className="flex items-center justify-around flex-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -130,10 +130,10 @@ const Navbar = () => {
                   aria-label={isThai ? item.label_th : item.label_en}
                   title={isThai ? item.label_th : item.label_en}
                   className={`
-                    p-2.5 rounded-md flex items-center justify-center transition-all duration-200 cursor-pointer
+                    p-2.5 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer
                     ${isActive
-                      ? 'bg-rose-600 text-white shadow-2xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-500/25 scale-105'
+                      : 'text-slate-600 hover:text-slate-950 hover:bg-white/60'
                     }
                   `}
                 >

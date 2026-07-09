@@ -1,3 +1,4 @@
+import AchievementCarousel from '@/components/AchievementCarousel';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import Footer from '@/components/Layout/Footer';
 import Navbar from '@/components/Layout/Navbar';
@@ -6,7 +7,7 @@ import About from '@/components/Section/About';
 import Achievement from '@/components/Section/Achievement';
 import Contact from '@/components/Section/Contact';
 import Home from '@/components/Section/Home';
-import Skills from '@/components/Section/Skills';
+import { getAchievementFirstImages } from '@/lib/achievement-carousel';
 import type { Metadata } from "next";
 
 import { getLocale } from "next-intl/server";
@@ -85,12 +86,36 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function IndexPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const categorySlug = typeof searchParams.category === "string"
-    ? searchParams.category
-    : undefined;
+  const locale = await getLocale();
+
+  const categorySlug =
+    typeof searchParams.category === "string"
+      ? searchParams.category
+      : undefined;
+
+  const images = await getAchievementFirstImages();
+  function shuffleArray<T>(array: T[]): T[] {
+    const arr = [...array];
+
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    return arr;
+  }
+
+  const mappedImages = shuffleArray(images).map((image) => ({
+    id: image.id,
+    url: image.url,
+    alt:
+      locale === "th"
+        ? image.alt_th || undefined
+        : image.alt_en || undefined,
+  }));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -135,15 +160,13 @@ export default async function IndexPage(props: {
           </div>
         </section>
 
-        {/* SECTION 3: SKILLS */}
-        <section id="Skills" className="w-full bg-white scroll-mt-20 border-b border-slate-200/80 transition-colors">
-          <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 py-12 md:py-16">
-            <Skills />
-          </div>
-        </section>
 
         {/* SECTION 4: ACHIEVEMENTS */}
         <section id="Achievements" className="w-full bg-slate-50/60 scroll-mt-20 border-b border-slate-200/80 transition-colors">
+          <AchievementCarousel
+            images={mappedImages}
+            locale={locale}
+          />
           <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 py-12 md:py-16">
             <Achievement slug={categorySlug} />
           </div>

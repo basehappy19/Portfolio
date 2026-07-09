@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Achievement as AchievementType } from '@/types/Achievements';
 import AchievementCard from './AchievementCard';
-import { Grid2X2, Grid3X3 } from 'lucide-react';
+import { Grid2X2, Grid3X3, Sparkles } from 'lucide-react';
 
 interface AchievementGridProps {
   achievements: AchievementType[];
@@ -18,40 +18,67 @@ export default function AchievementGrid({
 
   return (
     <div className="w-full">
-      {/* Column Switcher Controls */}
-      <div className="hidden md:flex justify-end mb-6 gap-2">
-        <button
-          onClick={() => setCols(2)}
-          aria-label="View as 2 columns"
-          className={`cursor-pointer px-3 py-1.5 rounded-md border text-xs font-semibold transition flex items-center gap-1.5 ${
-            cols === 2
-              ? 'bg-rose-500 text-white border-rose-500 shadow-2xs'
-              : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-rose-400'
-          }`}
-          title="2 Columns Layout"
-        >
-          <Grid2X2 className="w-4 h-4" />
-          <span>2 Cols</span>
-        </button>
+      {/* Interactive Stats & View Control Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 p-4 rounded-2xl bg-linear-to-r from-slate-50/90 via-white/80 to-slate-50/90 border border-slate-200/80 shadow-xs backdrop-blur-sm">
+        {/* Left Stats & Hint */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-2xs text-xs sm:text-sm font-bold text-slate-800">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
+            </span>
+            <span>
+              {locale === 'th'
+                ? `ผลงานทั้งหมด ${achievements.length} รายการ`
+                : `${achievements.length} Projects`}
+            </span>
+          </div>
 
-        <button
-          onClick={() => setCols(3)}
-          aria-label="View as 3 columns"
-          className={`cursor-pointer px-3 py-1.5 rounded-md border text-xs font-semibold transition flex items-center gap-1.5 ${
-            cols === 3
-              ? 'bg-rose-500 text-white border-rose-500 shadow-2xs'
-              : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:border-rose-400'
-          }`}
-          title="3 Columns Layout"
-        >
-          <Grid3X3 className="w-4 h-4" />
-          <span>3 Cols</span>
-        </button>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50/80 border border-rose-200/60 text-rose-700 text-xs font-semibold">
+            <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+            <span>
+              {locale === 'th'
+                ? 'คลิกที่ผลงานเพื่อดูรายละเอียด & รูปภาพ'
+                : 'Click any card to explore full details'}
+            </span>
+          </div>
+        </div>
+
+        {/* Right Segmented Column Controls */}
+        <div className="hidden md:flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/60 border border-slate-300/50">
+          <button
+            onClick={() => setCols(2)}
+            aria-label="View as 2 columns"
+            className={`cursor-pointer px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
+              cols === 2
+                ? 'bg-white text-slate-950 shadow-sm scale-102'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+            title={locale === 'th' ? 'มุมมองกว้าง (2 คอลัมน์)' : '2 Columns Layout'}
+          >
+            <Grid2X2 className="w-4 h-4 text-rose-600" />
+            <span>{locale === 'th' ? 'มุมมองกว้าง' : '2 Cols'}</span>
+          </button>
+
+          <button
+            onClick={() => setCols(3)}
+            aria-label="View as 3 columns"
+            className={`cursor-pointer px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 ${
+              cols === 3
+                ? 'bg-white text-slate-950 shadow-sm scale-102'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+            }`}
+            title={locale === 'th' ? 'มุมมองมาตรฐาน (3 คอลัมน์)' : '3 Columns Layout'}
+          >
+            <Grid3X3 className="w-4 h-4 text-rose-600" />
+            <span>{locale === 'th' ? 'มุมมองมาตรฐาน' : '3 Cols'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Grid Layout: 1 col on mobile portrait, 2 cols on mobile landscape/tablet, selected cols on desktop */}
+      {/* Grid Layout */}
       <div
-        className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${
+        className={`grid gap-6 sm:gap-7 transition-all duration-300 grid-cols-1 sm:grid-cols-2 ${
           cols === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'
         }`}
       >
@@ -60,6 +87,7 @@ export default function AchievementGrid({
             key={idx}
             achievement={achievement}
             locale={locale}
+            priorityImage={idx < 3}
           />
         ))}
       </div>

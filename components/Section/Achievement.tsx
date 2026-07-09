@@ -5,19 +5,20 @@ import { Suspense } from "react";
 import AchievementsList from "../AchievementsList";
 import AchievementGridSkeleton from "../Loading/AchievementGridSkeleton";
 
-const Achievement = async ({ slug }: { slug: string | undefined }) => {
+const Achievement = async ({
+    slug,
+}: {
+    slug: string | undefined;
+}) => {
     const locale = await getLocale();
     const t = await getTranslations("Index");
 
     return (
-        <div
-            className="min-h-screen w-full"
-        >
+        <div className="min-h-screen w-full">
             <div className="max-w-6xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab slugCurrentCategory={slug} />
-
-                <Suspense fallback={<AchievementGridSkeleton />}>
+                <Suspense fallback={<AchievementGridSkeleton />} key={slug ?? "all"}>
                     <AchievementsList slug={slug} locale={locale} />
                 </Suspense>
             </div>
@@ -26,4 +27,3 @@ const Achievement = async ({ slug }: { slug: string | undefined }) => {
 };
 
 export default Achievement;
-

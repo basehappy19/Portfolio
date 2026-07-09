@@ -9,6 +9,7 @@ const Home = async () => {
 
   const viewAchievementsText = await t('Home.Buttons.ViewAchievements');
   const roles = t.raw('Home.Roles') as string[];
+  const rolePrefix = t.has('Home.RolePrefix') ? t('Home.RolePrefix') : '';
 
   return (
     <div className="w-full relative py-8 md:py-16">
@@ -36,8 +37,8 @@ const Home = async () => {
           </h1>
 
           {/* Animated Role Component */}
-          <div className="mb-6 text-slate-700 font-bold w-full flex justify-start text-lg sm:text-2xl">
-            <AnimatedRole roles={roles} />
+          <div className="mb-6 w-full flex justify-start">
+            <AnimatedRole roles={roles} prefix={rolePrefix} />
           </div>
 
           {/* Description */}

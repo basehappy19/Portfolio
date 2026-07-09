@@ -16,19 +16,22 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Achievement } from "@/types/Achievements";
 import { downloadImage } from "@/lib/download";
+import { useSessionContext } from "@/app/contexts/SessionContext";
 
 interface AchievementCardProps {
     achievement: Achievement;
     locale: string;
+    priorityImage?: boolean;
 }
 
-const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
+const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCardProps) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const { session, loading } = useSessionContext();
 
     useEffect(() => {
         setMounted(true);
@@ -113,9 +116,12 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
         setIsImagesAnimating(false);
         setTimeout(() => {
             setLightbox(null);
-            // ถ้า modal ยังเปิดอยู่ ให้คง hidden ไม่งั้นคืน scroll
-            document.body.style.overflow = isModalOpen ? "hidden" : "unset";
-        }, 200);
+            if (!isModalOpen) {
+                document.body.style.overflow = "unset";
+            } else {
+                document.body.style.overflow = "hidden";
+            }
+        }, 180);
     };
 
     const goToNext = () => {
@@ -140,148 +146,148 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
         };
 
         document.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'unset';
+            if (!isModalOpen) {
+                document.body.style.overflow = 'unset';
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lightbox, activeImages.length]);
+    }, [lightbox, activeImages.length, isModalOpen]);
 
     return (
         <>
-            {/* Card */}
+            {/* Card with Dynamic Interactive Hover Flair */}
             <div
                 onClick={openModal}
-                className="cursor-pointer group bg-white rounded-lg shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden border border-slate-200 hover:border-rose-500"
+                className="cursor-pointer group relative bg-white rounded-2xl shadow-2xs hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 overflow-hidden border border-slate-200/90 hover:border-rose-400/80 flex flex-col h-full hover:-translate-y-1.5"
             >
                 {/* Image Section */}
-                <div className="relative h-56 bg-slate-100 overflow-hidden">
+                <div className="relative h-56 bg-slate-100 overflow-hidden shrink-0">
                     {mainImage && !imageError ? (
                         <Image
                             src={mainImage.url}
                             alt={tField(mainImage.altText_th, mainImage.altText_en, locale) || title}
                             fill
+                            priority={priorityImage}
+                            loading={priorityImage ? "eager" : "lazy"}
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            loading="lazy"
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
                             onError={() => setImageError(true)}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                            <Award className="w-20 h-20 text-slate-300" />
+                            <Award className="w-16 h-16 text-slate-300 group-hover:scale-110 transition-transform duration-300" />
                         </div>
                     )}
 
-                    <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
+                    {/* Gradient Overlay & Interactive Hover Reveal */}
+                    <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none group-hover:from-slate-950/60 transition-colors duration-300" />
 
-                    {/* Award Level Badge */}
-                    {awardLevel && (
-                        <div className="absolute top-4 left-4 z-10">
-                            <div className="
-            flex items-center gap-1.5 px-4 py-1.5 
-            bg-amber-600
-            text-white text-xs font-bold uppercase tracking-wider
-            rounded-full shadow-[0_4px_12px_rgba(245,158,11,0.5)] 
-            border border-yellow-200/40
-            bg-size-[200%_auto] animate-shine
-        ">
-                                <Trophy size={14} className="text-yellow-100" />
-                                <span>{awardLevel}</span>
-                            </div>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px] pointer-events-none">
+                        <div className="px-3.5 py-1.5 rounded-full bg-white/95 text-rose-600 text-xs font-bold shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                            <span>✨ {locale === "th" ? "คลิกเพื่อดูรายละเอียด" : "Click to view details"}</span>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Content Section */}
-                <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                <div className="p-6 flex flex-col flex-1">
+                    {/* Prestigious Inline Award Level Box (Never blocks photo) */}
+                    {awardLevel && (
+                        <div className="mb-3.5 p-3.5 rounded-xl bg-linear-to-r from-amber-50 via-orange-50/70 to-amber-50 border border-amber-200/80 flex items-start gap-2.5 text-amber-950 shadow-2xs">
+                            <Trophy className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div className="text-xs sm:text-sm font-bold leading-snug">
+                                {awardLevel}
+                            </div>
+                        </div>
+                    )}
+
+                    <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-3 line-clamp-2 group-hover:text-rose-600 transition-colors duration-200 leading-snug">
                         {title}
                     </h3>
 
                     {given_by && (
                         <div className="mb-4">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">
                                     {locale === "th" ? "มอบโดย" : "Awarded By"}
                                 </span>
                             </div>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
+                            <p className="text-xs sm:text-sm font-semibold text-slate-700 line-clamp-2">
                                 {given_by}
                             </p>
                         </div>
                     )}
 
                     {description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-600 mb-4 line-clamp-3 leading-relaxed">
                             {description.replace(/<[^>]+>/g, ' ')}
                         </p>
                     )}
 
-                    {location && (
-                        <div className="flex items-center gap-2 mb-5">
-                            <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700">
-                                <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                        {location ? (
+                            <div className="flex items-center gap-1.5 text-slate-500 text-xs line-clamp-1 max-w-[65%]">
+                                <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                                <span className="truncate">{location}</span>
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                                {location}
-                            </span>
-                        </div>
-                    )}
+                        ) : <div />}
 
-                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors">
-                                {locale === "th" ? "ดูรายละเอียด" : "View Details"}
-                            </span>
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
-                                <svg
-                                    className="w-4 h-4 text-red-600 dark:text-red-400 group-hover:translate-x-0.5 transition-transform"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors shrink-0 ml-auto">
+                            <span>{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors">
+                                <ChevronRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="h-1 bg-linear-to-r from-red-500 via-red-600 to-red-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                <div className="h-1.5 bg-linear-to-r from-rose-500 via-pink-500 to-amber-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </div>
 
-            {/* Modal - Rendered via Portal directly to body */}
+            {/* Slide-Over Detail Drawer (Side Panel - Super comfortable to read, no cramped popup box) */}
             {mounted && isModalOpen && createPortal(
                 <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center cursor-pointer backdrop-blur-md bg-black/50 p-2 sm:p-4"
+                    className="fixed inset-0 z-[9999] flex justify-end cursor-pointer backdrop-blur-xs bg-slate-900/50"
                     onClick={closeModal}
                     style={{
-                        animation: isAnimating ? "modalFadeIn 0.2s ease-out" : "modalFadeOut 0.2s ease-in",
+                        animation: isAnimating ? "modalFadeIn 0.25s ease-out" : "modalFadeOut 0.2s ease-in",
                     }}
                 >
                     <div
-                        className="cursor-default relative w-full h-full sm:w-full sm:max-w-4xl sm:h-auto sm:max-h-[92vh] bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl shadow-2xl overflow-hidden flex flex-col"
+                        className="cursor-default relative w-full sm:w-[620px] md:w-[700px] lg:w-[760px] h-full bg-white shadow-2xl flex flex-col overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            animation: isAnimating ? "modalSlideIn 0.25s ease-out" : "modalSlideOut 0.2s ease-in",
+                            animation: isAnimating ? "drawerSlideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)" : "drawerSlideOutRight 0.2s ease-in",
                         }}
                     >
-                        {/* Close Button */}
-                        <button
-                            onClick={closeModal}
-                            className="cursor-pointer absolute top-4 right-4 z-20 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
+                        {/* Sticky Top Header */}
+                        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-slate-200/80 flex items-center justify-between shrink-0 shadow-2xs">
+                            <div className="flex items-center gap-2.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse" />
+                                <span className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">
+                                    {locale === "th" ? "รายละเอียดผลงาน" : "Project Details"}
+                                </span>
+                            </div>
+                            <button
+                                onClick={closeModal}
+                                className="cursor-pointer px-4 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs border border-slate-200/80"
+                            >
+                                <span>{locale === "th" ? "ปิดหน้าต่าง" : "Close"}</span>
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
 
-                        <div className="overflow-y-auto max-h-[90vh] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-                            {/* Image Gallery */}
+                        {/* Spacious Scrollable Drawer Body */}
+                        <div className="overflow-y-auto flex-1 p-6 sm:p-8 md:p-10 space-y-8 scrollbar-thin scrollbar-thumb-slate-200">
+                            {/* Main High-Res Photo Gallery */}
                             {achievement.images.length > 0 && (
-                                <div className="relative bg-gray-50 dark:bg-gray-800">
-                                    {/* Main Image */}
-                                    <div className="relative h-[400px] group">
+                                <div className="space-y-3">
+                                    <div className="relative h-64 sm:h-80 md:h-[380px] w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-sm group">
                                         <Image
                                             src={achievement.images[currentImageIndex].url}
                                             alt={
@@ -292,45 +298,20 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                 ) || title
                                             }
                                             fill
-                                            sizes="(max-width: 1024px) 100vw, 800px"
-                                            className="cursor-pointer object-contain p-8 select-none transition-transform duration-300 group-hover:scale-[1.01]"
-                                            key={currentImageIndex}
+                                            sizes="(max-width: 1024px) 100vw, 760px"
+                                            className="cursor-pointer object-contain p-4 sm:p-6 select-none transition-transform duration-300 group-hover:scale-[1.01]"
                                             onClick={() => openLightbox(achievement.id, currentImageIndex)}
                                         />
 
-                                        <div
-                                            className="
-      pointer-events-none absolute inset-0
-      opacity-0 group-hover:opacity-100
-      transition-opacity duration-200
-    "
-                                        >
-                                            {/* gradient ช่วยให้อ่านตัวหนังสือได้ */}
-                                            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10 to-transparent" />
-
-                                            {/* badge */}
-                                            <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-black/60 backdrop-blur-sm">
-                                                {/* ใช้ SVG แว่นขยาย (ไม่ต้อง import เพิ่ม) */}
-                                                <svg
-                                                    className="w-4 h-4 text-white"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                >
-                                                    <circle cx="11" cy="11" r="8" />
-                                                    <path d="M21 21l-4.3-4.3" />
-                                                </svg>
-
-                                                <span className="text-white text-sm font-medium">
-                                                    {locale === "th" ? "คลิกเพื่อดูภาพเต็ม" : "Click to view full size"}
-                                                </span>
+                                        {/* Click to expand overlay hint */}
+                                        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
+                                            <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/70 backdrop-blur-sm text-white text-xs font-semibold">
+                                                <span>{locale === "th" ? "🔍 คลิกเพื่อดูภาพเต็ม" : "🔍 Click full screen"}</span>
                                             </div>
                                         </div>
 
-                                        {/* Navigation Buttons */}
+                                        {/* Navigation Arrows */}
                                         {achievement.images.length > 1 && (
                                             <>
                                                 <button
@@ -338,164 +319,150 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                         e.stopPropagation();
                                                         prevImage();
                                                     }}
-                                                    className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition"
+                                                    className="cursor-pointer absolute left-3 top-1/2 -translate-y-1/2 p-2.5 bg-white/90 hover:bg-white text-slate-800 rounded-xl transition shadow-md"
+                                                    title="ก่อนหน้า"
                                                 >
                                                     <ChevronLeft className="w-5 h-5" />
                                                 </button>
-
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         nextImage();
                                                     }}
-                                                    className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition"
+                                                    className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 p-2.5 bg-white/90 hover:bg-white text-slate-800 rounded-xl transition shadow-md"
+                                                    title="ถัดไป"
                                                 >
                                                     <ChevronRight className="w-5 h-5" />
                                                 </button>
-
-                                                <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/70 text-white text-sm rounded-lg">
+                                                <div className="absolute top-3 right-3 px-3 py-1 bg-slate-900/80 backdrop-blur-xs text-white text-xs font-bold rounded-lg shadow-sm">
                                                     {currentImageIndex + 1} / {achievement.images.length}
                                                 </div>
                                             </>
                                         )}
                                     </div>
 
-                                    {tField(
-                                        achievement.images[currentImageIndex].altText_th,
-                                        achievement.images[currentImageIndex].altText_en,
-                                        locale
-                                    ) && (
-                                            <div className="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-                                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                    {tField(
-                                                        achievement.images[currentImageIndex].altText_th,
-                                                        achievement.images[currentImageIndex].altText_en,
-                                                        locale
-                                                    )}
-                                                </p>
-                                            </div>
-                                        )}
-
-                                    {/* Thumbnails */}
+                                    {/* Thumbnails row */}
                                     {achievement.images.length > 1 && (
-                                        <div className="px-6 py-4">
-                                            <div className="flex gap-2 overflow-x-auto">
-                                                {achievement.images.map((image, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setCurrentImageIndex(index);
-                                                        }}
-                                                        className={`cursor-pointer relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition
-                              ${currentImageIndex === index
-                                                                ? "border-gray-900 dark:border-gray-100"
-                                                                : "border-gray-200 dark:border-gray-700 opacity-60 hover:opacity-100"
-                                                            }`}
-                                                    >
-                                                        <Image
-                                                            src={image.url}
-                                                            alt={tField(image.altText_th, image.altText_en, locale) || `Image ${index + 1}`}
-                                                            fill
-                                                            sizes="80px"
-                                                            className="object-cover"
-                                                        />
-                                                    </button>
-                                                ))}
-                                            </div>
+                                        <div className="flex gap-2.5 overflow-x-auto pb-2">
+                                            {achievement.images.map((image, index) => (
+                                                <button
+                                                    key={image.id}
+                                                    type="button"
+                                                    onClick={() => setCurrentImageIndex(index)}
+                                                    className={`relative shrink-0 overflow-hidden rounded-xl border-2 transition cursor-pointer w-16 h-16 sm:w-20 sm:h-20 ${
+                                                        currentImageIndex === index
+                                                            ? "border-rose-600 scale-105 shadow-md ring-2 ring-rose-200"
+                                                            : "border-slate-200 opacity-60 hover:opacity-100"
+                                                    }`}
+                                                >
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={`Image ${index + 1}`}
+                                                        fill
+                                                        sizes="80px"
+                                                        className="object-cover"
+                                                    />
+                                                </button>
+                                            ))}
                                         </div>
                                     )}
                                 </div>
                             )}
 
-                            {/* Content */}
-                            <div className="p-8">
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    {awardLevel && (
-                                        <span className="px-4 py-2 bg-amber-600 text-white text-sm font-bold rounded-md shadow-lg">
+                            {/* Full Award Banner inside drawer */}
+                            {awardLevel && (
+                                <div className="p-5 rounded-2xl bg-linear-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-300/80 flex items-start gap-3.5 text-amber-950 shadow-sm">
+                                    <div className="p-2.5 rounded-xl bg-amber-500 text-white shrink-0 shadow-md">
+                                        <Trophy className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
+                                            {locale === "th" ? "ระดับรางวัลที่ได้รับ" : "Award Distinction"}
+                                        </p>
+                                        <p className="text-base sm:text-lg font-extrabold leading-snug">
                                             {awardLevel}
-                                        </span>
-                                    )}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Categories */}
+                            {achievement.categories.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
                                     {achievement.categories.map((c) => (
                                         <span
                                             key={c.category.id}
-                                            className="flex items-center justify-center px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-md"
+                                            className="px-3.5 py-1.5 bg-slate-100 border border-slate-200/80 text-slate-700 text-xs sm:text-sm font-bold rounded-lg shadow-2xs"
                                         >
                                             {tField(c.category.name_th, c.category.name_en, locale)}
                                         </span>
                                     ))}
                                 </div>
+                            )}
 
-                                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                            {/* Title & Key Meta */}
+                            <div>
+                                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-5">
                                     {title}
                                 </h2>
 
-                                <div className="space-y-3 mb-6 text-gray-600 dark:text-gray-400">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 text-xs sm:text-sm font-medium">
                                     {achievement.receivedAt && (
-                                        <div className="flex items-center gap-3">
-                                            <Calendar className="w-5 h-5" />
+                                        <div className="flex items-center gap-2.5">
+                                            <Calendar className="w-4 h-4 text-rose-600 shrink-0" />
                                             <span>{formatDate(achievement.receivedAt, locale)}</span>
                                         </div>
                                     )}
                                     {location && (
-                                        <div className="flex items-center gap-3">
-                                            <MapPin className="w-5 h-5" />
+                                        <div className="flex items-center gap-2.5">
+                                            <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
                                             <span>{location}</span>
                                         </div>
                                     )}
                                     {given_by && (
-                                        <div className="flex items-center gap-3">
-                                            <Award className="w-5 h-5" />
-                                            <span>{given_by}</span>
+                                        <div className="flex items-center gap-2.5 sm:col-span-2">
+                                            <Award className="w-4 h-4 text-amber-600 shrink-0" />
+                                            <span className="font-bold text-slate-800">{given_by}</span>
                                         </div>
                                     )}
                                 </div>
-
-                                {description && (
-                                    <div className="mb-6">
-                                        <div
-                                            className="
-                text-gray-700 dark:text-gray-300 leading-relaxed
-                prose prose-sm sm:prose-base dark:prose-invert max-w-none
-                
-                {/* จัดการ List (Bullet points & Numbers) */}
-                [&_ul]:list-disc [&_ul]:pl-5 
-                [&_ol]:list-decimal [&_ol]:pl-5
-                
-                {/* จัดการหัวข้อ (Headings) */}
-                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3
-                [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2
-                
-                {/* จัดการ Link */}
-                [&_a]:text-sky-600 [&_a]:underline hover:[&_a]:text-sky-700
-                
-                {/* จัดการ Paragraph */}
-                [&_p]:mb-3
-            "
-                                            dangerouslySetInnerHTML={{ __html: description }}
-                                        />
-                                    </div>
-                                )}
-
-                                {achievement.links.length > 0 && (
-                                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <div className="flex flex-wrap gap-2">
-                                            {achievement.links.map((link, index) => (
-                                                <a
-                                                    key={index}
-                                                    href={link.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-sm font-medium rounded-lg transition-colors"
-                                                >
-                                                    <span>{tField(link.label_th, link.label_en, locale)}</span>
-                                                    <ExternalLink className="w-4 h-4" />
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
+
+                            {/* Full Article Description */}
+                            {description && (
+                                <div className="space-y-3 pt-2">
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        {locale === "th" ? "รายละเอียดโครงการ" : "Project Description"}
+                                    </h4>
+                                    <div
+                                        className="text-slate-700 text-sm sm:text-base leading-relaxed space-y-4 font-normal [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-semibold [&_a]:text-rose-600 [&_a]:underline"
+                                        dangerouslySetInnerHTML={{ __html: description }}
+                                    />
+                                </div>
+                            )}
+
+                            {/* External Links */}
+                            {achievement.links.length > 0 && (
+                                <div className="pt-6 border-t border-slate-200 space-y-3">
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        {locale === "th" ? "ลิงก์ที่เกี่ยวข้อง" : "External References"}
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2.5">
+                                        {achievement.links.map((link, index) => (
+                                            <a
+                                                key={index}
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-rose-600 text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-sm"
+                                            >
+                                                <span>{tField(link.label_th, link.label_en, locale)}</span>
+                                                <ExternalLink className="w-4 h-4" />
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>,
@@ -584,9 +551,14 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
 
                                             <button
                                                 type="button"
-                                                disabled={isDownloading}
+                                                disabled={isDownloading || !session}
                                                 onClick={async (e) => {
                                                     e.stopPropagation();
+
+                                                    if (!session) {
+                                                        alert(locale === "th" ? "กรุณาเข้าสู่ระบบก่อนดาวน์โหลด" : "Please login to download");
+                                                        return;
+                                                    }
 
                                                     if (isDownloading) return;
 
@@ -604,20 +576,23 @@ const AchievementCard = ({ achievement, locale }: AchievementCardProps) => {
                                                     }
                                                 }}
                                                 className={`
-    flex items-center gap-2 px-4 py-2 rounded-lg font-medium
-    backdrop-blur-sm transition-all duration-200
-    ${isDownloading
-                                                        ? "bg-white/10 text-white/60 cursor-not-allowed"
-                                                        : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+flex items-center gap-2 px-4 py-2 rounded-lg font-medium
+backdrop-blur-sm transition-all duration-200
+${!session
+                                                        ? "bg-white/10 text-white/40 cursor-not-allowed"
+                                                        : isDownloading
+                                                            ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                                            : "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
                                                     }
-  `}
+`}
                                             >
-                                                <Download
-                                                    className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
-                                                />
-                                                {isDownloading
-                                                    ? (locale === "th" ? "กำลังดาวน์โหลด..." : "Downloading...")
-                                                    : (locale === "th" ? "ดาวน์โหลด" : "Download")}
+                                                <Download className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`} />
+
+                                                {!session
+                                                    ? (locale === "th" ? "เข้าสู่ระบบเพื่อดาวน์โหลด" : "Login to download")
+                                                    : isDownloading
+                                                        ? (locale === "th" ? "กำลังดาวน์โหลด..." : "Downloading...")
+                                                        : (locale === "th" ? "ดาวน์โหลด" : "Download")}
                                             </button>
                                         </div>
                                     </div>

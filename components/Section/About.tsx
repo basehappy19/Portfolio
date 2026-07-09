@@ -1,29 +1,42 @@
+import Image from 'next/image';
 import { getMessages, getTranslations } from 'next-intl/server';
 import SectionHeader from '../SectionHeader';
 import WarpToAchievement from '../Button/WarpToAchievement';
 import WarpToContact from '../Button/WarpToContact';
 
-const About = async () => {
-  type Status = {
-    number: string;
-    label: string;
-  };
+type Skill = {
+  name: string;
+  src: string;
+};
 
-  type AboutMessages = {
-    Index: {
-      About: {
-        data: {
-          statuses: Status[];
-        };
+type Status = {
+  number: string;
+  label: string;
+};
+
+type IndexMessages = {
+  Index: {
+    About: {
+      data: {
+        statuses: Status[];
       };
     };
+    Skill: {
+      Heading: string;
+      Expertise: {
+        Heading: string;
+        Skills: Skill[];
+      }[];
+    };
   };
+};
 
+const About = async () => {
   const t = await getTranslations('Index');
-  const messages = await getMessages();
+  const messages = (await getMessages()) as unknown as IndexMessages;
 
-  const statuses =
-    (messages as unknown as AboutMessages).Index.About.data.statuses;
+  const statuses = messages.Index.About.data.statuses;
+  const expertise = messages.Index.Skill.Expertise;
 
   return (
     <div className="w-full text-slate-800 py-2">
@@ -68,6 +81,45 @@ const About = async () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Compact Tech Stack & Skills Strip */}
+        <div id="Skills" className="mt-14 pt-10 border-t border-slate-200/80 scroll-mt-24">
+          <div className="flex items-center gap-2.5 mb-6">
+            <span className="w-2 h-2 rounded-full bg-rose-600" />
+            <h3 className="text-sm md:text-base font-bold text-slate-800 uppercase tracking-wider">
+              {t('Skill.Heading')}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {expertise.map((cat, idx) => (
+              <div key={idx} className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
+                  <span>{cat.Heading}</span>
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {cat.Skills.map((skill, sIdx) => (
+                    <div
+                      key={sIdx}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200/80 text-slate-800 text-xs md:text-sm font-semibold hover:border-rose-400 hover:bg-rose-50/40 transition-all shadow-2xs"
+                    >
+                      <div className="relative w-4 h-4 shrink-0">
+                        <Image
+                          src={skill.src}
+                          alt={skill.name}
+                          fill
+                          sizes="16px"
+                          className="object-contain"
+                        />
+                      </div>
+                      <span>{skill.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

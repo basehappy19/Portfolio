@@ -3,17 +3,22 @@
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 
 const LanguageSwitcher = () => {
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
+    const [optimisticLocale, setOptimisticLocale] = useState<string | null>(null);
+
+    const currentLocale = optimisticLocale || locale;
 
     const switchLanguage = (newLocale: "th" | "en") => {
-        if (newLocale === locale || isPending) return;
+        if (newLocale === currentLocale) return;
+
+        setOptimisticLocale(newLocale);
 
         const queryString = searchParams.toString();
         const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
@@ -24,15 +29,15 @@ const LanguageSwitcher = () => {
     };
 
     return (
-        <div className={`inline-flex items-center rounded-md border p-0.5 transition bg-white/90 border-gray-200 dark:bg-zinc-800/90 dark:border-zinc-700 shadow-2xs ${isPending ? "opacity-60 pointer-events-none" : ""}`}>
+        <div className="inline-flex items-center rounded-xl border p-1 bg-white/40 backdrop-blur-md border-white/60 shadow-2xs">
             {/* TH Button */}
             <button
                 type="button"
                 onClick={() => switchLanguage("th")}
-                className={`cursor-pointer px-2.5 py-1 text-xs font-semibold rounded transition ${
-                    locale === "th"
-                        ? "bg-rose-500 text-white shadow-2xs"
-                        : "text-zinc-600 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white"
+                className={`cursor-pointer px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition-all duration-150 ${
+                    currentLocale === "th"
+                        ? "bg-rose-600 text-white shadow-2xs scale-102"
+                        : "text-slate-600 hover:text-rose-600 hover:bg-white/60"
                 }`}
             >
                 ไทย
@@ -42,13 +47,13 @@ const LanguageSwitcher = () => {
             <button
                 type="button"
                 onClick={() => switchLanguage("en")}
-                className={`cursor-pointer px-2.5 py-1 text-xs font-semibold rounded transition ${
-                    locale === "en"
-                        ? "bg-rose-500 text-white shadow-2xs"
-                        : "text-zinc-600 hover:text-rose-600 dark:text-zinc-300 dark:hover:text-white"
+                className={`cursor-pointer px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition-all duration-150 ${
+                    currentLocale === "en"
+                        ? "bg-rose-600 text-white shadow-2xs scale-102"
+                        : "text-slate-600 hover:text-rose-600 hover:bg-white/60"
                 }`}
             >
-                EN
+                English
             </button>
         </div>
     );

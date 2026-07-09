@@ -1,104 +1,32 @@
-import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getAchievements } from "@/lib/achievements";
 
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const category = searchParams.get("category");
 
-        const baseSelect = {
-            id: true,
-            title_th: true,
-            description_th: true,
-            awardLevel_th: true,
-            location_th: true,
-            given_by_th: true,
+        const category = searchParams.get("category") || undefined;
+        const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+        const limit = Math.max(1, Number(searchParams.get("limit")) || 9);
 
-            title_en: true,
-            description_en: true,
-            awardLevel_en: true,
-            location_en: true,
-            given_by_en: true,
+        const data = await getAchievements({
+            category,
+            offset,
+            limit,
+        });
 
-            status: true,
-            sortOrder: true,
-            receivedAt: true,
-            createdAt: true,
-            updatedAt: true,
-
-        };
-
-        let achievements;
-
-        if (category) {
-            achievements = await prisma.achievement.findMany({
-                select: {
-                    ...baseSelect,
-                    images: {
-                        orderBy: {
-                            sortOrder: "asc",
-                        },
-                    },
-                    links: {
-                        orderBy: {
-                            sortOrder: "asc",
-                        },
-                    },
-                    categories: {
-                        select: {
-                            category: true,
-                        },
-                    },
-                },
-                where: {
-                    status: "PUBLIC",
-                    categories: {
-                        some: {
-                            category: { slug: category },
-                        },
-                    },
-                },
-                orderBy: { sortOrder: "desc" }, // เรียงลิสต์ achievement ตาม sortOrder (ตัวใหญ่-เล็กแล้วแต่ดีไซน์)
-            });
-        } else {
-            achievements = await prisma.achievement.findMany({
-                select: {
-                    ...baseSelect,
-                    images: {
-                        orderBy: {
-                            sortOrder: "asc",
-                        },
-                    },
-                    links: {
-                        orderBy: {
-                            sortOrder: "asc",
-                        },
-                    },
-                    categories: {
-                        select: {
-                            category: {
-                                select: {
-                                    id: true,
-                                    name_en: true,
-                                    name_th: true,
-                                    slug: true,
-                                },
-                            },
-                        },
-                    },
-                },
-                where: {
-                    status: "PUBLIC",
-                },
-                orderBy: { sortOrder: "desc" },
-            });
-        }
-
-        return NextResponse.json({ ok: true, achievements });
+        return NextResponse.json({
+            ok: true,
+            ...data,
+        });
     } catch (error) {
         console.error("GET /api/achievements error:", error);
+
         return NextResponse.json(
-            { ok: false, error: "Failed to fetch achievements" },
+            {
+                ok: false,
+                error: "Failed to fetch achievements",
+            },
             { status: 500 }
         );
     }
