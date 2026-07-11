@@ -1,6 +1,7 @@
 'use client';
 import {
     useState,
+    useMemo,
     DragEvent,
 } from 'react';
 import { X, AlertCircle, Save, Loader2, Grid3x3, CheckCircle2 } from 'lucide-react';
@@ -142,17 +143,23 @@ const AchievementModalInner = ({
     });
 
 
-    const [links, setLinks] = useState<LinkForm[]>(() =>
-        editData?.links?.map((link, idx) => ({
+    const initialComparisonData = useMemo(() => ({
+        formData: createInitialFormState(editData, defaultSortOrder),
+        links: editData?.links?.map((link, idx) => ({
             id: link.id,
             label_th: link.label_th ?? '',
             label_en: link.label_en ?? '',
             url: link.url ?? '',
             sortOrder: link.sortOrder ?? idx + 1,
         })) ?? []
-    );
+    }), [editData, defaultSortOrder]);
 
-    const isDirty = Boolean(
+    const [links, setLinks] = useState<LinkForm[]>(() => initialComparisonData.links);
+
+    const isDirty = editData ? (
+        JSON.stringify(formData) !== JSON.stringify(initialComparisonData.formData) ||
+        JSON.stringify(links) !== JSON.stringify(initialComparisonData.links)
+    ) : Boolean(
         formData.title_th.trim() ||
         formData.title_en.trim() ||
         formData.description_th.trim() ||
@@ -166,7 +173,8 @@ const AchievementModalInner = ({
         draftKey,
         formData,
         links,
-        isDirty
+        isDirty,
+        initialComparisonData
     );
 
     const handleRestoreDraft = () => {

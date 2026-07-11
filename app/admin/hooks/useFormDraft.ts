@@ -25,7 +25,8 @@ export function useFormDraft<TForm, TLinks>(
   key: string,
   formData: TForm,
   links: TLinks,
-  enabled: boolean = true
+  enabled: boolean = true,
+  initialComparisonData?: { formData: TForm; links: TLinks }
 ) {
   const [hasDraft, setHasDraft] = useState(false);
   const [draftTime, setDraftTime] = useState<string | null>(null);
@@ -37,7 +38,12 @@ export function useFormDraft<TForm, TLinks>(
       const saved = localStorage.getItem(key);
       if (saved) {
         const parsed: DraftPackage<TForm, TLinks> = JSON.parse(saved);
-        if (parsed && parsed.timestamp && !isDraftPackageEmpty(parsed)) {
+        const isIdenticalToInitial = initialComparisonData
+          ? JSON.stringify(parsed.formData) === JSON.stringify(initialComparisonData.formData) &&
+            JSON.stringify(parsed.links) === JSON.stringify(initialComparisonData.links)
+          : false;
+
+        if (parsed && parsed.timestamp && !isDraftPackageEmpty(parsed) && !isIdenticalToInitial) {
           setHasDraft(true);
           setDraftTime(parsed.timestamp);
         } else {
@@ -65,9 +71,16 @@ export function useFormDraft<TForm, TLinks>(
           minute: '2-digit',
         }),
       };
-      if (!isDraftPackageEmpty(pkg)) {
+      const isIdenticalToInitial = initialComparisonData
+        ? JSON.stringify(pkg.formData) === JSON.stringify(initialComparisonData.formData) &&
+          JSON.stringify(pkg.links) === JSON.stringify(initialComparisonData.links)
+        : false;
+
+      if (!isDraftPackageEmpty(pkg) && !isIdenticalToInitial) {
         localStorage.setItem(key, JSON.stringify(pkg));
         setHasDraft(true);
+      } else if (isIdenticalToInitial) {
+        localStorage.removeItem(key);
       }
     } catch {
       // ignore
@@ -89,8 +102,15 @@ export function useFormDraft<TForm, TLinks>(
             minute: '2-digit',
           }),
         };
-        if (!isDraftPackageEmpty(pkg)) {
+        const isIdenticalToInitial = initialComparisonData
+          ? JSON.stringify(pkg.formData) === JSON.stringify(initialComparisonData.formData) &&
+            JSON.stringify(pkg.links) === JSON.stringify(initialComparisonData.links)
+          : false;
+
+        if (!isDraftPackageEmpty(pkg) && !isIdenticalToInitial) {
           localStorage.setItem(key, JSON.stringify(pkg));
+        } else if (isIdenticalToInitial) {
+          localStorage.removeItem(key);
         }
       } catch {
         // ignore storage errors
@@ -109,7 +129,12 @@ export function useFormDraft<TForm, TLinks>(
       const saved = localStorage.getItem(key);
       if (!saved) return null;
       const parsed: DraftPackage<TForm, TLinks> = JSON.parse(saved);
-      if (isDraftPackageEmpty(parsed)) {
+      const isIdenticalToInitial = initialComparisonData
+        ? JSON.stringify(parsed.formData) === JSON.stringify(initialComparisonData.formData) &&
+          JSON.stringify(parsed.links) === JSON.stringify(initialComparisonData.links)
+        : false;
+
+      if (isDraftPackageEmpty(parsed) || isIdenticalToInitial) {
         localStorage.removeItem(key);
         setHasDraft(false);
         return null;
