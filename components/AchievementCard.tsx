@@ -213,7 +213,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                     {given_by && (
                         <div className="mb-4">
                             <div className="flex items-center gap-1.5 mb-1">
-                                <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">
+                                <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wide">
                                     {locale === "th" ? "มอบโดย" : "Awarded By"}
                                 </span>
                             </div>
@@ -421,7 +421,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                     )}
                                     {given_by && (
                                         <div className="flex items-center gap-2.5 sm:col-span-2">
-                                            <Award className="w-4 h-4 text-amber-600 shrink-0" />
+                                            <Award className="w-4 h-4 text-rose-600 shrink-0" />
                                             <span className="font-bold text-slate-800">{given_by}</span>
                                         </div>
                                     )}
