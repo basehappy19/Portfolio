@@ -234,7 +234,7 @@ export default async function AdminPage(props: {
                                         className="group flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-gray-100/80 hover:bg-rose-50 dark:bg-zinc-800/80 dark:hover:bg-rose-950/40 text-gray-700 hover:text-rose-600 dark:text-gray-300 dark:hover:text-rose-400 transition-all shadow-2xs"
                                     >
                                         <Home className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                                        <span className="hidden sm:inline">หน้าหลัก (Home)</span>
+                                        <span className="hidden sm:inline">หน้าหลัก</span>
                                     </Link>
                                     <div className="h-5 w-px bg-gray-200 dark:bg-zinc-800"></div>
                                     <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default async function AdminPage(props: {
                                             <Award className="w-4 h-4 sm:w-5 sm:h-5" />
                                         </div>
                                         <h2 className="text-sm sm:text-base md:text-lg font-extrabold tracking-tight bg-linear-to-r from-gray-900 via-gray-800 to-gray-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
-                                            ระบบจัดการผลงาน <span className="hidden sm:inline font-normal text-xs text-gray-500 dark:text-zinc-400">(Studio Admin)</span>
+                                            ระบบจัดการผลงาน
                                         </h2>
                                     </div>
                                 </div>
@@ -271,7 +271,7 @@ export default async function AdminPage(props: {
                             <div className="relative z-10 space-y-1.5 max-w-2xl">
                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
-                                    <span>Workspace Management</span>
+                                    <span>ระบบจัดการหลังบ้าน</span>
                                 </div>
                                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                                     จัดการพอร์ตฟอลิโอและผลงาน
@@ -313,7 +313,7 @@ export default async function AdminPage(props: {
                                         {publicCount}
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        เผยแพร่แล้ว (Public)
+                                        เผยแพร่แล้ว
                                     </div>
                                 </div>
                             </div>
@@ -329,7 +329,7 @@ export default async function AdminPage(props: {
                                         {draftCount}
                                     </div>
                                     <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        แบบร่าง (Drafts)
+                                        แบบร่าง
                                     </div>
                                 </div>
                             </div>
@@ -359,7 +359,7 @@ export default async function AdminPage(props: {
                                         <Filter className="w-4 h-4 text-rose-500" />
                                     </div>
                                     <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
-                                        ค้นหาและกรองข้อมูล (Filter & Search)
+                                        ค้นหาและกรองข้อมูล
                                     </h3>
                                 </div>
                             </div>

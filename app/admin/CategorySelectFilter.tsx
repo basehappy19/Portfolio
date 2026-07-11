@@ -26,11 +26,11 @@ export default function CategorySelectFilter() {
             onChange={(e) => handleChange(e.target.value)}
             className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/70 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-2xs cursor-pointer"
         >
-            <option value="">ทุกหมวดหมู่ (All Categories)</option>
+            <option value="">ทุกหมวดหมู่</option>
 
             {categories.map(cat => (
                 <option key={cat.id} value={cat.slug}>
-                    {cat.name_th} ({cat.name_en})
+                    {cat.name_th}
                 </option>
             ))}
         </select>

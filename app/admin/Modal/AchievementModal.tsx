@@ -170,14 +170,7 @@ const AchievementModalInner = ({
     };
 
     const handleSafeClose = () => {
-        const isDirty = formData.title_th.trim() !== '' || formData.title_en.trim() !== '' || formData.description_th.trim() !== '';
-        if (isDirty && !editData) {
-            if (window.confirm('คุณมีข้อมูลที่กำลังพิมพ์ค้างไว้ (ระบบบันทึก Draft ให้อัตโนมัติแล้ว) ต้องการปิดหน้าต่างหรือไม่?')) {
-                close();
-            }
-        } else {
-            close();
-        }
+        close();
     };
 
     const handleLinkDragStart = (e: DragEvent<HTMLElement>, index: number) => {
@@ -370,7 +363,7 @@ const AchievementModalInner = ({
             />
 
             {/* Slide-over Studio Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 max-w-4xl w-full flex pl-10">
+            <div className="fixed inset-y-0 right-0 max-w-4xl w-full flex pl-0 sm:pl-10">
                 <div
                     className={`w-full bg-white dark:bg-zinc-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-zinc-800 ${
                         isAnimating ? 'translate-x-0' : 'translate-x-full'
@@ -381,30 +374,13 @@ const AchievementModalInner = ({
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between sticky top-0 z-20">
                         <div>
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                                {editData ? 'บรรณาธิการผลงาน' : 'เพิ่มผลงานใหม่ (Studio Editor)'}
+                                {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
                             </h2>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 จัดการรายละเอียด หมวดหมู่ รูปภาพ และลิงก์ที่เกี่ยวข้อง
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={handleSubmit}
-                                disabled={isSubmitting || !isFormValid}
-                                className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 rounded-md font-medium text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-2xs transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>กำลังบันทึก...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4" />
-                                        <span>{editData ? 'บันทึกการแก้ไข' : 'บันทึกผลงาน'}</span>
-                                    </>
-                                )}
-                            </button>
                             <button
                                 onClick={handleSafeClose}
                                 type="button"
@@ -449,7 +425,7 @@ const AchievementModalInner = ({
                             <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
                                 <div className="w-1 h-4 bg-rose-500 rounded-full"></div>
                                 <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                                    ข้อมูลทั่วไป (General Info)
+                                    ข้อมูลทั่วไป
                                 </h3>
                             </div>
 
@@ -611,7 +587,7 @@ const AchievementModalInner = ({
                                         >
                                             {categories.map((cat) => (
                                                 <option key={cat.id} value={cat.slug}>
-                                                    {cat.name_th} - {cat.name_en}
+                                                    {cat.name_th}
                                                 </option>
                                             ))}
                                         </select>
