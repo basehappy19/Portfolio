@@ -21,10 +21,8 @@ export default async function Footer() {
             <h3 className="text-xl sm:text-2xl font-bold mb-1.5 text-slate-900 tracking-tight">
               {t("Heading")}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-sm">
-              Creative portfolio built with clean enterprise standards, responsive design, and minimalist aesthetics.
-            </p>
           </div>
+
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {session ? (

@@ -24,22 +24,16 @@ export default function CategorySelectFilter() {
         <select
             value={current}
             onChange={(e) => handleChange(e.target.value)}
-            className="
-                px-4 py-2 rounded-lg transition-all border shadow-sm
-
-                bg-white text-gray-900 border-gray-300
-                focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-
-                dark:bg-gray-800 dark:text-white dark:border-gray-600
-            "
+            className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/70 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-2xs cursor-pointer"
         >
-            <option value="">ทุกหมวดหมู่</option>
+            <option value="">ทุกหมวดหมู่ (All Categories)</option>
 
             {categories.map(cat => (
                 <option key={cat.id} value={cat.slug}>
-                    {cat.name_th} - {cat.name_en}
+                    {cat.name_th} ({cat.name_en})
                 </option>
             ))}
         </select>
+
     );
 }

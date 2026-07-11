@@ -3,7 +3,10 @@ import { APIError } from "better-auth/api";
 import prisma from "@/lib/prisma";
 
 export const auth = betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
+    baseURL: process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "https://portfolio.basehappy19.site"),
+    trustedOrigins: ["https://portfolio.basehappy19.site", "http://localhost:3000"],
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,

@@ -128,6 +128,7 @@ const AchievementModalInner = ({
 
     const {
         handleImageUpload,
+        handleReplaceImage,
         handleImageAltChange,
         handleRemoveImage,
         handleDragStart,
@@ -139,6 +140,7 @@ const AchievementModalInner = ({
         draggedIndex,
         setDraggedIndex,
     });
+
 
     const [links, setLinks] = useState<LinkForm[]>(() =>
         editData?.links?.map((link, idx) => ({
@@ -379,7 +381,7 @@ const AchievementModalInner = ({
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between sticky top-0 z-20">
                         <div>
                             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                                {editData ? 'บรรณาธิการผลงาน (Edit Achievement)' : 'เพิ่มผลงานใหม่ (Studio Editor)'}
+                                {editData ? 'บรรณาธิการผลงาน' : 'เพิ่มผลงานใหม่ (Studio Editor)'}
                             </h2>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                 จัดการรายละเอียด หมวดหมู่ รูปภาพ และลิงก์ที่เกี่ยวข้อง
@@ -702,12 +704,14 @@ const AchievementModalInner = ({
                                 imagePreview={imagePreview}
                                 draggedIndex={draggedIndex}
                                 handleImageUpload={handleImageUpload}
+                                handleReplaceImage={handleReplaceImage}
                                 handleImageAltChange={handleImageAltChange}
                                 handleRemoveImage={handleRemoveImage}
                                 handleDragStart={handleDragStart}
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
                             />
+
                         </div>
                     </div>
 

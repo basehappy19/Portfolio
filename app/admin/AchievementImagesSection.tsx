@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ChangeEvent, DragEvent } from 'react';
-import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { ImagePreview } from '@/types/Form';
 
@@ -9,6 +9,7 @@ type Props = {
     imagePreview: ImagePreview[];
     draggedIndex: number | null;
     handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
+    handleReplaceImage: (index: number, e: ChangeEvent<HTMLInputElement>) => void;
     handleImageAltChange: (
         index: number,
         field: 'altText_th' | 'altText_en',
@@ -24,6 +25,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
     imagePreview,
     draggedIndex,
     handleImageUpload,
+    handleReplaceImage,
     handleImageAltChange,
     handleRemoveImage,
     handleDragStart,
@@ -150,14 +152,31 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                 />
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveImage(index)}
-                                className="cursor-pointer text-gray-400 hover:text-red-500 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition shrink-0"
-                                title="ลบรูปภาพ"
-                            >
-                                <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center gap-1 shrink-0">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id={`replace-image-${index}`}
+                                    className="hidden"
+                                    onChange={(e) => handleReplaceImage(index, e)}
+                                />
+                                <label
+                                    htmlFor={`replace-image-${index}`}
+                                    className="cursor-pointer text-gray-400 hover:text-blue-500 p-1.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
+                                    title="เปลี่ยนรูปภาพ (Replace Image)"
+                                >
+                                    <RefreshCw size={16} />
+                                </label>
+
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage(index)}
+                                    className="cursor-pointer text-gray-400 hover:text-red-500 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                                    title="ลบรูปภาพ"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
