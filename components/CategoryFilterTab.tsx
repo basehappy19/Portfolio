@@ -76,27 +76,21 @@ const CategoryFilterTab = async ({
                 </div>
             )}
 
-            {/* Horizontal Scrollable Category Bar on Mobile/Tablet (`overflow-x-auto no-scrollbar`), Clean Wrap on Desktop */}
-            <div className="relative w-full -mx-2 px-2 sm:mx-0 sm:px-0">
-                {/* Left/Right Subtle Fade Masks for Mobile Horizontal Swipe Hint */}
-                <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 sm:hidden opacity-80" />
-                <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-slate-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 sm:hidden opacity-90" />
+            {/* Category Pill Tag Cloud: Balanced flex-wrap centered on mobile (`justify-center sm:justify-start`), tap right away without scrolling */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 py-1 w-full">
+                <AllButton
+                    TotalAchievements={totalAchievements}
+                    AllButtonLabel={AllButtonLabel}
+                    slugCurrentCategory={slugCurrentCategory}
+                />
 
-                <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1.5 px-1 w-full snap-x snap-mandatory sm:flex-wrap sm:justify-start">
-                    <AllButton
-                        TotalAchievements={totalAchievements}
-                        AllButtonLabel={AllButtonLabel}
+                {categories.map((category) => (
+                    <CategoryButton
+                        key={category.id}
                         slugCurrentCategory={slugCurrentCategory}
+                        category={category}
                     />
-
-                    {categories.map((category) => (
-                        <CategoryButton
-                            key={category.id}
-                            slugCurrentCategory={slugCurrentCategory}
-                            category={category}
-                        />
-                    ))}
-                </div>
+                ))}
             </div>
         </div>
     );
