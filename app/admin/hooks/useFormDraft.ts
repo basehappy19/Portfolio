@@ -8,6 +8,19 @@ export interface DraftPackage<TForm, TLinks> {
   timestamp: string;
 }
 
+function isDraftPackageEmpty(pkg: any): boolean {
+  if (!pkg || !pkg.formData) return true;
+  const f = pkg.formData;
+  const hasContent = Boolean(
+    (f.title_th && typeof f.title_th === 'string' && f.title_th.trim()) ||
+    (f.title_en && typeof f.title_en === 'string' && f.title_en.trim()) ||
+    (f.description_th && typeof f.description_th === 'string' && f.description_th.trim()) ||
+    (f.description_en && typeof f.description_en === 'string' && f.description_en.trim()) ||
+    (Array.isArray(pkg.links) && pkg.links.length > 0)
+  );
+  return !hasContent;
+}
+
 export function useFormDraft<TForm, TLinks>(
   key: string,
   formData: TForm,
@@ -24,9 +37,13 @@ export function useFormDraft<TForm, TLinks>(
       const saved = localStorage.getItem(key);
       if (saved) {
         const parsed: DraftPackage<TForm, TLinks> = JSON.parse(saved);
-        if (parsed && parsed.timestamp) {
+        if (parsed && parsed.timestamp && !isDraftPackageEmpty(parsed)) {
           setHasDraft(true);
           setDraftTime(parsed.timestamp);
+        } else {
+          localStorage.removeItem(key);
+          setHasDraft(false);
+          setDraftTime(null);
         }
       } else {
         setHasDraft(false);
@@ -36,6 +53,26 @@ export function useFormDraft<TForm, TLinks>(
       setHasDraft(false);
     }
   }, [key]);
+
+  const saveDraftNow = useCallback(() => {
+    if (!enabled || typeof window === 'undefined') return;
+    try {
+      const pkg: DraftPackage<TForm, TLinks> = {
+        formData,
+        links,
+        timestamp: new Date().toLocaleTimeString('th-TH', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      };
+      if (!isDraftPackageEmpty(pkg)) {
+        localStorage.setItem(key, JSON.stringify(pkg));
+        setHasDraft(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, [key, formData, links, enabled]);
 
   // Auto save draft on form change with debounce
   useEffect(() => {
@@ -52,7 +89,9 @@ export function useFormDraft<TForm, TLinks>(
             minute: '2-digit',
           }),
         };
-        localStorage.setItem(key, JSON.stringify(pkg));
+        if (!isDraftPackageEmpty(pkg)) {
+          localStorage.setItem(key, JSON.stringify(pkg));
+        }
       } catch {
         // ignore storage errors
       }
@@ -70,6 +109,11 @@ export function useFormDraft<TForm, TLinks>(
       const saved = localStorage.getItem(key);
       if (!saved) return null;
       const parsed: DraftPackage<TForm, TLinks> = JSON.parse(saved);
+      if (isDraftPackageEmpty(parsed)) {
+        localStorage.removeItem(key);
+        setHasDraft(false);
+        return null;
+      }
       setHasDraft(false);
       return { formData: parsed.formData, links: parsed.links };
     } catch {
@@ -92,6 +136,7 @@ export function useFormDraft<TForm, TLinks>(
     hasDraft,
     draftTime,
     restoreDraft,
+    saveDraftNow,
     clearDraft,
   };
 }
