@@ -40,6 +40,7 @@ export function useFormDraft<TForm, TLinks>(
   // Auto save draft on form change with debounce
   useEffect(() => {
     if (!enabled || typeof window === 'undefined') return;
+    if (hasDraft && !enabled) return;
 
     const timer = setTimeout(() => {
       try {
@@ -58,7 +59,7 @@ export function useFormDraft<TForm, TLinks>(
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [key, formData, links, enabled]);
+  }, [key, formData, links, enabled, hasDraft]);
 
   const restoreDraft = useCallback((): {
     formData: TForm;
@@ -69,6 +70,7 @@ export function useFormDraft<TForm, TLinks>(
       const saved = localStorage.getItem(key);
       if (!saved) return null;
       const parsed: DraftPackage<TForm, TLinks> = JSON.parse(saved);
+      setHasDraft(false);
       return { formData: parsed.formData, links: parsed.links };
     } catch {
       return null;

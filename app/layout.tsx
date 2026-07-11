@@ -27,7 +27,13 @@ export default async function RootLayout({
                     >
                         <NextTopLoader color={`#ed4a4a`} />
                         {children}
-                        <Toaster position="top-right" />
+                        <Toaster 
+                            position="top-right" 
+                            containerStyle={{ zIndex: 99999 }}
+                            toastOptions={{
+                                style: { zIndex: 99999 },
+                            }}
+                        />
                     </ThemeProvider>
                 </SessionProvider>
             </body>

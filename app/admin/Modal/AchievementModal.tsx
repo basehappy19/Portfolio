@@ -152,12 +152,21 @@ const AchievementModalInner = ({
         })) ?? []
     );
 
+    const isDirty = Boolean(
+        formData.title_th.trim() ||
+        formData.title_en.trim() ||
+        formData.description_th.trim() ||
+        formData.description_en.trim() ||
+        links.length > 0 ||
+        imagePreview.length > 0
+    );
+
     const draftKey = editData ? `achievement_draft_${editData.id}` : 'achievement_draft_new';
     const { hasDraft, draftTime, restoreDraft, clearDraft } = useFormDraft(
         draftKey,
         formData,
         links,
-        true
+        isDirty
     );
 
     const handleRestoreDraft = () => {
@@ -166,6 +175,8 @@ const AchievementModalInner = ({
             setFormData(recovered.formData);
             setLinks(recovered.links);
             toast.success('กู้คืนข้อมูลที่พิมพ์ค้างไว้เรียบร้อยแล้ว');
+        } else {
+            toast.error('ไม่พบข้อมูลร่างในระบบ');
         }
     };
 
