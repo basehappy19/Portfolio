@@ -226,21 +226,20 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                         </p>
                     )}
 
-                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-                        {location ? (
-                            <div className="flex items-center gap-1.5 text-slate-500 text-xs line-clamp-1 max-w-[65%]" title={location}>
-                                <MapPin className="w-3.5 h-3.5 shrink-0 text-rose-500" />
-                                <span className="font-semibold text-slate-400">{locale === "th" ? "สถานที่:" : "Loc:"}</span>
-                                <span className="truncate text-slate-600 font-medium">{location}</span>
-                            </div>
-                        ) : <div />}
+                    {/* Location Badge (If present) - Dedicated full width row so it never wraps "สถานที่:" or cramps text */}
+                    {location && (
+                        <div className="mt-auto mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/70 dark:border-zinc-700/60 text-slate-700 dark:text-slate-300 text-xs shadow-2xs" title={location}>
+                            <MapPin className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                            <span className="font-bold text-slate-500 dark:text-slate-400 shrink-0 whitespace-nowrap">{locale === "th" ? "สถานที่:" : "Loc:"}</span>
+                            <span className="truncate font-semibold text-slate-800 dark:text-slate-200">{location}</span>
+                        </div>
+                    )}
 
-                        <div className="flex items-center gap-2 shrink-0 ml-auto">
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
-                                <span>{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
-                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors">
-                                    <ChevronRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
-                                </div>
+                    <div className={`${!location ? 'mt-auto ' : ''}pt-3.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end`}>
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
+                            <span className="whitespace-nowrap">{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors shrink-0">
+                                <ChevronRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                         </div>
                     </div>

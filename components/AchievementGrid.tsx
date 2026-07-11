@@ -19,19 +19,7 @@ export default function AchievementGrid({
   return (
     <div className="space-y-6">
       {/* Top Controls Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-b border-slate-200/80">
-        {/* Left Segment */}
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-            <span>
-              {locale === 'th'
-                ? `ผลงานทั้งหมด ${achievements.length} รายการ`
-                : `${achievements.length} Projects`}
-            </span>
-          </div>
-        </div>
-
+      <div className="flex items-center justify-end py-2 border-b border-slate-200/80">
         {/* Right Segmented Column Controls */}
         <div className="hidden md:flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/60 border border-slate-300/50">
           <button
