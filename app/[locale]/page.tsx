@@ -162,12 +162,22 @@ export default async function IndexPage(props: {
 
 
         {/* SECTION 4: ACHIEVEMENTS */}
-        <section id="Achievements" className="w-full bg-slate-50/60 scroll-mt-20 border-b border-slate-200/80 transition-colors">
+        <section id="Achievements" className="w-full relative overflow-hidden bg-gradient-to-b from-slate-50/90 via-white to-slate-50/90 dark:from-zinc-950 dark:via-zinc-900/60 dark:to-zinc-950 scroll-mt-20 border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
+          {/* Decorative Background Elements & Glowing Blobs */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+            {/* Top Right Glowing Rose Blob */}
+            <div className="absolute -top-[15%] -right-[10%] w-[550px] h-[550px] rounded-full bg-radial from-rose-500/12 via-pink-500/5 to-transparent blur-3xl opacity-90" />
+            {/* Bottom Left Glowing Amber/Indigo Blob */}
+            <div className="absolute -bottom-[15%] -left-[10%] w-[550px] h-[550px] rounded-full bg-radial from-amber-500/10 via-indigo-500/5 to-transparent blur-3xl opacity-80" />
+            {/* Modern Subtle Grid Pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_60%,transparent_100%)]" />
+          </div>
+
           <AchievementCarousel
             images={mappedImages}
             locale={locale}
           />
-          <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 py-12 md:py-16">
+          <div className="max-w-[1536px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-14 md:py-20">
             <Achievement slug={categorySlug} />
           </div>
         </section>

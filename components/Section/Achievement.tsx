@@ -15,7 +15,7 @@ const Achievement = async ({
 
     return (
         <div className="min-h-screen w-full">
-            <div className="max-w-6xl mx-auto">
+            <div className="w-full max-w-7xl mx-auto">
                 <SectionHeader text={t("Achievement.Heading")} />
                 <CategoryFilterTab slugCurrentCategory={slug} />
                 <Suspense fallback={<AchievementGridSkeleton />} key={slug ?? "all"}>

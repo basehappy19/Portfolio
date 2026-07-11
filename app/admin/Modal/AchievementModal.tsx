@@ -110,6 +110,18 @@ const AchievementModalInner = ({
         setTouched,
     });
 
+    const toggleCategorySlug = (slug: string) => {
+        setFormData((prev) => {
+            const current = prev.categorySlugs || [];
+            const exists = current.includes(slug);
+            const updated = exists
+                ? current.filter((s) => s !== slug)
+                : [...current, slug];
+            return { ...prev, categorySlugs: updated };
+        });
+        setTouched((prev) => ({ ...prev, categorySlugs: true }));
+    };
+
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
     const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
@@ -598,70 +610,109 @@ const AchievementModalInner = ({
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
-                                        <Grid3x3 className="w-3.5 h-3.5 text-rose-500" />
-                                        เลือกหมวดหมู่
-                                        <span className="text-rose-500">*</span>
-                                    </label>
-
-                                    <div className={`rounded-md border overflow-hidden transition ${
-                                        errors.categorySlugs && touched.categorySlugs
-                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20'
-                                            : 'border-gray-200 bg-white dark:bg-zinc-800/80 dark:border-zinc-700'
-                                    }`}>
-                                        <select
-                                            multiple
-                                            name="categorySlugs"
-                                            value={formData.categorySlugs}
-                                            onChange={handleCategoryChange}
-                                            onBlur={() => handleBlur('categorySlugs')}
-                                            className="w-full min-h-[160px] border-none p-2 text-xs bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none [&>option]:py-2 [&>option]:px-2.5 [&>option]:my-0.5 [&>option]:rounded [&>option:checked]:bg-rose-600 [&>option:checked]:text-white"
-                                        >
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.slug}>
-                                                    {cat.name_th}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        <div className="px-3 py-2 bg-gray-50 border-t border-gray-200 dark:bg-zinc-900/60 dark:border-zinc-700 flex items-center justify-between">
-                                            <span className="text-[11px] text-gray-500 dark:text-gray-400">
-                                                💡 กด Ctrl / Cmd ค้างไว้เพื่อเลือกหลายรายการ
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Category Selection Panel (2 Columns) */}
+                                <div className="lg:col-span-2 space-y-2">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
+                                            <Grid3x3 className="w-4 h-4 text-rose-500" />
+                                            <span>เลือกหมวดหมู่ผลงาน</span>
+                                            <span className="text-rose-500">*</span>
+                                        </label>
+                                        {formData.categorySlugs.length > 0 && (
+                                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1">
+                                                <CheckCircle2 size={13} />
+                                                เลือกแล้ว {formData.categorySlugs.length} หมวดหมู่
                                             </span>
-                                            {formData.categorySlugs.length > 0 && (
-                                                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                                                    <CheckCircle2 size={12} />
-                                                    {formData.categorySlugs.length} หมวดหมู่
-                                                </span>
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        💡 คลิกที่กล่องหมวดหมู่ด้านล่างเพื่อเลือกหรือยกเลิก (สามารถเลือกได้หลายหมวดหมู่พร้อมกันโดยไม่ต้องกดปุ่มอื่นค้าง)
+                                    </p>
+
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1.5">
+                                        {categories.map((cat) => {
+                                            const isSelected = formData.categorySlugs.includes(cat.slug);
+                                            return (
+                                                <button
+                                                    key={cat.id}
+                                                    type="button"
+                                                    onClick={() => toggleCategorySlug(cat.slug)}
+                                                    className={`cursor-pointer p-3 rounded-xl border text-left font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs select-none ${
+                                                        isSelected
+                                                            ? 'bg-rose-500 text-white border-rose-600 shadow-md ring-2 ring-rose-500/20 scale-[1.01]'
+                                                            : 'bg-white dark:bg-zinc-800/80 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-zinc-700 hover:border-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
+                                                    }`}
+                                                >
+                                                    <span className="truncate">{cat.name_th}</span>
+                                                    <div className={`w-5 h-5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                                        isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-400'
+                                                    }`}>
+                                                        {isSelected ? <CheckCircle2 size={14} className="stroke-[2.5]" /> : <span className="text-xs font-black">+</span>}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
                                     {errors.categorySlugs && touched.categorySlugs && (
-                                        <div className="flex items-center gap-1.5 mt-1 text-xs text-red-600 dark:text-red-400">
-                                            <AlertCircle size={14} />
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-2.5 rounded-xl border border-red-200 dark:border-red-800/60">
+                                            <AlertCircle size={15} className="shrink-0" />
                                             <span>{errors.categorySlugs}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50/60 dark:border-zinc-700 dark:bg-zinc-800/40">
-                                        <input
-                                            type="checkbox"
-                                            id="isPublished"
-                                            name="isPublished"
-                                            checked={formData.isPublished}
-                                            onChange={handleInputChange}
-                                            className="w-4 h-4 cursor-pointer rounded text-rose-600 border-gray-300 focus:ring-rose-500"
-                                        />
-                                        <label
-                                            htmlFor="isPublished"
-                                            className="text-xs font-medium cursor-pointer text-gray-800 dark:text-gray-200 select-none"
-                                        >
-                                            เผยแพร่ผลงานนี้สู่สาธารณะทันทีหลังบันทึก
-                                        </label>
+                                {/* Publish Setting Action Card (1 Column) */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                                        <span>สถานะการเผยแพร่</span>
+                                    </label>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        กำหนดการแสดงผลบนหน้าเว็บสาธารณะ
+                                    </p>
+
+                                    <div
+                                        onClick={() => setFormData(prev => ({ ...prev, isPublished: !prev.isPublished }))}
+                                        className={`cursor-pointer p-4 sm:p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 shadow-2xs select-none h-[calc(100%-44px)] min-h-[140px] ${
+                                            formData.isPublished
+                                                ? 'bg-emerald-50/90 dark:bg-emerald-950/30 border-emerald-500/80 dark:border-emerald-600/60 ring-2 ring-emerald-500/10'
+                                                : 'bg-gray-50 dark:bg-zinc-800/60 border-gray-200 dark:border-zinc-700 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
+                                                        formData.isPublished
+                                                            ? 'bg-emerald-500 text-white shadow-xs'
+                                                            : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'
+                                                    }`}>
+                                                        {formData.isPublished ? '🚀 เผยแพร่ทันที (Public)' : '📝 ฉบับร่าง (Draft)'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed pt-1">
+                                                    {formData.isPublished
+                                                        ? 'ผลงานนี้จะแสดงบนหน้าเว็บไซต์หลักทันที ทุกคนสามารถมองเห็นและเข้าชมได้'
+                                                        : 'ผลงานนี้จะถูกบันทึกเก็บไว้เป็นฉบับร่าง ซ่อนจากสาธารณะ (เห็นเฉพาะผู้ดูแลระบบ)'}
+                                                </p>
+                                            </div>
+
+                                            {/* Visual Toggle Switch */}
+                                            <div className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-300 ease-in-out shrink-0 flex items-center ${
+                                                formData.isPublished ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'
+                                            }`}>
+                                                <div className={`w-4.5 h-4.5 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
+                                                    formData.isPublished ? 'translate-x-5.5' : 'translate-x-0'
+                                                }`} />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 border-t border-gray-200/60 dark:border-zinc-700/60 flex items-center justify-between text-[11px] font-bold text-gray-500">
+                                            <span>คลิกเพื่อสลับสถานะ</span>
+                                            <span>{formData.isPublished ? 'เปิดแสดงผล' : 'ซ่อนไว้ก่อน'}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

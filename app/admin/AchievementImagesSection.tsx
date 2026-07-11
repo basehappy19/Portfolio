@@ -183,7 +183,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                     {/* Hover Overlay Prompt */}
                                     <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white p-2 text-center gap-1.5 backdrop-blur-[2px]">
                                         <ZoomIn className="w-7 h-7 text-rose-400" />
-                                        <span className="text-xs font-bold tracking-wide">คลิกเพื่อขยายดูภาพชัดๆ</span>
+                                        <span className="text-xs font-bold tracking-wide">คลิกเพื่อขยายภาพ</span>
                                     </div>
 
                                 </div>
