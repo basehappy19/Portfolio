@@ -231,9 +231,10 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
 
                     <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
                         {location ? (
-                            <div className="flex items-center gap-1.5 text-slate-500 text-xs line-clamp-1 max-w-[65%]">
-                                <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                                <span className="truncate">{location}</span>
+                            <div className="flex items-center gap-1.5 text-slate-500 text-xs line-clamp-1 max-w-[65%]" title={location}>
+                                <MapPin className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                                <span className="font-semibold text-slate-400">{locale === "th" ? "สถานที่:" : "Loc:"}</span>
+                                <span className="truncate text-slate-600 font-medium">{location}</span>
                             </div>
                         ) : <div />}
 
@@ -406,23 +407,50 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                     {title}
                                 </h2>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 text-xs sm:text-sm font-medium">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 p-4 sm:p-5 rounded-2xl bg-slate-50/90 border border-slate-200/80">
                                     {achievement.receivedAt && (
-                                        <div className="flex items-center gap-2.5">
-                                            <Calendar className="w-4 h-4 text-rose-600 shrink-0" />
-                                            <span>{formatDate(achievement.receivedAt, locale)}</span>
+                                        <div className="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-200/60 shadow-2xs">
+                                            <div className="p-2 rounded-lg bg-rose-50 text-rose-600 shrink-0 mt-0.5">
+                                                <Calendar className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">
+                                                    {locale === "th" ? "วันที่ได้รับ" : "Date"}
+                                                </span>
+                                                <span className="block text-xs sm:text-sm font-semibold text-slate-800 wrap-break-word">
+                                                    {formatDate(achievement.receivedAt, locale)}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     {location && (
-                                        <div className="flex items-center gap-2.5">
-                                            <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
-                                            <span>{location}</span>
+                                        <div className="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-200/60 shadow-2xs">
+                                            <div className="p-2 rounded-lg bg-rose-50 text-rose-600 shrink-0 mt-0.5">
+                                                <MapPin className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">
+                                                    {locale === "th" ? "สถานที่จัดงาน" : "Location"}
+                                                </span>
+                                                <span className="block text-xs sm:text-sm font-semibold text-slate-800 wrap-break-word">
+                                                    {location}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     {given_by && (
-                                        <div className="flex items-center gap-2.5 sm:col-span-2">
-                                            <Award className="w-4 h-4 text-rose-600 shrink-0" />
-                                            <span className="font-bold text-slate-800">{given_by}</span>
+                                        <div className="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-200/60 shadow-2xs sm:col-span-2 lg:col-span-1">
+                                            <div className="p-2 rounded-lg bg-rose-50 text-rose-600 shrink-0 mt-0.5">
+                                                <Award className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-0.5">
+                                                    {locale === "th" ? "หน่วยงานที่มอบ" : "Awarded By"}
+                                                </span>
+                                                <span className="block text-xs sm:text-sm font-semibold text-slate-800 wrap-break-word">
+                                                    {given_by}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
