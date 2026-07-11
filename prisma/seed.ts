@@ -7,14 +7,8 @@ async function main() {
         "pakpoom.myself@gmail.com",
     ];
 
-    const envEmails = (process.env.ALLOWED_EMAILS ?? "")
-        .split(",")
-        .map((e) => e.trim().toLowerCase())
-        .filter(Boolean);
+    for (const email of defaultEmails) {
 
-    const allEmails = Array.from(new Set([...defaultEmails, ...envEmails]));
-
-    for (const email of allEmails) {
         await prisma.allowedEmail.upsert({
             where: { email },
             update: {},
