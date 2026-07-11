@@ -626,9 +626,6 @@ const AchievementModalInner = ({
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        💡 คลิกที่กล่องหมวดหมู่ด้านล่างเพื่อเลือกหรือยกเลิก (สามารถเลือกได้หลายหมวดหมู่พร้อมกันโดยไม่ต้องกดปุ่มอื่นค้าง)
-                                    </p>
 
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1.5">
                                         {categories.map((cat) => {
@@ -689,13 +686,13 @@ const AchievementModalInner = ({
                                                             ? 'bg-emerald-500 text-white shadow-xs'
                                                             : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'
                                                     }`}>
-                                                        {formData.isPublished ? '🚀 เผยแพร่ทันที (Public)' : '📝 ฉบับร่าง (Draft)'}
+                                                        {formData.isPublished ? 'เผยแพร่ทันที' : 'ฉบับร่าง'}
                                                     </span>
                                                 </div>
                                                 <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed pt-1">
                                                     {formData.isPublished
                                                         ? 'ผลงานนี้จะแสดงบนหน้าเว็บไซต์หลักทันที ทุกคนสามารถมองเห็นและเข้าชมได้'
-                                                        : 'ผลงานนี้จะถูกบันทึกเก็บไว้เป็นฉบับร่าง ซ่อนจากสาธารณะ (เห็นเฉพาะผู้ดูแลระบบ)'}
+                                                        : 'ผลงานนี้จะถูกบันทึกเก็บไว้เป็นฉบับร่าง ซ่อนจากสาธารณะ เห็นเฉพาะผู้ดูแลระบบ'}
                                                 </p>
                                             </div>
 
