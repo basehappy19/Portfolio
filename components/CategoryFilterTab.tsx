@@ -69,25 +69,34 @@ const CategoryFilterTab = async ({
         : ``
 
     return (
-        <div className="space-y-3">
-            <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                {currentFilterText}
-            </div>
+        <div className="space-y-3 mb-6">
+            {currentFilterText && (
+                <div className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 px-1">
+                    {currentFilterText}
+                </div>
+            )}
 
-            <div className="flex flex-wrap gap-3 mb:mb-0 mb-6">
-                <AllButton
-                    TotalAchievements={totalAchievements}
-                    AllButtonLabel={AllButtonLabel}
-                    slugCurrentCategory={slugCurrentCategory}
-                />
+            {/* Horizontal Scrollable Category Bar on Mobile/Tablet (`overflow-x-auto no-scrollbar`), Clean Wrap on Desktop */}
+            <div className="relative w-full -mx-2 px-2 sm:mx-0 sm:px-0">
+                {/* Left/Right Subtle Fade Masks for Mobile Horizontal Swipe Hint */}
+                <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-slate-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 sm:hidden opacity-80" />
+                <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-slate-50 dark:from-zinc-950 to-transparent pointer-events-none z-10 sm:hidden opacity-90" />
 
-                {categories.map((category) => (
-                    <CategoryButton
-                        key={category.id}
+                <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1.5 px-1 w-full snap-x snap-mandatory sm:flex-wrap sm:justify-start">
+                    <AllButton
+                        TotalAchievements={totalAchievements}
+                        AllButtonLabel={AllButtonLabel}
                         slugCurrentCategory={slugCurrentCategory}
-                        category={category}
                     />
-                ))}
+
+                    {categories.map((category) => (
+                        <CategoryButton
+                            key={category.id}
+                            slugCurrentCategory={slugCurrentCategory}
+                            category={category}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
