@@ -169,7 +169,7 @@ const AchievementModalInner = ({
     );
 
     const draftKey = editData ? `achievement_draft_${editData.id}` : 'achievement_draft_new';
-    const { hasDraft, draftTime, restoreDraft, saveDraftNow, clearDraft } = useFormDraft(
+    const { hasDraft, draftTime, draftPreview, restoreDraft, saveDraftNow, clearDraft } = useFormDraft(
         draftKey,
         formData,
         links,
@@ -421,23 +421,30 @@ const AchievementModalInner = ({
 
                     {/* Draft Banner */}
                     {hasDraft && (
-                        <div className="mx-6 mt-4 px-4 py-2.5 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between gap-3 text-xs text-amber-800 dark:text-amber-300 shrink-0">
-                            <div className="flex items-center gap-2 font-medium">
-                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                                <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime} (กันเผลอกดปิด)</span>
+                        <div className="mx-6 mt-4 px-4.5 py-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-900 dark:text-amber-200 shrink-0 shadow-xs">
+                            <div className="flex items-center gap-3 font-semibold min-w-0">
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 animate-pulse" />
+                                <div className="min-w-0 flex flex-wrap items-center gap-2">
+                                    <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime}</span>
+                                    {draftPreview && (
+                                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-100/90 dark:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 font-bold text-amber-950 dark:text-amber-100 truncate max-w-[280px]">
+                                            "{draftPreview}"
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                                 <button
                                     type="button"
                                     onClick={handleRestoreDraft}
-                                    className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded shadow-2xs transition cursor-pointer"
+                                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg shadow-2xs transition cursor-pointer"
                                 >
                                     กู้คืนข้อมูล
                                 </button>
                                 <button
                                     type="button"
                                     onClick={clearDraft}
-                                    className="px-2.5 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 font-medium rounded transition cursor-pointer"
+                                    className="px-3.5 py-1.5 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold rounded-lg transition cursor-pointer"
                                 >
                                     ลบร่าง
                                 </button>
@@ -477,7 +484,7 @@ const AchievementModalInner = ({
                                 onBlur={() => handleBlur('title_en')}
                                 placeholder="Achievement Title"
                                 required
-                                size="md"
+                                size="lg"
                                 error={errors.title_en}
                                 touched={touched.title_en}
                             />
@@ -577,7 +584,7 @@ const AchievementModalInner = ({
                                     name="receivedAt"
                                     value={formData.receivedAt}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 rounded-md border text-sm bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
+                                    className="w-full px-3.5 py-2.5 rounded-lg border text-sm sm:text-base font-medium bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
                                 />
                             </div>
                         </div>
@@ -640,37 +647,7 @@ const AchievementModalInner = ({
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
-                                            ลำดับการแสดงผล
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="number"
-                                                name="sortOrder"
-                                                value={formData.sortOrder}
-                                                onChange={handleInputChange}
-                                                min={1}
-                                                className="w-full px-3 py-2 rounded-md border text-sm bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setFormData(prev => ({ ...prev, sortOrder: Math.max(1, prev.sortOrder - 1) }))}
-                                                className="cursor-pointer px-3 py-2 rounded-md border border-gray-200 hover:bg-gray-100 font-bold dark:border-zinc-700 dark:hover:bg-zinc-800 transition"
-                                            >
-                                                −
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setFormData(prev => ({ ...prev, sortOrder: prev.sortOrder + 1 }))}
-                                                className="cursor-pointer px-3 py-2 rounded-md border border-gray-200 hover:bg-gray-100 font-bold dark:border-zinc-700 dark:hover:bg-zinc-800 transition"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2.5 p-3 rounded-md border border-gray-200 bg-gray-50/50 dark:border-zinc-700 dark:bg-zinc-800/40">
+                                    <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50/60 dark:border-zinc-700 dark:bg-zinc-800/40">
                                         <input
                                             type="checkbox"
                                             id="isPublished"

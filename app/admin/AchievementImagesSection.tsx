@@ -138,7 +138,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                     onChange={(e) =>
                                         handleImageAltChange(index, 'altText_th', e.target.value)
                                     }
-                                    className="w-full px-3 py-1.5 text-xs rounded-md border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
+                                    className="w-full px-3.5 py-2.5 text-sm font-medium rounded-lg border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
                                 />
 
                                 <input
@@ -148,7 +148,7 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                     onChange={(e) =>
                                         handleImageAltChange(index, 'altText_en', e.target.value)
                                     }
-                                    className="w-full px-3 py-1.5 text-xs rounded-md border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
+                                    className="w-full px-3.5 py-2.5 text-sm font-medium rounded-lg border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900/80 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700"
                                 />
                             </div>
 

@@ -21,6 +21,17 @@ function isDraftPackageEmpty(pkg: any): boolean {
   return !hasContent;
 }
 
+function getDraftPreviewText(pkg: any): string {
+  if (!pkg || !pkg.formData) return '';
+  const f = pkg.formData;
+  if (typeof f.title_th === 'string' && f.title_th.trim()) return f.title_th.trim();
+  if (typeof f.title_en === 'string' && f.title_en.trim()) return f.title_en.trim();
+  if (typeof f.description_th === 'string' && f.description_th.trim()) return f.description_th.trim().slice(0, 50);
+  if (typeof f.description_en === 'string' && f.description_en.trim()) return f.description_en.trim().slice(0, 50);
+  if (Array.isArray(pkg.links) && pkg.links.length > 0) return `ลิงก์แนบ (${pkg.links.length} รายการ)`;
+  return 'ข้อมูลผลงาน';
+}
+
 export function useFormDraft<TForm, TLinks>(
   key: string,
   formData: TForm,
@@ -30,6 +41,7 @@ export function useFormDraft<TForm, TLinks>(
 ) {
   const [hasDraft, setHasDraft] = useState(false);
   const [draftTime, setDraftTime] = useState<string | null>(null);
+  const [draftPreview, setDraftPreview] = useState<string | null>(null);
 
   // Check draft on mount or key change
   useEffect(() => {
@@ -46,17 +58,21 @@ export function useFormDraft<TForm, TLinks>(
         if (parsed && parsed.timestamp && !isDraftPackageEmpty(parsed) && !isIdenticalToInitial) {
           setHasDraft(true);
           setDraftTime(parsed.timestamp);
+          setDraftPreview(getDraftPreviewText(parsed));
         } else {
           localStorage.removeItem(key);
           setHasDraft(false);
           setDraftTime(null);
+          setDraftPreview(null);
         }
       } else {
         setHasDraft(false);
         setDraftTime(null);
+        setDraftPreview(null);
       }
     } catch {
       setHasDraft(false);
+      setDraftPreview(null);
     }
   }, [key]);
 
@@ -79,6 +95,7 @@ export function useFormDraft<TForm, TLinks>(
       if (!isDraftPackageEmpty(pkg) && !isIdenticalToInitial) {
         localStorage.setItem(key, JSON.stringify(pkg));
         setHasDraft(true);
+        setDraftPreview(getDraftPreviewText(pkg));
       } else if (isIdenticalToInitial) {
         localStorage.removeItem(key);
       }
@@ -109,6 +126,7 @@ export function useFormDraft<TForm, TLinks>(
 
         if (!isDraftPackageEmpty(pkg) && !isIdenticalToInitial) {
           localStorage.setItem(key, JSON.stringify(pkg));
+          setDraftPreview(getDraftPreviewText(pkg));
         } else if (isIdenticalToInitial) {
           localStorage.removeItem(key);
         }
@@ -137,9 +155,11 @@ export function useFormDraft<TForm, TLinks>(
       if (isDraftPackageEmpty(parsed) || isIdenticalToInitial) {
         localStorage.removeItem(key);
         setHasDraft(false);
+        setDraftPreview(null);
         return null;
       }
       setHasDraft(false);
+      setDraftPreview(null);
       return { formData: parsed.formData, links: parsed.links };
     } catch {
       return null;
@@ -152,6 +172,7 @@ export function useFormDraft<TForm, TLinks>(
       localStorage.removeItem(key);
       setHasDraft(false);
       setDraftTime(null);
+      setDraftPreview(null);
     } catch {
       // ignore
     }
@@ -160,6 +181,7 @@ export function useFormDraft<TForm, TLinks>(
   return {
     hasDraft,
     draftTime,
+    draftPreview,
     restoreDraft,
     saveDraftNow,
     clearDraft,
