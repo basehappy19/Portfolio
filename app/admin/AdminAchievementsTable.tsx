@@ -52,12 +52,12 @@ const AchievementExpandedDetails = ({
                 <div className="bg-white dark:bg-zinc-900/90 rounded-xl p-4 sm:p-5 shadow-2xs border border-gray-200/80 dark:border-zinc-800">
                     <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3.5 flex items-center gap-2">
                         <div className="w-1 h-4 bg-rose-500 rounded-full" />
-                        <span>คำอธิบายผลงาน (Description)</span>
+                        <span>คำอธิบายผลงาน</span>
                     </h4>
                     <div className="space-y-4">
                         <div>
                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">
-                                THAI (TH):
+                                ภาษาไทย:
                             </span>
                             {achievement.description_th ? (
                                 <div
@@ -73,7 +73,7 @@ const AchievementExpandedDetails = ({
 
                         <div>
                             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">
-                                ENGLISH (EN):
+                                ภาษาอังกฤษ:
                             </span>
                             {achievement.description_en ? (
                                 <div
@@ -92,7 +92,7 @@ const AchievementExpandedDetails = ({
                     <div className="bg-white dark:bg-zinc-900/90 rounded-xl p-4 sm:p-5 shadow-2xs border border-gray-200/80 dark:border-zinc-800">
                         <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3.5 flex items-center gap-2">
                             <div className="w-1 h-4 bg-amber-500 rounded-full" />
-                            <span>ผู้มอบรางวัล / องค์กร (Presented By)</span>
+                            <span>ผู้มอบรางวัล / องค์กร</span>
                         </h4>
                         <div className="space-y-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                             <p className="wrap-break-word whitespace-pre-wrap">
@@ -109,7 +109,7 @@ const AchievementExpandedDetails = ({
                 <div className="bg-white dark:bg-zinc-900/90 rounded-xl p-4 sm:p-5 shadow-2xs border border-gray-200/80 dark:border-zinc-800">
                     <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3.5 flex items-center gap-2">
                         <div className="w-1 h-4 bg-emerald-500 rounded-full" />
-                        <span>วันที่และเวลา (Dates & Timeline)</span>
+                        <span>วันที่และเวลา</span>
                     </h4>
                     <div className="grid grid-cols-1 xs:grid-cols-3 gap-3">
                         <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50 dark:bg-zinc-800/50">
@@ -142,12 +142,12 @@ const AchievementExpandedDetails = ({
                     </div>
                 </div>
 
-                {/* Links */}
+                {/* External Links */}
                 {achievement.links.length > 0 && (
                     <div className="bg-white dark:bg-zinc-900/90 rounded-xl p-4 sm:p-5 shadow-2xs border border-gray-200/80 dark:border-zinc-800">
                         <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3.5 flex items-center gap-2">
                             <div className="w-1 h-4 bg-purple-500 rounded-full" />
-                            <span>ลิงก์ที่เกี่ยวข้อง (External Links)</span>
+                            <span>ลิงก์ที่เกี่ยวข้อง</span>
                         </h4>
                         <div className="space-y-2">
                             {achievement.links.map((link) => (
@@ -183,7 +183,7 @@ const AchievementExpandedDetails = ({
                         <div className="flex items-center justify-between mb-4">
                             <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                                 <div className="w-1 h-4 bg-pink-500 rounded-full" />
-                                <span>รูปภาพทั้งหมด (Gallery)</span>
+                                <span>รูปภาพทั้งหมด</span>
                             </h4>
                             <span className="px-2.5 py-0.5 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 border border-pink-200/60 dark:border-pink-800/60 rounded-full text-xs font-bold">
                                 {achievement.images.length} รูป
@@ -554,22 +554,22 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
                         <thead className="bg-gray-50/80 dark:bg-zinc-800/60 border-b border-gray-200/80 dark:border-zinc-800">
                             <tr>
                                 <th className="px-6 py-4 text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    ผลงาน (Achievement)
+                                    ผลงาน
                                 </th>
                                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    จัดการ (Actions)
+                                    จัดการ
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    ระดับรางวัล (Level)
+                                    ระดับรางวัล
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    หมวดหมู่ (Categories)
+                                    หมวดหมู่
                                 </th>
                                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    ลำดับ (Order)
+                                    ลำดับ
                                 </th>
                                 <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                    สถานะ (Status)
+                                    สถานะ
                                 </th>
                                 <th className="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                     สื่อ / รายละเอียด
