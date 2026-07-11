@@ -187,14 +187,8 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                         </div>
                     )}
 
-                    {/* Gradient Overlay & Interactive Hover Reveal */}
+                    {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none group-hover:from-slate-950/60 transition-colors duration-300" />
-
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px] pointer-events-none">
-                        <div className="px-3.5 py-1.5 rounded-full bg-white/95 text-rose-600 text-xs font-bold shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                            <span>✨ {locale === "th" ? "คลิกเพื่อดูรายละเอียด" : "Click to view details"}</span>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Content Section */}
@@ -242,19 +236,6 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                         ) : <div />}
 
                         <div className="flex items-center gap-2 shrink-0 ml-auto">
-                            {session && (
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(`/admin?edit=${achievement.id}`);
-                                    }}
-                                    className="cursor-pointer p-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition shadow-2xs"
-                                    title={locale === "th" ? "แก้ไขผลงานใน Admin" : "Edit in Admin"}
-                                >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                </button>
-                            )}
                             <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
                                 <span>{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
                                 <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors">
@@ -527,11 +508,11 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
 
                             {/* Bottom Admin Quick Action Bar when logged in */}
                             {session && (
-                                <div className="pt-6 border-t border-slate-200/80 flex items-center justify-between bg-rose-50/60 p-4 rounded-2xl border border-rose-200/60">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse" />
-                                        <span className="text-xs sm:text-sm font-bold text-rose-900">
-                                            {locale === "th" ? "คุณอยู่ในระบบผู้ดูแล (Admin)" : "Logged in as Admin"}
+                                <div className="mt-8 pt-5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-linear-to-r from-rose-50/90 via-rose-50 to-rose-50/90 p-5 rounded-2xl border border-rose-200/70 shadow-2xs text-center sm:text-left">
+                                    <div className="flex items-center justify-center sm:justify-start gap-2.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse shrink-0" />
+                                        <span className="text-xs sm:text-sm font-extrabold text-rose-950">
+                                            {locale === "th" ? "คุณอยู่ในระบบผู้ดูแล" : "Logged in as Admin"}
                                         </span>
                                     </div>
                                     <button
@@ -539,9 +520,9 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                         onClick={() => {
                                             router.push(`/admin?edit=${achievement.id}`);
                                         }}
-                                        className="cursor-pointer px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 shadow-sm transition"
+                                        className="cursor-pointer w-full sm:w-auto justify-center px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center gap-2 shadow-sm transition hover:scale-[1.01] active:scale-[0.99]"
                                     >
-                                        <Edit2 className="w-4 h-4" />
+                                        <Edit2 className="w-4 h-4 shrink-0" />
                                         <span>{locale === "th" ? "แก้ไขผลงานนี้" : "Edit Achievement"}</span>
                                     </button>
                                 </div>
