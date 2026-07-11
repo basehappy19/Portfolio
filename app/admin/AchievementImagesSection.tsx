@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ChangeEvent, DragEvent, useState } from 'react';
-import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown, RefreshCw, ZoomIn, X, Eye } from 'lucide-react';
+import { GripVertical, Plus, Trash2, ChevronUp, ChevronDown, RefreshCw, ZoomIn, X } from 'lucide-react';
 import Image from 'next/image';
 import { ImagePreview } from '@/types/Form';
 import { createPortal } from 'react-dom';
@@ -186,11 +186,6 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                         <span className="text-xs font-bold tracking-wide">คลิกเพื่อขยายดูภาพชัดๆ</span>
                                     </div>
 
-                                    {/* Always Visible Zoom Badge */}
-                                    <div className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur-xs text-white text-[11px] font-bold flex items-center gap-1 pointer-events-none">
-                                        <Eye size={12} className="text-rose-400" />
-                                        <span>ขยายดู</span>
-                                    </div>
                                 </div>
 
                                 {/* Action Buttons underneath the photo (Replace & Delete) */}
@@ -231,16 +226,15 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                             <span className="w-1.5 h-3.5 bg-rose-500 rounded-full inline-block" />
                                             <span>คำอธิบายภาพภาษาไทย</span>
                                         </label>
-                                        <span className="text-[11px] text-gray-400">แสดงเวลาเอาเมาส์ชี้หรือเปิดภาพเต็ม</span>
                                     </div>
-                                    <input
-                                        type="text"
+                                    <textarea
+                                        rows={3}
                                         placeholder="ระบุคำอธิบายรูปภาพภาษาไทย เช่น ภาพโปสเตอร์หลัก, บรรยากาศการรับรางวัล..."
                                         value={img.altText_th}
                                         onChange={(e) =>
                                             handleImageAltChange(index, 'altText_th', e.target.value)
                                         }
-                                        className="w-full min-h-[48px] px-4 py-2.5 text-sm sm:text-base font-medium rounded-xl border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200/80 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700 transition"
+                                        className="w-full min-h-[76px] px-4 py-3 text-sm sm:text-base font-medium rounded-xl border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200/80 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-900 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700 transition resize-y leading-relaxed"
                                     />
                                 </div>
 
@@ -250,16 +244,15 @@ export const AchievementImagesSection: React.FC<Props> = ({
                                             <span className="w-1.5 h-3.5 bg-blue-500 rounded-full inline-block" />
                                             <span>คำอธิบายภาพภาษาอังกฤษ</span>
                                         </label>
-                                        <span className="text-[11px] text-gray-400">English Caption</span>
                                     </div>
-                                    <input
-                                        type="text"
+                                    <textarea
+                                        rows={3}
                                         placeholder="Enter English caption for this image..."
                                         value={img.altText_en}
                                         onChange={(e) =>
                                             handleImageAltChange(index, 'altText_en', e.target.value)
                                         }
-                                        className="w-full min-h-[48px] px-4 py-2.5 text-sm sm:text-base font-medium rounded-xl border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200/80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-zinc-900 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700 transition"
+                                        className="w-full min-h-[76px] px-4 py-3 text-sm sm:text-base font-medium rounded-xl border shadow-2xs bg-white text-gray-900 placeholder-gray-400 border-gray-200/80 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-zinc-900 dark:text-white dark:placeholder-gray-500 dark:border-zinc-700 transition resize-y leading-relaxed"
                                     />
                                 </div>
                             </div>

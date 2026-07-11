@@ -390,7 +390,7 @@ const AchievementModalInner = ({
             />
 
             {/* Slide-over Studio Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 max-w-4xl w-full flex pl-0 sm:pl-10">
+            <div className="fixed inset-y-0 right-0 max-w-6xl w-full flex pl-0 sm:pl-6">
                 <div
                     className={`w-full bg-white dark:bg-zinc-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-zinc-800 ${
                         isAnimating ? 'translate-x-0' : 'translate-x-full'
