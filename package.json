@@ -8,11 +8,12 @@
         "start": "next start",
         "lint": "eslint",
         "db:studio": "prisma studio",
-        "postinstall": "prisma generate && prisma db push"
+        "db:seed": "tsx prisma/seed.ts",
+        "postinstall": "prisma generate && prisma db push && prisma db seed"
     },
     "dependencies": {
-        "@prisma/adapter-pg": "^7.4.1",
-        "@prisma/client": "^7.3.0",
+        "@prisma/adapter-pg": "^7.8.0",
+        "@prisma/client": "^7.8.0",
         "@prisma/extension-accelerate": "^3.0.1",
         "@supabase/supabase-js": "^2.97.0",
         "@tiptap/extension-font-size": "3.0.0-next.3",
@@ -50,9 +51,21 @@
         "dotenv": "^17.3.1",
         "eslint": "^10",
         "eslint-config-next": "^0.2.4",
-        "prisma": "^7.0.0",
+        "prisma": "^7.8.0",
         "tailwindcss": "^4",
         "ts-node": "^10.9.2",
+        "tsx": "^4.23.0",
         "typescript": "^5"
+    },
+    "prisma": {
+        "seed": "tsx prisma/seed.ts"
+    },
+    "allowScripts": {
+        "@parcel/watcher@2.5.6": true,
+        "@prisma/engines@7.8.0": true,
+        "@swc/core@1.15.13": true,
+        "prisma@7.8.0": true,
+        "sharp@0.34.5": true,
+        "esbuild@0.28.1": true
     }
 }

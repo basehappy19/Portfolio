@@ -116,108 +116,109 @@ export default async function AdminPage(props: {
             ? (searchParams.status.toUpperCase() as Status)
             : undefined;
 
-    const achievements = await prisma.achievement.findMany({
-        where: {
-            categories: categorySlug
-                ? {
-                    some: {
-                        category: { slug: categorySlug },
-                    },
-                }
-                : undefined,
+    const [achievements, categories, sortOrderAgg] = await Promise.all([
+        prisma.achievement.findMany({
+            where: {
+                categories: categorySlug
+                    ? {
+                        some: {
+                            category: { slug: categorySlug },
+                        },
+                    }
+                    : undefined,
 
-            OR: search
-                ? [
-                    { title_th: { contains: search, mode: "insensitive" } },
-                    { title_en: { contains: search, mode: "insensitive" } },
-                    { description_th: { contains: search, mode: "insensitive" } },
-                    { description_en: { contains: search, mode: "insensitive" } },
-                ]
-                : undefined,
+                OR: search
+                    ? [
+                        { title_th: { contains: search, mode: "insensitive" } },
+                        { title_en: { contains: search, mode: "insensitive" } },
+                        { description_th: { contains: search, mode: "insensitive" } },
+                        { description_en: { contains: search, mode: "insensitive" } },
+                    ]
+                    : undefined,
 
-            status: statusValue
-        },
+                status: statusValue
+            },
 
-        select: {
-            id: true,
-            title_th: true,
-            title_en: true,
-            description_th: true,
-            description_en: true,
-            awardLevel_th: true,
-            awardLevel_en: true,
-            location_th: true,
-            location_en: true,
-            given_by_th: true,
-            given_by_en: true,
-            receivedAt: true,
-            status: true,
-            sortOrder: true,
-            categories: {
-                select: {
-                    category: {
-                        select: {
-                            id: true,
-                            name_th: true,
-                            name_en: true,
-                            slug: true,
-                            createdAt: true,
-                            updatedAt: true,
+            select: {
+                id: true,
+                title_th: true,
+                title_en: true,
+                description_th: true,
+                description_en: true,
+                awardLevel_th: true,
+                awardLevel_en: true,
+                location_th: true,
+                location_en: true,
+                given_by_th: true,
+                given_by_en: true,
+                receivedAt: true,
+                status: true,
+                sortOrder: true,
+                categories: {
+                    select: {
+                        category: {
+                            select: {
+                                id: true,
+                                name_th: true,
+                                name_en: true,
+                                slug: true,
+                                createdAt: true,
+                                updatedAt: true,
+                            },
                         },
                     },
                 },
-            },
-            images: {
-                select: {
-                    id: true,
-                    url: true,
-                    altText_th: true,
-                    altText_en: true,
-                    sortOrder: true,
-                    createdAt: true,
-                    updatedAt: true,
+                images: {
+                    select: {
+                        id: true,
+                        url: true,
+                        altText_th: true,
+                        altText_en: true,
+                        sortOrder: true,
+                        createdAt: true,
+                        updatedAt: true,
+                    },
+                    orderBy: {
+                        sortOrder: "asc",
+                    },
                 },
-                orderBy: {
-                    sortOrder: "asc",
+                links: {
+                    orderBy: {
+                        sortOrder: "asc",
+                    },
                 },
+                createdAt: true,
+                updatedAt: true,
             },
-            links: {
-                orderBy: {
-                    sortOrder: "asc",
-                },
-            },
-            createdAt: true,
-            updatedAt: true,
-        },
 
-        orderBy: {
-            sortOrder: "desc",
-        },
-    });
-
-    const categories = await prisma.category.findMany({
-        select: {
-            id: true,
-            name_th: true,
-            name_en: true,
-            slug: true,
-        },
-        orderBy: {
-            id: "asc",
-        }
-    });
+            orderBy: {
+                sortOrder: "desc",
+            },
+        }),
+        prisma.category.findMany({
+            select: {
+                id: true,
+                name_th: true,
+                name_en: true,
+                slug: true,
+            },
+            orderBy: {
+                id: "asc",
+            }
+        }),
+        prisma.achievement.aggregate({
+            _max: {
+                sortOrder: true,
+            },
+        })
+    ]);
 
     const publicCount = achievements.filter((a: any) => a.status === 'PUBLIC').length;
     const draftCount = achievements.filter((a: any) => a.status === 'DRAFT').length;
 
     const totalImages = achievements.reduce((sum: number, a: any) => sum + a.images.length, 0);
-    const sortOrderAgg = await prisma.achievement.aggregate({
-        _max: {
-            sortOrder: true,
-        },
-    });
-
     const nextSortOrder = (sortOrderAgg._max.sortOrder ?? 0) + 1;
+
 
     return (
         <CategoriesProvider categories={categories}>

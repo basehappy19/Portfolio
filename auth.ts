@@ -1,17 +1,13 @@
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
-
-const ALLOWED_EMAILS = (process.env.ALLOWED_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+import prisma from "@/lib/prisma";
 
 export const auth = betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL,
+    baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.Google_CLIENT_SECRET as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
             getUserInfo: async (token) => {
                 const response = await fetch(
                     "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -31,7 +27,17 @@ export const auth = betterAuth({
                 const profile = await response.json();
                 const email = profile.email?.toLowerCase();
 
-                if (!email || !ALLOWED_EMAILS.includes(email)) {
+                if (!email) {
+                    throw new APIError("UNAUTHORIZED", {
+                        message: "No email provided.",
+                    });
+                }
+
+                const allowedUser = await prisma.allowedEmail.findUnique({
+                    where: { email },
+                });
+
+                if (!allowedUser) {
                     throw new APIError("UNAUTHORIZED", {
                         message: "This email is not allowed to sign in.",
                     });
