@@ -33,6 +33,7 @@ import {
 } from './services/achievements';
 import toast from 'react-hot-toast';
 import { downloadImage } from '@/lib/download';
+import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 
 const AchievementExpandedDetails = ({
     achievement,
@@ -246,6 +247,7 @@ type Props = {
 
 
 export const AdminAchievementsTable = ({ achievements }: Props) => {
+    const { open } = useAchievementModal();
     const [isDownloading, setIsDownloading] = useState(false);
     const [localAchievements, setLocalAchievements] = useState(achievements);
     const [isPending, startTransition] = useTransition();
@@ -273,6 +275,20 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     useEffect(() => {
         setLocalAchievements(achievements);
     }, [achievements]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get('edit');
+        if (editId && localAchievements.length > 0) {
+            const target = localAchievements.find(a => a.id === editId);
+            if (target) {
+                open(target);
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+        }
+    }, [localAchievements, open]);
 
     useEffect(() => {
         setSortInputValues(

@@ -1,7 +1,7 @@
 "use client";
 
 import { AchievementModalContextType, EditData } from "@/types/Achievements";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 
 const AchievementModalContext = createContext<AchievementModalContextType | undefined>(undefined);
 
@@ -11,17 +11,17 @@ export function AchievementModalProvider({ children }: { children: React.ReactNo
     const [editData, setEditData] = useState<EditData | null>(null);
 
     // เปิด modal พร้อม animation
-    const open = (data?: EditData) => {
+    const open = useCallback((data?: EditData) => {
         if (data) setEditData(data);
         else setEditData(null);
 
         setIsAnimating(true);
         setIsOpen(true); // mount modal
         document.body.style.overflow = "hidden";
-    };
+    }, []);
 
     // ปิด modal พร้อม animation
-    const close = () => {
+    const close = useCallback(() => {
         setIsAnimating(false); // เริ่ม fade-out
 
         setTimeout(() => {
@@ -29,12 +29,12 @@ export function AchievementModalProvider({ children }: { children: React.ReactNo
             setEditData(null);
             document.body.style.overflow = "unset";
         }, 200); // ต้องตรงกับ animation duration
-    };
+    }, []);
 
-    const toggle = () => {
+    const toggle = useCallback(() => {
         if (isOpen) close();
         else open();
-    };
+    }, [isOpen, close, open]);
 
     return (
         <AchievementModalContext.Provider
