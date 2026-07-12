@@ -153,3 +153,13 @@ model Account {
   createdAt             DateTime
   updatedAt             DateTime
 }
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
