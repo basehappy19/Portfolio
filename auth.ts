@@ -69,15 +69,15 @@ export const auth = betterAuth({
     },
     rateLimit: {
         window: 60,
-        max: 100,
+        max: 1000,
         customRules: {
             "/sign-in/social": {
                 window: 60,
-                max: 100,
+                max: 1000,
             },
             "/sign-in/*": {
                 window: 60,
-                max: 100,
+                max: 1000,
             },
         },
     },
