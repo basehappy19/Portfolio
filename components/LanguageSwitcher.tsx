@@ -21,10 +21,12 @@ const LanguageSwitcher = () => {
         setOptimisticLocale(newLocale);
 
         const queryString = searchParams.toString();
-        const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+        const hash = typeof window !== "undefined" ? window.location.hash : "";
+        const basePath = queryString ? `${pathname}?${queryString}` : pathname;
+        const fullPathWithHash = hash ? `${basePath}${hash}` : basePath;
 
         startTransition(() => {
-            router.replace(fullPath, { locale: newLocale });
+            router.replace(fullPathWithHash as any, { locale: newLocale, scroll: false });
         });
     };
 
