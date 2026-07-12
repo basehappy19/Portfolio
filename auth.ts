@@ -1,8 +1,13 @@
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import prisma from "@/lib/prisma";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
+    database: prismaAdapter(prisma, {
+        provider: "postgresql",
+    }),
     baseURL: process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
         : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "https://portfolio.basehappy19.site"),
@@ -59,12 +64,14 @@ export const auth = betterAuth({
             },
         },
     },
+    plugins: [
+        nextCookies(),
+    ],
     session: {
-        expiresIn: 60 * 60 * 24 * 7,
-        updateAge: 60 * 60 * 24,
+        expiresIn: 60 * 60 * 24 * 365, // 1 year (safely under 400-day Max-Age limit)
+        updateAge: 60 * 60 * 24, // refresh daily automatically
         cookieCache: {
-            enabled: true,
-            maxAge: 60 * 60 * 24 * 7
+            enabled: false
         }
     },
     rateLimit: {
@@ -96,3 +103,4 @@ export const auth = betterAuth({
         },
     },
 });
+
