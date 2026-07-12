@@ -67,5 +67,32 @@ export const auth = betterAuth({
             maxAge: 60 * 60 * 24 * 7
         }
     },
-    
+    rateLimit: {
+        window: 60,
+        max: 100,
+        customRules: {
+            "/sign-in/social": {
+                window: 60,
+                max: 100,
+            },
+            "/sign-in/*": {
+                window: 60,
+                max: 100,
+            },
+        },
+    },
+    advanced: {
+        trustedProxyHeaders: true,
+        ipAddress: {
+            ipAddressHeaders: ["cf-connecting-ip", "x-real-ip", "x-forwarded-for"],
+            trustedProxies: [
+                "10.0.0.0/8",
+                "172.16.0.0/12",
+                "192.168.0.0/16",
+                "127.0.0.0/8",
+                "fc00::/7",
+                "::1/128"
+            ],
+        },
+    },
 });
