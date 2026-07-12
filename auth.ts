@@ -1,3 +1,7 @@
+import dns from "node:dns";
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder("ipv4first");
+}
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import prisma from "@/lib/prisma";
