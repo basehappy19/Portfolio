@@ -1,6 +1,6 @@
 import { SubmitData } from "@/types/Form";
 
-const baseUrl = "";
+const baseUrl = typeof window !== "undefined" ? "" : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000");
 
 export async function updateAchievement(id: string, payload: SubmitData) {
     const res = await fetch(`${baseUrl}/api/admin/achievements/${id}`, {

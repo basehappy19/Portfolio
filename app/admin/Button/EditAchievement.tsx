@@ -8,12 +8,16 @@ const EditAchievement = ({ achievement }: { achievement: Achievement }) => {
 
     return (
         <button
-            onClick={() => open(achievement)}
-            className="bg-white dark:bg-[#282c33] shadow-sm max-w-sm w-full p-2.5 cursor-pointer text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg"
-            title="แก้ไข"
+            onClick={(e) => {
+                e.stopPropagation();
+                open(achievement);
+            }}
+            className="inline-flex items-center justify-center p-2 rounded-lg bg-gray-100 hover:bg-rose-50 dark:bg-zinc-800 dark:hover:bg-rose-950/40 text-gray-700 hover:text-rose-600 dark:text-gray-300 dark:hover:text-rose-400 transition cursor-pointer shadow-2xs shrink-0"
+            title="แก้ไขผลงาน"
         >
-            <Edit2 size={18} />
+            <Edit2 size={16} />
         </button>
+
     );
 };
 

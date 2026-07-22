@@ -1,7 +1,7 @@
-import { cache } from "react";
 import prisma from "@/lib/prisma";
+import { cache } from "react";
 
-export const getAchievementFirstImages = cache(async (limit: number | undefined = undefined) => {
+export const getAchievementFirstImages = cache(async function getAchievementFirstImages(limit?: number) {
     const achievements = await prisma.achievement.findMany({
         where: {
             status: "PUBLIC",
@@ -35,4 +35,4 @@ export const getAchievementFirstImages = cache(async (limit: number | undefined 
             alt_en: a.images[0].altText_en,
         }))
         .filter(Boolean);
-});
+});

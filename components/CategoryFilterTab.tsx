@@ -69,12 +69,15 @@ const CategoryFilterTab = async ({
         : ``
 
     return (
-        <div className="space-y-3">
-            <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                {currentFilterText}
-            </div>
+        <div className="space-y-3 mb-6">
+            {currentFilterText && (
+                <div className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 px-1">
+                    {currentFilterText}
+                </div>
+            )}
 
-            <div className="flex flex-wrap gap-3 mb:mb-0 mb-6">
+            {/* Category Pill Tag Cloud: Balanced flex-wrap centered on mobile (`justify-center sm:justify-start`), tap right away without scrolling */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 py-1 w-full">
                 <AllButton
                     TotalAchievements={totalAchievements}
                     AllButtonLabel={AllButtonLabel}

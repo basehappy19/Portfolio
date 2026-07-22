@@ -23,28 +23,18 @@ export default function SearchBar() {
     return (
         <div className="relative w-full">
             <Search
-                className="
-                    absolute left-3 top-1/2 -translate-y-1/2
-                    text-gray-400
-                    dark:text-gray-400
-                "
-                size={20}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
+                size={18}
             />
 
             <input
                 type="text"
-                placeholder="ค้นหาผลงาน..."
+                placeholder="ค้นหาชื่อผลงาน, สถานที่, หรือรางวัล..."
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="
-                    w-full pl-10 pr-4 py-2 rounded-lg border
-                    bg-white text-gray-900 placeholder-gray-400 border-gray-300 transition-all
-                    focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                    shadow-sm
-
-                    dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:border-gray-600
-                "
+                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/70 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-2xs"
             />
         </div>
+
     );
 }

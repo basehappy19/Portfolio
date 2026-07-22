@@ -3,6 +3,7 @@
 import { authClient } from '@/lib/auth-client';
 import { useState } from 'react';
 import { useLocale } from 'next-intl';
+import toast from 'react-hot-toast';
 
 export const SignInButton = () => {
     const locale = useLocale();
@@ -16,12 +17,16 @@ export const SignInButton = () => {
         setIsLoading(true);
 
         try {
-            await authClient.signIn.social({
+            const res = await authClient.signIn.social({
                 provider: 'google',
                 callbackURL: '/admin',
             });
-        } catch (e) {
+            if (res.error) {
+                toast.error(res.error.message || (locale === 'th' ? 'เข้าสู่ระบบไม่สำเร็จ หรือถูกจำกัดจำนวนครั้ง กรุณาลองใหม่ในอีกสักครู่' : 'Sign in failed or rate limited. Please try again soon.'));
+            }
+        } catch (e: any) {
             console.error(e);
+            toast.error(e?.message || (locale === 'th' ? 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' : 'An error occurred while signing in.'));
         }
 
         setIsLoading(false);

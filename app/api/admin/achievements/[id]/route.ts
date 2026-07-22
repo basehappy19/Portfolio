@@ -111,15 +111,17 @@ export async function PUT(
                 if (!img.url) continue;
 
                 try {
-                    const url = new URL(img.url);
-                    const prefix = "/storage/v1/object/public/achievements/";
-                    const idx = url.pathname.indexOf(prefix);
-
-                    if (idx !== -1) {
-                        const pathInBucket = url.pathname.substring(
-                            idx + prefix.length
-                        );
-                        pathsToDelete.push(pathInBucket);
+                    if (img.url.startsWith("http://") || img.url.startsWith("https://")) {
+                        const url = new URL(img.url);
+                        const prefix = "/storage/v1/object/public/achievements/";
+                        const idx = url.pathname.indexOf(prefix);
+                        if (idx !== -1) {
+                            pathsToDelete.push(url.pathname.substring(idx + prefix.length));
+                        } else {
+                            pathsToDelete.push(img.url);
+                        }
+                    } else if (!img.url.includes("/")) {
+                        pathsToDelete.push(`${achievementId}/${img.url}`);
                     } else {
                         pathsToDelete.push(img.url);
                     }
@@ -127,6 +129,7 @@ export async function PUT(
                     pathsToDelete.push(img.url);
                 }
             }
+
 
             if (pathsToDelete.length > 0) {
                 const { error: deleteError } =
@@ -325,15 +328,17 @@ export async function DELETE(
             if (!img.url) continue;
 
             try {
-                const url = new URL(img.url);
-                const prefix = "/storage/v1/object/public/achievements/";
-                const idx = url.pathname.indexOf(prefix);
-
-                if (idx !== -1) {
-                    const pathInBucket = url.pathname.substring(
-                        idx + prefix.length
-                    );
-                    pathsToDelete.push(pathInBucket);
+                if (img.url.startsWith("http://") || img.url.startsWith("https://")) {
+                    const url = new URL(img.url);
+                    const prefix = "/storage/v1/object/public/achievements/";
+                    const idx = url.pathname.indexOf(prefix);
+                    if (idx !== -1) {
+                        pathsToDelete.push(url.pathname.substring(idx + prefix.length));
+                    } else {
+                        pathsToDelete.push(img.url);
+                    }
+                } else if (!img.url.includes("/")) {
+                    pathsToDelete.push(`${achievementId}/${img.url}`);
                 } else {
                     pathsToDelete.push(img.url);
                 }
@@ -341,6 +346,7 @@ export async function DELETE(
                 pathsToDelete.push(img.url);
             }
         }
+
 
         if (pathsToDelete.length > 0) {
             const { error: deleteError } = await supabaseServerClient.storage

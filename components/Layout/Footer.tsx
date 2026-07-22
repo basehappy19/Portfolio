@@ -1,16 +1,8 @@
-import { auth } from "@/auth";
-import { headers } from "next/headers";
-import { SignOutButton } from "../Button/SignOutButton";
-import { SignInButton } from "../Button/SignInButton";
 import { getTranslations } from "next-intl/server";
 import Copyright from "./Copyright";
-import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import FooterAuth from "./FooterAuth";
 
 export default async function Footer() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
   const t = await getTranslations("Index.Footer");
 
   return (
@@ -21,35 +13,10 @@ export default async function Footer() {
             <h3 className="text-xl sm:text-2xl font-bold mb-1.5 text-slate-900 tracking-tight">
               {t("Heading")}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-sm">
-              Creative portfolio built with clean enterprise standards, responsive design, and minimalist aesthetics.
-            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            {session ? (
-              <div className="flex flex-col sm:flex-row items-center gap-3 px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  <span className="text-xs font-medium text-slate-700">
-                    {session.user.email}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/admin"
-                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md font-semibold transition bg-rose-600 text-white shadow-2xs hover:bg-rose-700"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>หน้าแอดมิน</span>
-                  </Link>
-                  <SignOutButton />
-                </div>
-              </div>
-            ) : (
-              <SignInButton />
-            )}
+            <FooterAuth />
           </div>
         </div>
 

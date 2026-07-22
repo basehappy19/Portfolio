@@ -1,5 +1,5 @@
-import { cache } from "react";
 import prisma from "@/lib/prisma";
+import { cache } from "react";
 
 type GetAchievementsParams = {
     category?: string;
@@ -7,11 +7,11 @@ type GetAchievementsParams = {
     limit?: number;
 };
 
-export const getAchievements = cache(async ({
+export const getAchievements = cache(async function getAchievements({
     category,
     offset = 0,
     limit = 9,
-}: GetAchievementsParams = {}) => {
+}: GetAchievementsParams) {
     const baseSelect = {
         id: true,
         title_th: true,
@@ -93,4 +93,4 @@ export const getAchievements = cache(async ({
         hasMore: offset + achievements.length < total,
         nextOffset: offset + achievements.length,
     };
-});
+});

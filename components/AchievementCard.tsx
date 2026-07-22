@@ -11,9 +11,11 @@ import {
     ChevronRight,
     Download,
     Trophy,
+    Edit2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { Achievement } from "@/types/Achievements";
 import { downloadImage } from "@/lib/download";
 import { useSessionContext } from "@/app/contexts/SessionContext";
@@ -25,6 +27,7 @@ interface AchievementCardProps {
 }
 
 const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCardProps) => {
+    const router = useRouter();
     const [isDownloading, setIsDownloading] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -184,14 +187,8 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                         </div>
                     )}
 
-                    {/* Gradient Overlay & Interactive Hover Reveal */}
+                    {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none group-hover:from-slate-950/60 transition-colors duration-300" />
-
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px] pointer-events-none">
-                        <div className="px-3.5 py-1.5 rounded-full bg-white/95 text-rose-600 text-xs font-bold shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                            <span>✨ {locale === "th" ? "คลิกเพื่อดูรายละเอียด" : "Click to view details"}</span>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Content Section */}
@@ -213,7 +210,7 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                     {given_by && (
                         <div className="mb-4">
                             <div className="flex items-center gap-1.5 mb-1">
-                                <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">
+                                <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wide">
                                     {locale === "th" ? "มอบโดย" : "Awarded By"}
                                 </span>
                             </div>
@@ -229,17 +226,19 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                         </p>
                     )}
 
-                    <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-                        {location ? (
-                            <div className="flex items-center gap-1.5 text-slate-500 text-xs line-clamp-1 max-w-[65%]">
-                                <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-                                <span className="truncate">{location}</span>
-                            </div>
-                        ) : <div />}
+                    {/* Location Badge (If present) - Dedicated full width row so it never wraps "สถานที่:" or cramps text */}
+                    {location && (
+                        <div className="mt-auto mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/70 dark:border-zinc-700/60 text-slate-700 dark:text-slate-300 text-xs shadow-2xs" title={location}>
+                            <MapPin className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                            <span className="font-bold text-slate-500 dark:text-slate-400 shrink-0 whitespace-nowrap">{locale === "th" ? "สถานที่:" : "Loc:"}</span>
+                            <span className="truncate font-semibold text-slate-800 dark:text-slate-200">{location}</span>
+                        </div>
+                    )}
 
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors shrink-0 ml-auto">
-                            <span>{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
-                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors">
+                    <div className={`${!location ? 'mt-auto ' : ''}pt-3.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end`}>
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
+                            <span className="whitespace-nowrap">{locale === "th" ? "ดูรายละเอียด" : "View Details"}</span>
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-rose-50 group-hover:bg-rose-100 transition-colors shrink-0">
                                 <ChevronRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                         </div>
@@ -273,13 +272,28 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                     {locale === "th" ? "รายละเอียดผลงาน" : "Project Details"}
                                 </span>
                             </div>
-                            <button
-                                onClick={closeModal}
-                                className="cursor-pointer px-4 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs border border-slate-200/80"
-                            >
-                                <span>{locale === "th" ? "ปิดหน้าต่าง" : "Close"}</span>
-                                <X className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-2.5">
+                                {session && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            router.push(`/admin?edit=${achievement.id}`);
+                                        }}
+                                        className="cursor-pointer px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 shadow-sm transition"
+                                        title={locale === "th" ? "แก้ไขผลงานในหน้า Admin" : "Edit in Admin"}
+                                    >
+                                        <Edit2 className="w-4 h-4" />
+                                        <span>{locale === "th" ? "แก้ไข" : "Edit"}</span>
+                                    </button>
+                                )}
+                                <button
+                                    onClick={closeModal}
+                                    className="cursor-pointer px-4 py-1.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs border border-slate-200/80"
+                                >
+                                    <span>{locale === "th" ? "ปิดหน้าต่าง" : "Close"}</span>
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Spacious Scrollable Drawer Body */}
@@ -406,23 +420,50 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                     {title}
                                 </h2>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200/70 text-slate-700 text-xs sm:text-sm font-medium">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                                     {achievement.receivedAt && (
-                                        <div className="flex items-center gap-2.5">
-                                            <Calendar className="w-4 h-4 text-rose-600 shrink-0" />
-                                            <span>{formatDate(achievement.receivedAt, locale)}</span>
+                                        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 shadow-xs hover:bg-slate-100/60 transition">
+                                            <div className="p-2.5 rounded-xl bg-rose-100/80 text-rose-600 shrink-0 mt-0.5 shadow-2xs">
+                                                <Calendar className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">
+                                                    {locale === "th" ? "วันที่ได้รับ" : "Date"}
+                                                </span>
+                                                <span className="block text-sm font-bold text-slate-800 wrap-break-word">
+                                                    {formatDate(achievement.receivedAt, locale)}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     {location && (
-                                        <div className="flex items-center gap-2.5">
-                                            <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
-                                            <span>{location}</span>
+                                        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 shadow-xs hover:bg-slate-100/60 transition">
+                                            <div className="p-2.5 rounded-xl bg-rose-100/80 text-rose-600 shrink-0 mt-0.5 shadow-2xs">
+                                                <MapPin className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">
+                                                    {locale === "th" ? "สถานที่จัดงาน" : "Location"}
+                                                </span>
+                                                <span className="block text-sm font-bold text-slate-800 wrap-break-word">
+                                                    {location}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     {given_by && (
-                                        <div className="flex items-center gap-2.5 sm:col-span-2">
-                                            <Award className="w-4 h-4 text-amber-600 shrink-0" />
-                                            <span className="font-bold text-slate-800">{given_by}</span>
+                                        <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 shadow-xs hover:bg-slate-100/60 transition sm:col-span-2 lg:col-span-1">
+                                            <div className="p-2.5 rounded-xl bg-rose-100/80 text-rose-600 shrink-0 mt-0.5 shadow-2xs">
+                                                <Award className="w-4 h-4" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">
+                                                    {locale === "th" ? "มอบโดย" : "Awarded By"}
+                                                </span>
+                                                <span className="block text-sm font-bold text-slate-800 wrap-break-word">
+                                                    {given_by}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -461,6 +502,28 @@ const AchievementCard = ({ achievement, locale, priorityImage }: AchievementCard
                                             </a>
                                         ))}
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Bottom Admin Quick Action Bar when logged in */}
+                            {session && (
+                                <div className="mt-8 pt-5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-linear-to-r from-rose-50/90 via-rose-50 to-rose-50/90 p-5 rounded-2xl border border-rose-200/70 shadow-2xs text-center sm:text-left">
+                                    <div className="flex items-center justify-center sm:justify-start gap-2.5">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse shrink-0" />
+                                        <span className="text-xs sm:text-sm font-extrabold text-rose-950">
+                                            {locale === "th" ? "คุณอยู่ในระบบผู้ดูแล" : "Logged in as Admin"}
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            router.push(`/admin?edit=${achievement.id}`);
+                                        }}
+                                        className="cursor-pointer w-full sm:w-auto justify-center px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center gap-2 shadow-sm transition hover:scale-[1.01] active:scale-[0.99]"
+                                    >
+                                        <Edit2 className="w-4 h-4 shrink-0" />
+                                        <span>{locale === "th" ? "แก้ไขผลงานนี้" : "Edit Achievement"}</span>
+                                    </button>
                                 </div>
                             )}
                         </div>

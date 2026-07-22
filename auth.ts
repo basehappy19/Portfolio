@@ -1,17 +1,25 @@
+import dns from "node:dns";
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder("ipv4first");
+}
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
-
-const ALLOWED_EMAILS = (process.env.ALLOWED_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+import prisma from "@/lib/prisma";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
-    baseURL: process.env.BETTER_AUTH_URL,
+    database: prismaAdapter(prisma, {
+        provider: "postgresql",
+    }),
+    baseURL: process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : (process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "https://portfolio.basehappy19.site"),
+    trustedOrigins: ["https://portfolio.basehappy19.site", "http://localhost:3000"],
     socialProviders: {
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.Google_CLIENT_SECRET as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
             getUserInfo: async (token) => {
                 const response = await fetch(
                     "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -31,7 +39,17 @@ export const auth = betterAuth({
                 const profile = await response.json();
                 const email = profile.email?.toLowerCase();
 
-                if (!email || !ALLOWED_EMAILS.includes(email)) {
+                if (!email) {
+                    throw new APIError("UNAUTHORIZED", {
+                        message: "No email provided.",
+                    });
+                }
+
+                const allowedUser = await prisma.allowedEmail.findUnique({
+                    where: { email },
+                });
+
+                if (!allowedUser) {
                     throw new APIError("UNAUTHORIZED", {
                         message: "This email is not allowed to sign in.",
                     });
@@ -50,13 +68,43 @@ export const auth = betterAuth({
             },
         },
     },
+    plugins: [
+        nextCookies(),
+    ],
     session: {
-        expiresIn: 60 * 60 * 24 * 7,
-        updateAge: 60 * 60 * 24,
+        expiresIn: 60 * 60 * 24 * 365, // 1 year (safely under 400-day Max-Age limit)
+        updateAge: 60 * 60 * 24, // refresh daily automatically
         cookieCache: {
-            enabled: true,
-            maxAge: 60 * 60 * 24 * 7
+            enabled: false
         }
     },
-    
+    rateLimit: {
+        window: 60,
+        max: 1000,
+        customRules: {
+            "/sign-in/social": {
+                window: 60,
+                max: 1000,
+            },
+            "/sign-in/*": {
+                window: 60,
+                max: 1000,
+            },
+        },
+    },
+    advanced: {
+        trustedProxyHeaders: true,
+        ipAddress: {
+            ipAddressHeaders: ["cf-connecting-ip", "x-real-ip", "x-forwarded-for"],
+            trustedProxies: [
+                "10.0.0.0/8",
+                "172.16.0.0/12",
+                "192.168.0.0/16",
+                "127.0.0.0/8",
+                "fc00::/7",
+                "::1/128"
+            ],
+        },
+    },
 });
+

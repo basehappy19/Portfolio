@@ -53,12 +53,12 @@ export function AchievementRichText({
         editorProps: {
             attributes: {
                 class: [
-                    'min-h-[140px] w-full rounded-md border px-3.5 py-3 resize-y overflow-auto text-sm',
+                    'min-h-[180px] w-full rounded-xl border px-4 py-3.5 resize-y overflow-auto text-sm sm:text-base leading-relaxed',
                     'bg-white text-gray-900 shadow-2xs',
                     'placeholder:text-gray-400',
                     'focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500',
                     'dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700 dark:focus:border-rose-500',
-                    'prose prose-sm dark:prose-invert max-w-none',
+                    'prose prose-sm sm:prose-base dark:prose-invert max-w-none',
                     '[&_ul]:list-disc [&_ul]:pl-5',
                     '[&_ol]:list-decimal [&_ol]:pl-5',
                     '[&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1',

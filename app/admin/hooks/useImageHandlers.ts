@@ -56,6 +56,28 @@ export const useImageHandlers = ({
         );
     };
 
+    const handleReplaceImage = (
+        index: number,
+        e: ChangeEvent<HTMLInputElement>
+    ) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImagePreview((prev) => {
+            const updated = [...prev];
+            const oldImg = updated[index];
+            if (!oldImg) return prev;
+
+            updated[index] = {
+                ...oldImg,
+                file,
+                preview: URL.createObjectURL(file),
+                id: undefined, // Clear ID so backend treats it as new and deletes old image record + file
+            };
+            return updated;
+        });
+    };
+
     const handleDragStart = (e: DragEvent<HTMLElement>, index: number) => {
         setDraggedIndex(index);
         e.dataTransfer.effectAllowed = "move";
@@ -102,6 +124,7 @@ export const useImageHandlers = ({
 
     return {
         handleImageUpload,
+        handleReplaceImage,
         handleImageAltChange,
         handleRemoveImage,
         handleDragStart,
@@ -110,3 +133,4 @@ export const useImageHandlers = ({
         handleMoveImage,
     };
 };
+

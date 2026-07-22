@@ -33,7 +33,7 @@ export const AchievementTextField: React.FC<Props> = ({
     const hasError = Boolean(error && touched);
 
     const baseInputClass = [
-        'w-full rounded-md border transition-all duration-150 text-sm',
+        'w-full rounded-lg border transition-all duration-150',
         'bg-white text-gray-900 placeholder-gray-400 hover:border-gray-400',
         'focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500',
         'shadow-2xs',
@@ -42,8 +42,8 @@ export const AchievementTextField: React.FC<Props> = ({
 
     const sizeClass =
         size === 'lg'
-            ? 'px-3.5 py-2.5 font-medium'
-            : 'px-3 py-2';
+            ? 'px-4 py-3 text-base sm:text-lg font-semibold rounded-xl'
+            : 'px-3.5 py-2.5 text-sm sm:text-base font-medium rounded-lg';
 
     const borderClass = hasError
         ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20'

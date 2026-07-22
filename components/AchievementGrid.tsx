@@ -17,24 +17,9 @@ export default function AchievementGrid({
   const [cols, setCols] = useState<2 | 3>(3);
 
   return (
-    <div className="w-full">
-      {/* Interactive Stats & View Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 p-4 rounded-2xl bg-linear-to-r from-slate-50/90 via-white/80 to-slate-50/90 border border-slate-200/80 shadow-xs backdrop-blur-sm">
-        {/* Left Stats */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-2xs text-xs sm:text-sm font-bold text-slate-800">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600"></span>
-            </span>
-            <span>
-              {locale === 'th'
-                ? `ผลงานทั้งหมด ${achievements.length} รายการ`
-                : `${achievements.length} Projects`}
-            </span>
-          </div>
-        </div>
-
+    <div className="space-y-6">
+      {/* Top Controls Bar */}
+      <div className="flex items-center justify-end py-2 border-b border-slate-200/80">
         {/* Right Segmented Column Controls */}
         <div className="hidden md:flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/60 border border-slate-300/50">
           <button
