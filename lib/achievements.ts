@@ -1,8 +1,5 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-const connectionString = process.env.DATABASE_URL;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+import { cache } from "react";
+import prisma from "@/lib/prisma";
 
 type GetAchievementsParams = {
     category?: string;
@@ -10,11 +7,11 @@ type GetAchievementsParams = {
     limit?: number;
 };
 
-export async function getAchievements({
+export const getAchievements = cache(async ({
     category,
     offset = 0,
     limit = 9,
-}: GetAchievementsParams) {
+}: GetAchievementsParams = {}) => {
     const baseSelect = {
         id: true,
         title_th: true,
@@ -96,4 +93,4 @@ export async function getAchievements({
         hasMore: offset + achievements.length < total,
         nextOffset: offset + achievements.length,
     };
-}
+});

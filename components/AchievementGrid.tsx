@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Achievement as AchievementType } from '@/types/Achievements';
 import AchievementCard from './AchievementCard';
-import { Grid2X2, Grid3X3, Sparkles } from 'lucide-react';
+import { Grid2X2, Grid3X3 } from 'lucide-react';
 
 interface AchievementGridProps {
   achievements: AchievementType[];
@@ -20,7 +20,7 @@ export default function AchievementGrid({
     <div className="w-full">
       {/* Interactive Stats & View Control Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 p-4 rounded-2xl bg-linear-to-r from-slate-50/90 via-white/80 to-slate-50/90 border border-slate-200/80 shadow-xs backdrop-blur-sm">
-        {/* Left Stats & Hint */}
+        {/* Left Stats */}
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 shadow-2xs text-xs sm:text-sm font-bold text-slate-800">
             <span className="relative flex h-2 w-2">
@@ -31,15 +31,6 @@ export default function AchievementGrid({
               {locale === 'th'
                 ? `ผลงานทั้งหมด ${achievements.length} รายการ`
                 : `${achievements.length} Projects`}
-            </span>
-          </div>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50/80 border border-rose-200/60 text-rose-700 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-            <span>
-              {locale === 'th'
-                ? 'คลิกที่ผลงานเพื่อดูรายละเอียด & รูปภาพ'
-                : 'Click any card to explore full details'}
             </span>
           </div>
         </div>

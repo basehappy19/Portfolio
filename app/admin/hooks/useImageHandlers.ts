@@ -86,6 +86,20 @@ export const useImageHandlers = ({
         );
     };
 
+    const handleMoveImage = (fromIndex: number, toIndex: number) => {
+        setImagePreview((prev) => {
+            const newImages = [...prev];
+            const item = newImages[fromIndex];
+            if (!item) return prev;
+            newImages.splice(fromIndex, 1);
+            newImages.splice(toIndex, 0, item);
+            return newImages.map((img, idx) => ({
+                ...img,
+                sortOrder: idx + 1,
+            }));
+        });
+    };
+
     return {
         handleImageUpload,
         handleImageAltChange,
@@ -93,5 +107,6 @@ export const useImageHandlers = ({
         handleDragStart,
         handleDragOver,
         handleDragEnd,
+        handleMoveImage,
     };
 };

@@ -3,9 +3,14 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error("Missing OPENAI_API_KEY environment variable");
+    }
+    return new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
+}
 
 export async function POST(req: Request) {
     const session = await auth.api.getSession({
@@ -49,6 +54,7 @@ export async function POST(req: Request) {
     }
 
     try {
+        const openai = getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [

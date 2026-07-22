@@ -5,6 +5,11 @@ import NextTopLoader from 'nextjs-toploader';
 import { SessionProvider } from "./contexts/SessionContext";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    metadataBase: new URL("https://portfolio.basehappy19.site"),
+};
 
 export default async function RootLayout({
     children,

@@ -14,19 +14,19 @@ import { getLocale } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-
   const isTH = locale === "th";
 
+  const baseUrl = "https://portfolio.basehappy19.site";
+  const url = `${baseUrl}/${locale}`;
+  const image = `${baseUrl}/profiles/me.png`;
+
   const title = isTH
-    ? "ผลงาน & โปรไฟล์ | พอร์ตฟอลิโอของผม"
-    : "Portfolio & Works | My Personal Profile";
+    ? "ผลงาน & โปรไฟล์ | พอร์ตฟอลิโอของผม (Portfolio & Achievements)"
+    : "Portfolio & Works | Professional Developer & Innovator Profile";
 
   const description = isTH
-    ? "พอร์ตฟอลิโอแสดงทักษะ ความสามารถ ผลงานรางวัล และประสบการณ์ในการทำงานของผม"
-    : "A personal portfolio showcasing my skills, achievements, projects, awards, and professional experience";
-
-  const url = process.env.NEXT_PUBLIC_APP_URL;
-  const image = process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? "";
+    ? "ยินดีต้อนรับสู่พอร์ตฟอลิโออย่างเป็นทางการ แสดงผลงาน รางวัลนวัตกรรม ทักษะการพัฒนาซอฟต์แวร์ และประสบการณ์การทำงานระดับมืออาชีพ"
+    : "Welcome to my official portfolio showcasing innovative projects, prestigious awards, software engineering skills, and professional achievements.";
 
   return {
     title,
@@ -37,34 +37,51 @@ export async function generateMetadata(): Promise<Metadata> {
         "Portfolio",
         "ผลงาน",
         "นักพัฒนา",
-        "เว็บ",
-        "นักออกแบบ",
+        "เว็บแอปพลิเคชัน",
+        "นวัตกร",
+        "ซอฟต์แวร์",
         "เรซูเม่",
         "สมัครงาน"
       ]
       : [
         "Portfolio",
-        "Developer",
-        "Designer",
+        "Full-Stack Developer",
+        "Software Engineer",
+        "Web Development",
         "Projects",
-        "Resume",
-        "Software Engineer"
+        "Awards",
+        "Innovator",
+        "Resume"
       ],
+    authors: [{ name: "Pakpoom TD", url: baseUrl }],
+    creator: "Pakpoom TD",
+    publisher: "Pakpoom TD",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
 
     openGraph: {
       title,
       description,
       url,
-      siteName: isTH ? "พอร์ตฟอลิโอของผม" : "My Portfolio",
+      siteName: isTH ? "พอร์ตฟอลิโอของผม" : "My Professional Portfolio",
       images: [
         {
           url: image,
           width: 1200,
           height: 630,
-          alt: isTH ? "พอร์ตฟอลิโอ" : "Portfolio"
+          alt: isTH ? "ภาพโปรไฟล์และผลงานของผม" : "Personal Portfolio & Achievements Profile Image"
         }
       ],
-      locale: locale,
+      locale: isTH ? "th_TH" : "en_US",
       type: "website",
     },
 
@@ -78,8 +95,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: url,
       languages: {
-        en: `${url}/en`,
-        th: `${url}/th`,
+        en: `${baseUrl}/en`,
+        th: `${baseUrl}/th`,
       },
     },
   };
@@ -122,9 +139,11 @@ export default async function IndexPage(props: {
     "@type": "ProfilePage",
     "mainEntity": {
       "@type": "Person",
-      "name": "Full Stack Developer Portfolio",
-      "description": "Professional Software Engineer & Designer Portfolio showcasing creative achievements and modern web development skills.",
-      "url": process.env.NEXT_PUBLIC_APP_URL || "https://portfolio.com",
+      "name": locale === "th" ? "พอร์ตฟอลิโอของผม (Pakpoom TD)" : "Pakpoom TD - Full Stack Developer Portfolio",
+      "description": locale === "th" ? "พอร์ตฟอลิโอแสดงทักษะ ความสามารถ ผลงานรางวัลนวัตกรรม และประสบการณ์ในการทำงานของผม" : "Professional Software Engineer & Innovator Portfolio showcasing creative achievements and modern web development skills.",
+      "url": "https://portfolio.basehappy19.site",
+      "image": "https://portfolio.basehappy19.site/profiles/me.png",
+      "jobTitle": "Full Stack Developer",
       "sameAs": []
     }
   };

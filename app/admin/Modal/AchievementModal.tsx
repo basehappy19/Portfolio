@@ -133,6 +133,7 @@ const AchievementModalInner = ({
         handleDragStart,
         handleDragOver,
         handleDragEnd,
+        handleMoveImage,
     } = useImageHandlers({
         imagePreview,
         setImagePreview,
@@ -707,6 +708,7 @@ const AchievementModalInner = ({
                                 handleDragStart={handleDragStart}
                                 handleDragOver={handleDragOver}
                                 handleDragEnd={handleDragEnd}
+                                handleMoveImage={handleMoveImage}
                             />
                         </div>
                     </div>

@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const locale = await getLocale();
     const isTH = locale === "th";
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const baseUrl = "https://portfolio.basehappy19.site";
     const path = "/admin";
     const url = `${baseUrl}${path}`;
 
@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
         ? "ระบบหลังบ้านสำหรับจัดการผลงาน รางวัล และข้อมูลในพอร์ตฟอลิโอของผม"
         : "Admin dashboard for managing achievements, awards, and portfolio content.";
 
-    const image = process.env.NEXT_PUBLIC_OG_IMAGE_URL ?? "";
+    const image = `${baseUrl}/profiles/me.png`;
 
     return {
         title,

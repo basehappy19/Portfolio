@@ -18,6 +18,7 @@ type Props = {
     handleDragStart: (e: DragEvent<HTMLElement>, index: number) => void;
     handleDragOver: (e: DragEvent<HTMLElement>, index: number) => void;
     handleDragEnd: () => void;
+    handleMoveImage: (fromIndex: number, toIndex: number) => void;
 };
 
 export const AchievementImagesSection: React.FC<Props> = ({
@@ -29,25 +30,16 @@ export const AchievementImagesSection: React.FC<Props> = ({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    handleMoveImage,
 }) => {
     const moveUp = (index: number) => {
         if (index === 0) return;
-        const currentImg = imagePreview[index];
-        const prevImg = imagePreview[index - 1];
-        handleImageAltChange(index, 'altText_th', prevImg.altText_th);
-        handleImageAltChange(index, 'altText_en', prevImg.altText_en);
-        handleImageAltChange(index - 1, 'altText_th', currentImg.altText_th);
-        handleImageAltChange(index - 1, 'altText_en', currentImg.altText_en);
+        handleMoveImage(index, index - 1);
     };
 
     const moveDown = (index: number) => {
         if (index === imagePreview.length - 1) return;
-        const currentImg = imagePreview[index];
-        const nextImg = imagePreview[index + 1];
-        handleImageAltChange(index, 'altText_th', nextImg.altText_th);
-        handleImageAltChange(index, 'altText_en', nextImg.altText_en);
-        handleImageAltChange(index + 1, 'altText_th', currentImg.altText_th);
-        handleImageAltChange(index + 1, 'altText_en', currentImg.altText_en);
+        handleMoveImage(index, index + 1);
     };
 
     return (

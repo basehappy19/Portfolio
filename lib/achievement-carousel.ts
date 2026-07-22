@@ -1,10 +1,7 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-const connectionString = process.env.DATABASE_URL;
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+import { cache } from "react";
+import prisma from "@/lib/prisma";
 
-export async function getAchievementFirstImages(limit = undefined) {
+export const getAchievementFirstImages = cache(async (limit: number | undefined = undefined) => {
     const achievements = await prisma.achievement.findMany({
         where: {
             status: "PUBLIC",
@@ -38,4 +35,4 @@ export async function getAchievementFirstImages(limit = undefined) {
             alt_en: a.images[0].altText_en,
         }))
         .filter(Boolean);
-}
+});
