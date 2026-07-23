@@ -43,6 +43,17 @@ export const AchievementImagesSection: React.FC<Props> = ({
         setMounted(true);
     }, []);
 
+    React.useEffect(() => {
+        if (previewUrl) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [previewUrl]);
+
     const moveUp = (index: number) => {
         if (index === 0) return;
         handleMoveImage(index, index - 1);

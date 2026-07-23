@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 type DeleteModalProps = {
     isOpen: boolean;
     onClose: () => void;
@@ -17,6 +19,17 @@ const DeleteModal = ({
     isLoading = false,
     isAnimating = false
 }: DeleteModalProps) => {
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
