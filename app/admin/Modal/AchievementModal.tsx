@@ -5,7 +5,7 @@ import {
     DragEvent,
     useEffect,
 } from 'react';
-import { X, AlertCircle, Save, Loader2, Grid3x3, CheckCircle2 } from 'lucide-react';
+import { X, AlertCircle, Save, Loader2, Grid3x3, CheckCircle2, Info, Image as ImageIcon } from 'lucide-react';
 import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
 import { EditData } from '@/types/Achievements';
@@ -22,6 +22,8 @@ import { createAchievement, deleteAchievement, updateAchievement } from '../serv
 import toast from 'react-hot-toast';
 import { AchievementRichText } from '../AchievementRichText';
 import { useFormDraft } from '../hooks/useFormDraft';
+
+type Tab = 'general' | 'details' | 'media';
 
 export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
@@ -93,6 +95,7 @@ const AchievementModalInner = ({
         createInitialFormState(editData, defaultSortOrder)
     );
 
+    const [activeTab, setActiveTab] = useState<Tab>('general');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -400,117 +403,167 @@ const AchievementModalInner = ({
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const mediaCount = imagePreview.length + links.length;
+
     return (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ${
+                className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
                     isAnimating ? 'opacity-100' : 'opacity-0'
                 }`}
                 onClick={handleSafeClose}
             />
 
-            {/* Slide-over Studio Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 w-full flex">
-                <div
-                    className={`w-full bg-white dark:bg-zinc-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-zinc-800 ${
-                        isAnimating ? 'translate-x-0' : 'translate-x-full'
+            {/* Modal Panel */}
+            <div
+                className={`relative w-full sm:max-w-3xl bg-white dark:bg-zinc-900 shadow-2xl flex flex-col
+                    rounded-t-2xl sm:rounded-2xl border border-gray-200 dark:border-zinc-800
+                    transform transition-all duration-300 ease-out
+                    max-h-[95dvh] sm:max-h-[90dvh]
+                    ${isAnimating
+                        ? 'translate-y-0 opacity-100 scale-100'
+                        : 'translate-y-8 opacity-0 scale-[0.98]'
                     }`}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {/* Sticky Top Header Bar */}
-                    <div className="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between sticky top-0 z-20">
-                        <div>
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                                {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
-                            </h2>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                จัดการรายละเอียด หมวดหมู่ รูปภาพ และลิงก์ที่เกี่ยวข้อง
-                            </p>
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-zinc-800 shrink-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <h2 className="text-base font-bold text-gray-900 dark:text-white truncate">
+                            {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
+                        </h2>
+                        {isDirty && (
+                            <span
+                                className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse"
+                                title="มีการแก้ไขที่ยังไม่ได้บันทึก"
+                            />
+                        )}
+                    </div>
+                    <button
+                        onClick={handleSafeClose}
+                        type="button"
+                        className="cursor-pointer p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 dark:hover:text-gray-300 transition shrink-0"
+                        title="ปิดหน้าต่าง"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {/* Draft Banner */}
+                {hasDraft && (
+                    <div className="mx-4 mt-3 px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200 shrink-0">
+                        <div className="flex items-center gap-2 font-semibold min-w-0">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse" />
+                            <span className="truncate">พบข้อมูลร่างล่าสุดเมื่อ {draftTime}</span>
+                            {draftPreview && (
+                                <span className="hidden sm:inline px-2 py-0.5 rounded-md bg-amber-100/90 dark:bg-amber-900/60 border border-amber-300/60 font-bold truncate max-w-[180px]">
+                                    &ldquo;{draftPreview}&rdquo;
+                                </span>
+                            )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
                             <button
-                                onClick={handleSafeClose}
                                 type="button"
-                                className="cursor-pointer p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 dark:hover:text-gray-300 transition"
-                                title="ปิดหน้าต่าง"
+                                onClick={handleRestoreDraft}
+                                className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition cursor-pointer"
                             >
-                                <X size={20} />
+                                กู้คืน
+                            </button>
+                            <button
+                                type="button"
+                                onClick={clearDraft}
+                                className="px-2.5 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold rounded-lg text-xs transition cursor-pointer"
+                            >
+                                ลบร่าง
                             </button>
                         </div>
                     </div>
+                )}
 
-                    {/* Draft Banner */}
-                    {hasDraft && (
-                        <div className="mx-6 mt-4 px-4.5 py-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-900 dark:text-amber-200 shrink-0 shadow-xs">
-                            <div className="flex items-center gap-3 font-semibold min-w-0">
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 animate-pulse" />
-                                <div className="min-w-0 flex flex-wrap items-center gap-2">
-                                    <span>พบข้อมูลร่างที่พิมพ์ค้างไว้ล่าสุดเมื่อเวลา {draftTime}</span>
-                                    {draftPreview && (
-                                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-100/90 dark:bg-amber-900/60 border border-amber-300/80 dark:border-amber-700/60 font-bold text-amber-950 dark:text-amber-100 truncate max-w-[280px]">
-                                            "{draftPreview}"
-                                        </span>
-                                    )}
-                                </div>
+                {/* Tab Bar */}
+                <div className="flex items-center gap-0.5 px-4 pt-3 pb-0 border-b border-gray-100 dark:border-zinc-800 shrink-0">
+                    {([
+                        {
+                            id: 'general' as Tab,
+                            label: 'ทั่วไป',
+                            icon: <Grid3x3 size={13} />,
+                            badge: (!formData.title_th || !formData.title_en || formData.categorySlugs.length === 0) ? '!' : null,
+                        },
+                        {
+                            id: 'details' as Tab,
+                            label: 'รายละเอียด',
+                            icon: <Info size={13} />,
+                            badge: null,
+                        },
+                        {
+                            id: 'media' as Tab,
+                            label: 'รูปภาพ & ลิงก์',
+                            icon: <ImageIcon size={13} />,
+                            badge: mediaCount > 0 ? mediaCount : null,
+                        },
+                    ]).map((tab) => (
+                        <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`cursor-pointer flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
+                                activeTab === tab.id
+                                    ? 'border-rose-500 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/20'
+                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-zinc-600'
+                            }`}
+                        >
+                            {tab.icon}
+                            <span>{tab.label}</span>
+                            {tab.badge !== null && (
+                                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
+                                    tab.badge === '!'
+                                        ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
+                                        : 'bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300'
+                                }`}>
+                                    {tab.badge}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Scrollable Tab Content */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+
+                    {/* TAB 1: ทั่วไป */}
+                    {activeTab === 'general' && (
+                        <div className="px-5 py-5 space-y-5">
+                            {/* ชื่อผลงาน */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <AchievementTextField
+                                    label="ชื่อผลงาน (ไทย)"
+                                    name="title_th"
+                                    value={formData.title_th}
+                                    onChange={handleInputChange}
+                                    onBlur={() => handleBlur("title_th")}
+                                    placeholder="ชื่อผลงานภาษาไทย"
+                                    required
+                                    size="lg"
+                                    error={errors.title_th}
+                                    touched={touched.title_th}
+                                />
+                                <AchievementTextField
+                                    label="ชื่อผลงาน (English)"
+                                    name="title_en"
+                                    value={formData.title_en}
+                                    onChange={handleInputChange}
+                                    onBlur={() => handleBlur('title_en')}
+                                    placeholder="Achievement Title"
+                                    required
+                                    size="lg"
+                                    error={errors.title_en}
+                                    touched={touched.title_en}
+                                />
                             </div>
-                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                                <button
-                                    type="button"
-                                    onClick={handleRestoreDraft}
-                                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg shadow-2xs transition cursor-pointer"
-                                >
-                                    กู้คืนข้อมูล
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={clearDraft}
-                                    className="px-3.5 py-1.5 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold rounded-lg transition cursor-pointer"
-                                >
-                                    ลบร่าง
-                                </button>
-                            </div>
-                        </div>
-                    )}
 
-                    {/* Scrollable Body */}
-                    <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 space-y-8">
-                        {/* ข้อมูลหลัก */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
-                                <div className="w-1 h-4 bg-rose-500 rounded-full"></div>
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                                    ข้อมูลทั่วไป
-                                </h3>
-                            </div>
-
-                            <AchievementTextField
-                                label="ชื่อผลงาน (ไทย)"
-                                name="title_th"
-                                value={formData.title_th}
-                                onChange={handleInputChange}
-                                onBlur={() => handleBlur("title_th")}
-                                placeholder="ชื่อผลงานภาษาไทย"
-                                required
-                                size="lg"
-                                error={errors.title_th}
-                                touched={touched.title_th}
-                            />
-
-                            <AchievementTextField
-                                label="ชื่อผลงาน (English)"
-                                name="title_en"
-                                value={formData.title_en}
-                                onChange={handleInputChange}
-                                onBlur={() => handleBlur('title_en')}
-                                placeholder="Achievement Title"
-                                required
-                                size="lg"
-                                error={errors.title_en}
-                                touched={touched.title_en}
-                            />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* มอบโดย */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <AchievementTextField
                                     label="มอบโดย (ไทย)"
                                     name="given_by_th"
@@ -519,7 +572,6 @@ const AchievementModalInner = ({
                                     placeholder="ชื่อองค์กร / สถาบัน"
                                     size="md"
                                 />
-
                                 <AchievementTextField
                                     label="มอบโดย (English)"
                                     name="given_by_en"
@@ -530,33 +582,92 @@ const AchievementModalInner = ({
                                 />
                             </div>
 
-                            <AchievementRichText
-                                label="รายละเอียด (ไทย)"
-                                name="description_th"
-                                value={formData.description_th}
-                                onChange={handleRichChange}
-                                placeholder="อธิบายรายละเอียดของผลงาน รางวัล หรือโครงการนี้..."
-                            />
+                            <hr className="border-gray-100 dark:border-zinc-800" />
 
-                            <AchievementRichText
-                                label="รายละเอียด (English)"
-                                name="description_en"
-                                value={formData.description_en}
-                                onChange={handleRichChange}
-                                placeholder="Describe the achievement, competition, or project details..."
-                            />
-                        </div>
+                            {/* หมวดหมู่ + สถานะ */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                                {/* Category */}
+                                <div className="lg:col-span-2 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                            <Grid3x3 className="w-3.5 h-3.5 text-rose-500" />
+                                            <span>หมวดหมู่</span>
+                                            <span className="text-rose-500">*</span>
+                                        </label>
+                                        {formData.categorySlugs.length > 0 && (
+                                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] flex items-center gap-1">
+                                                <CheckCircle2 size={11} />
+                                                {formData.categorySlugs.length} หมวด
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {categories.map((cat) => {
+                                            const isSelected = formData.categorySlugs.includes(cat.slug);
+                                            return (
+                                                <button
+                                                    key={cat.id}
+                                                    type="button"
+                                                    onClick={() => toggleCategorySlug(cat.slug)}
+                                                    className={`cursor-pointer px-3 py-2 rounded-lg border text-left text-xs font-semibold transition-all flex items-center justify-between gap-1.5 select-none ${
+                                                        isSelected
+                                                            ? 'bg-rose-500 text-white border-rose-600 shadow-sm ring-2 ring-rose-500/20'
+                                                            : 'bg-white dark:bg-zinc-800/80 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-zinc-700 hover:border-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
+                                                    }`}
+                                                >
+                                                    <span className="truncate">{cat.name_th}</span>
+                                                    {isSelected && <CheckCircle2 size={13} className="shrink-0 stroke-[2.5]" />}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    {errors.categorySlugs && touched.categorySlugs && (
+                                        <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold text-red-600 dark:text-red-400">
+                                            <AlertCircle size={13} className="shrink-0" />
+                                            <span>{errors.categorySlugs}</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                        {/* ข้อมูลรางวัลและสถานที่ */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
-                                <div className="w-1 h-4 bg-amber-500 rounded-full"></div>
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                                    ระดับรางวัล & สถานที่
-                                </h3>
+                                {/* Publish Toggle */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-200 block">
+                                        สถานะการเผยแพร่
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, isPublished: !prev.isPublished }))}
+                                        className={`w-full cursor-pointer p-3.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 shadow-xs select-none ${
+                                            formData.isPublished
+                                                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-600/60'
+                                                : 'bg-gray-50 dark:bg-zinc-800/60 border-gray-200 dark:border-zinc-700'
+                                        }`}
+                                    >
+                                        <div className="text-left">
+                                            <div className={`text-xs font-bold ${formData.isPublished ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-600 dark:text-gray-400'}`}>
+                                                {formData.isPublished ? 'เผยแพร่แล้ว' : 'ฉบับร่าง'}
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">
+                                                {formData.isPublished ? 'แสดงบนเว็บสาธารณะ' : 'ซ่อนจากสาธารณะ'}
+                                            </div>
+                                        </div>
+                                        <div className={`w-10 h-5 rounded-full p-0.5 transition-colors duration-200 flex items-center shrink-0 ${
+                                            formData.isPublished ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'
+                                        }`}>
+                                            <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-transform duration-200 ${
+                                                formData.isPublished ? 'translate-x-5' : 'translate-x-0'
+                                            }`} />
+                                        </div>
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                    )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* TAB 2: รายละเอียด */}
+                    {activeTab === 'details' && (
+                        <div className="px-5 py-5 space-y-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <AchievementTextField
                                     label="ระดับรางวัล (ไทย)"
                                     name="awardLevel_th"
@@ -565,7 +676,6 @@ const AchievementModalInner = ({
                                     placeholder="เช่น ระดับประเทศ / ระดับภาค"
                                     size="md"
                                 />
-
                                 <AchievementTextField
                                     label="ระดับรางวัล (English)"
                                     name="awardLevel_en"
@@ -574,9 +684,6 @@ const AchievementModalInner = ({
                                     placeholder="e.g. National / Regional"
                                     size="md"
                                 />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <AchievementTextField
                                     label="สถานที่ (ไทย)"
                                     name="location_th"
@@ -585,7 +692,6 @@ const AchievementModalInner = ({
                                     placeholder="สถานที่จัดงาน / เมือง"
                                     size="md"
                                 />
-
                                 <AchievementTextField
                                     label="สถานที่ (English)"
                                     name="location_en"
@@ -605,138 +711,32 @@ const AchievementModalInner = ({
                                     name="receivedAt"
                                     value={formData.receivedAt}
                                     onChange={handleInputChange}
-                                    className="w-full px-3.5 py-2.5 rounded-lg border text-sm sm:text-base font-medium bg-white text-gray-900 border-gray-200 shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
+                                    className="px-3.5 py-2.5 rounded-lg border text-sm font-medium bg-white text-gray-900 border-gray-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
                                 />
                             </div>
-                        </div>
 
-                        {/* การตั้งค่าและหมวดหมู่ */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
-                                <div className="w-1 h-4 bg-emerald-500 rounded-full"></div>
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                                    หมวดหมู่และการเผยแพร่
-                                </h3>
-                            </div>
+                            <hr className="border-gray-100 dark:border-zinc-800" />
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                {/* Category Selection Panel (2 Columns) */}
-                                <div className="lg:col-span-2 space-y-2">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <label className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200">
-                                            <Grid3x3 className="w-4 h-4 text-rose-500" />
-                                            <span>เลือกหมวดหมู่ผลงาน</span>
-                                            <span className="text-rose-500">*</span>
-                                        </label>
-                                        {formData.categorySlugs.length > 0 && (
-                                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1">
-                                                <CheckCircle2 size={13} />
-                                                เลือกแล้ว {formData.categorySlugs.length} หมวดหมู่
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1.5">
-                                        {categories.map((cat) => {
-                                            const isSelected = formData.categorySlugs.includes(cat.slug);
-                                            return (
-                                                <button
-                                                    key={cat.id}
-                                                    type="button"
-                                                    onClick={() => toggleCategorySlug(cat.slug)}
-                                                    className={`cursor-pointer p-3 rounded-xl border text-left font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs select-none ${
-                                                        isSelected
-                                                            ? 'bg-rose-500 text-white border-rose-600 shadow-md ring-2 ring-rose-500/20 scale-[1.01]'
-                                                            : 'bg-white dark:bg-zinc-800/80 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-zinc-700 hover:border-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
-                                                    }`}
-                                                >
-                                                    <span className="truncate">{cat.name_th}</span>
-                                                    <div className={`w-5 h-5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                                                        isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-zinc-700 text-gray-400'
-                                                    }`}>
-                                                        {isSelected ? <CheckCircle2 size={14} className="stroke-[2.5]" /> : <span className="text-xs font-black">+</span>}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {errors.categorySlugs && touched.categorySlugs && (
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 p-2.5 rounded-xl border border-red-200 dark:border-red-800/60">
-                                            <AlertCircle size={15} className="shrink-0" />
-                                            <span>{errors.categorySlugs}</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Publish Setting Action Card (1 Column) */}
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-1">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                                        <span>สถานะการเผยแพร่</span>
-                                    </label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        กำหนดการแสดงผลบนหน้าเว็บสาธารณะ
-                                    </p>
-
-                                    <div
-                                        onClick={() => setFormData(prev => ({ ...prev, isPublished: !prev.isPublished }))}
-                                        className={`cursor-pointer p-4 sm:p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 shadow-2xs select-none h-[calc(100%-44px)] min-h-[140px] ${
-                                            formData.isPublished
-                                                ? 'bg-emerald-50/90 dark:bg-emerald-950/30 border-emerald-500/80 dark:border-emerald-600/60 ring-2 ring-emerald-500/10'
-                                                : 'bg-gray-50 dark:bg-zinc-800/60 border-gray-200 dark:border-zinc-700 hover:border-gray-300'
-                                        }`}
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
-                                                        formData.isPublished
-                                                            ? 'bg-emerald-500 text-white shadow-xs'
-                                                            : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'
-                                                    }`}>
-                                                        {formData.isPublished ? 'เผยแพร่ทันที' : 'ฉบับร่าง'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs font-medium text-gray-600 dark:text-gray-300 leading-relaxed pt-1">
-                                                    {formData.isPublished
-                                                        ? 'ผลงานนี้จะแสดงบนหน้าเว็บไซต์หลักทันที ทุกคนสามารถมองเห็นและเข้าชมได้'
-                                                        : 'ผลงานนี้จะถูกบันทึกเก็บไว้เป็นฉบับร่าง ซ่อนจากสาธารณะ เห็นเฉพาะผู้ดูแลระบบ'}
-                                                </p>
-                                            </div>
-
-                                            {/* Visual Toggle Switch */}
-                                            <div className={`w-12 h-6.5 rounded-full p-1 transition-colors duration-300 ease-in-out shrink-0 flex items-center ${
-                                                formData.isPublished ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'
-                                            }`}>
-                                                <div className={`w-4.5 h-4.5 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
-                                                    formData.isPublished ? 'translate-x-5.5' : 'translate-x-0'
-                                                }`} />
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2 border-t border-gray-200/60 dark:border-zinc-700/60 flex items-center justify-between text-[11px] font-bold text-gray-500">
-                                            <span>คลิกเพื่อสลับสถานะ</span>
-                                            <span>{formData.isPublished ? 'เปิดแสดงผล' : 'ซ่อนไว้ก่อน'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ลิงก์และรูปภาพ */}
-                        <div className="space-y-6 pt-2">
-                            <AchievementLinksSection
-                                links={links}
-                                draggedLinkIndex={draggedLinkIndex}
-                                addLink={addLink}
-                                removeLink={removeLink}
-                                handleLinkChange={handleLinkChange}
-                                handleLinkDragStart={handleLinkDragStart}
-                                handleLinkDragOver={handleLinkDragOver}
-                                handleLinkDragEnd={handleLinkDragEnd}
+                            <AchievementRichText
+                                label="รายละเอียด (ไทย)"
+                                name="description_th"
+                                value={formData.description_th}
+                                onChange={handleRichChange}
+                                placeholder="อธิบายรายละเอียดของผลงาน รางวัล หรือโครงการนี้..."
                             />
+                            <AchievementRichText
+                                label="รายละเอียด (English)"
+                                name="description_en"
+                                value={formData.description_en}
+                                onChange={handleRichChange}
+                                placeholder="Describe the achievement, competition, or project details..."
+                            />
+                        </div>
+                    )}
 
+                    {/* TAB 3: รูปภาพ & ลิงก์ */}
+                    {activeTab === 'media' && (
+                        <div className="px-5 py-5 space-y-6">
                             <AchievementImagesSection
                                 imagePreview={imagePreview}
                                 draggedIndex={draggedIndex}
@@ -749,28 +749,56 @@ const AchievementModalInner = ({
                                 handleDragEnd={handleDragEnd}
                                 handleMoveImage={handleMoveImage}
                             />
-
+                            <hr className="border-gray-100 dark:border-zinc-800" />
+                            <AchievementLinksSection
+                                links={links}
+                                draggedLinkIndex={draggedLinkIndex}
+                                addLink={addLink}
+                                removeLink={removeLink}
+                                handleLinkChange={handleLinkChange}
+                                handleLinkDragStart={handleLinkDragStart}
+                                handleLinkDragOver={handleLinkDragOver}
+                                handleLinkDragEnd={handleLinkDragEnd}
+                            />
                         </div>
-                    </div>
+                    )}
+                </div>
 
-                    {/* Sticky Bottom Action Bar */}
-                    <div className="px-6 py-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-900/90 flex justify-end gap-3 sticky bottom-0 z-20">
+                {/* Action Bar */}
+                <div className="px-5 py-3.5 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-900/90 flex items-center justify-between gap-3 shrink-0">
+                    {/* Tab dots indicator */}
+                    <div className="flex items-center gap-1.5">
+                        {(['general', 'details', 'media'] as const).map((tab, i) => (
+                            <button
+                                key={tab}
+                                type="button"
+                                onClick={() => setActiveTab(tab)}
+                                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                                    activeTab === tab
+                                        ? 'bg-rose-500 w-5'
+                                        : 'bg-gray-300 dark:bg-zinc-600 hover:bg-gray-400 w-1.5'
+                                }`}
+                                aria-label={`Tab ${i + 1}`}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
                         <button
                             onClick={close}
                             type="button"
-                            className="cursor-pointer px-4 py-2 rounded-md font-medium text-xs border border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800 transition"
+                            className="cursor-pointer px-4 py-2 rounded-lg font-medium text-xs border border-gray-200 text-gray-600 hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800 transition"
                         >
                             ยกเลิก
                         </button>
                         <button
                             onClick={handleSubmit}
                             disabled={isSubmitting || !isFormValid}
-                            className="cursor-pointer inline-flex items-center gap-1.5 px-5 py-2 rounded-md font-medium text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="cursor-pointer inline-flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>กำลังบันทึกข้อมูล...</span>
+                                    <span>กำลังบันทึก...</span>
                                 </>
                             ) : (
                                 <>
