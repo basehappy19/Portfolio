@@ -1,6 +1,4 @@
-import { supabaseServerClient } from "@/lib/supabaseServer";
-
-const compressImage = async (file: File, quality = 0.8): Promise<Blob> => {
+const compressImage = async (file: File, quality = 0.9): Promise<File> => {
     const imageBitmap = await createImageBitmap(file);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -13,36 +11,36 @@ const compressImage = async (file: File, quality = 0.8): Promise<Blob> => {
 
     ctx?.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
 
-    return await new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob as Blob), "image/jpeg", quality);
+    const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b as Blob), "image/jpeg", quality);
     });
+
+    return new File([blob], `compressed_${Date.now()}.jpg`, { type: "image/jpeg" });
 };
 
 export const uploadAchievementImageDirect = async (
     file: File,
     achievementId: string | null
 ) => {
-    const ext = file.name.split(".").pop() || "jpg";
-    const randomName = `${crypto.randomUUID()}.${ext}`;
+    const compressedFile = await compressImage(file, 0.9);
 
-    const path = `${achievementId ?? "_temp"}/${randomName}`;
+    const formData = new FormData();
+    formData.append("file", compressedFile);
+    formData.append("achievementId", achievementId ?? "_temp");
 
-    const compressedBlob = await compressImage(file, 0.9);
+    const res = await fetch("/api/uploads", {
+        method: "POST",
+        body: formData,
+    });
 
-    const { error } = await supabaseServerClient.storage
-        .from("achievements")
-        .upload(path, compressedBlob, {
-            contentType: "image/jpeg",
-        });
+    if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json?.error ?? `Upload failed (${res.status})`);
+    }
 
-    if (error) throw error;
-
-    const { data: publicUrlData } = supabaseServerClient.storage
-        .from("achievements")
-        .getPublicUrl(path);
-
+    const json = await res.json();
     return {
-        fileName: randomName,
-        url: publicUrlData.publicUrl,
+        fileName: json.fileName as string,
+        url: json.url as string,
     };
 };
