@@ -18,6 +18,8 @@ import { useFormDraft } from '../hooks/useFormDraft';
 import { AWARD_PRESETS, LEVEL_SUFFIXES, labelFromUrl, stripHtml, thaiDate, translateText, type Pair } from '../editor-helpers';
 import { getAchievementIcon, getAwardIcon, iconSrc, ICON_OPTIONS } from '@/lib/achievement-icon';
 import { getAwardTier, TIER_STYLE } from '@/lib/award-tier';
+import Combobox from '../ui/Combobox';
+import DatePicker from '../ui/DatePicker';
 
 export type EditorSuggestions = { givenBy: Pair[]; location: Pair[] };
 
@@ -625,65 +627,42 @@ function Editor({
                             {enRow("awardLevel", "Award (English)")}
 
                             <label className="mb-1.5 mt-6 block text-sm font-semibold text-zinc-700">ผู้จัด / ผู้มอบรางวัล</label>
-                            <input
-                                list="givenby-suggestions"
+                            <Combobox
                                 className={`${inputCls} min-h-12`}
                                 value={form.given_by_th}
-                                onChange={(e) => {
-                                    const v = e.target.value;
+                                options={suggestions.givenBy.map((s) => s.th)}
+                                onChange={(v) => {
                                     const known = suggestions.givenBy.find((s) => s.th === v);
                                     setForm((f) => ({ ...f, given_by_th: v, ...(known && !dirtyEN.current.given_by ? { given_by_en: known.en } : {}) }));
                                 }}
                                 onBlur={() => translateField('given_by')}
                                 placeholder="พิมพ์บางคำ แล้วเลือกจากรายการที่เคยใช้"
                             />
-                            <datalist id="givenby-suggestions">
-                                {suggestions.givenBy.map((s) => (
-                                    <option key={s.th} value={s.th} />
-                                ))}
-                            </datalist>
                             {enRow("given_by", "Organizer (English)")}
 
                             <div className="mt-6 grid gap-5 sm:grid-cols-2">
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-zinc-700">สถานที่</label>
-                                    <input
-                                        list="location-suggestions"
+                                    <Combobox
                                         className={`${inputCls} min-h-12`}
                                         value={form.location_th}
-                                        onChange={(e) => {
-                                            const v = e.target.value;
+                                        options={suggestions.location.map((s) => s.th)}
+                                        onChange={(v) => {
                                             const known = suggestions.location.find((s) => s.th === v);
                                             setForm((f) => ({ ...f, location_th: v, ...(known && !dirtyEN.current.location ? { location_en: known.en } : {}) }));
                                         }}
                                         onBlur={() => translateField('location')}
                                         placeholder="เช่น มหาวิทยาลัยมหิดล"
                                     />
-                                    <datalist id="location-suggestions">
-                                        {suggestions.location.map((s) => (
-                                            <option key={s.th} value={s.th} />
-                                        ))}
-                                    </datalist>
                                     {enRow("location", "Location (English)")}
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-zinc-700">วันที่ได้รับ</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="date"
-                                            className={`${inputCls} min-h-12`}
-                                            value={form.receivedAt ?? ''}
-                                            onChange={(e) => set('receivedAt', e.target.value)}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => set('receivedAt', new Date().toISOString().slice(0, 10))}
-                                            className="min-h-12 shrink-0 cursor-pointer rounded-xl border border-zinc-200 bg-white px-3 text-sm font-semibold hover:border-zinc-400"
-                                        >
-                                            วันนี้
-                                        </button>
-                                    </div>
-                                    {form.receivedAt && <p className="mt-1.5 text-sm text-zinc-500">{thaiDate(form.receivedAt)}</p>}
+                                    <DatePicker
+                                        className={`${inputCls} min-h-12`}
+                                        value={form.receivedAt}
+                                        onChange={(iso) => set('receivedAt', iso)}
+                                    />
                                 </div>
                             </div>
                         </>)}

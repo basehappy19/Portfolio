@@ -31,7 +31,7 @@ export function AchievementRichText({
     const editor = useEditor({
         immediatelyRender: false,
         extensions: [
-            StarterKit.configure({}),
+            StarterKit.configure({ link: false, underline: false }),
             TextStyle,
             Underline,
             Link.configure({
@@ -64,7 +64,6 @@ export function AchievementRichText({
                     '[&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1',
                     '[&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1',
                     '[&_p]:mb-2',
-                    '[&_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.is-editor-empty:first-child::before]:text-gray-400 [&_.is-editor-empty:first-child::before]:float-left [&_.is-editor-empty:first-child::before]:pointer-events-none',
                     hasError ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20' : 'border-gray-200 dark:border-zinc-700',
                 ].join(' '),
             },

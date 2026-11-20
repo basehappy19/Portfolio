@@ -99,3 +99,14 @@ export const changeAchievementSortOrder = async (
     const data = await res.json();
     return data;
 };
+
+/** Save a new display order (first id = shown first). */
+export const reorderAchievements = async (ids: string[]) => {
+    const res = await fetch(`${baseUrl}/api/admin/achievements/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+    });
+    if (!res.ok) throw new Error((await res.text().catch(() => "")) || "Failed to save order");
+    return res.json();
+};

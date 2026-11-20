@@ -7,12 +7,12 @@ import CategorySelectFilter from './CategorySelectFilter';
 import StatusFilter from './StatusFilter';
 import { AchievementModal } from './Modal/AchievementModal';
 import { AchievementModalProvider } from '@/app/contexts/AchievementModalContext';
-import { AdminAchievementsTable } from './AdminAchievementsTable';
+import AdminDashboard from './AdminDashboard';
 import { auth } from '@/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Award, Filter } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { getLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
@@ -215,10 +215,10 @@ export default async function AdminPage(props: {
         })
     ]);
 
-    const publicCount = achievements.filter((a) => a.status === 'PUBLIC').length;
-    const draftCount = achievements.filter((a) => a.status === 'DRAFT').length;
-
-    const totalImages = achievements.reduce((sum: number, a) => sum + a.images.length, 0);
+    const statusCounts = await prisma.achievement.groupBy({ by: ["status"], _count: { _all: true } });
+    const publicTotal = statusCounts.find((c) => c.status === "PUBLIC")?._count._all ?? 0;
+    const draftTotal = statusCounts.find((c) => c.status === "DRAFT")?._count._all ?? 0;
+    const totalCount = publicTotal + draftTotal;
     const nextSortOrder = (sortOrderAgg._max.sortOrder ?? 0) + 1;
 
     // Previously used organizers / locations, for autocomplete in the editor
@@ -233,161 +233,53 @@ export default async function AdminPage(props: {
     };
 
 
+    const filtered = Boolean(categorySlug || search || statusValue);
+
     return (
         <CategoriesProvider categories={categories}>
             <AchievementModalProvider>
-                <div className="min-h-screen bg-linear-to-br from-gray-50 via-rose-50/30 to-red-50/40 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-900/90 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-                    {/* Top Glassmorphism Navigation Bar */}
-                    <header className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-gray-200/80 dark:border-zinc-800/80 sticky top-0 z-30 shadow-2xs">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            <div className="flex items-center justify-between h-16 gap-4">
-                                <div className="flex items-center gap-2 sm:gap-3.5">
-                                    <Link
-                                        href="/"
-                                        className="group flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-gray-100/80 hover:bg-rose-50 dark:bg-zinc-800/80 dark:hover:bg-rose-950/40 text-gray-700 hover:text-rose-600 dark:text-gray-300 dark:hover:text-rose-400 transition-all shadow-2xs"
-                                    >
-                                        <Home className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                                        <span className="hidden sm:inline">หน้าหลัก</span>
-                                    </Link>
-                                    <div className="h-5 w-px bg-gray-200 dark:bg-zinc-800"></div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="bg-linear-to-tr from-rose-600 to-red-500 p-1.5 rounded-lg text-white shadow-sm shadow-rose-500/20">
-                                            <Award className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        </div>
-                                        <h2 className="text-sm sm:text-base md:text-lg font-extrabold tracking-tight bg-linear-to-r from-gray-900 via-gray-800 to-gray-600 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
-                                            ระบบจัดการผลงาน
-                                        </h2>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-1.5 sm:gap-2.5 text-xs">
-                                    <span className="px-2.5 py-1 rounded-full bg-gray-100 dark:bg-zinc-800 font-semibold text-gray-700 dark:text-gray-300 border border-gray-200/60 dark:border-zinc-700">
-                                        ทั้งหมด: <strong className="text-rose-600 dark:text-rose-400">{achievements.length}</strong>
-                                    </span>
-                                    <span className="hidden xs:inline-block px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200/60 dark:border-emerald-800/60">
-                                        เผยแพร่: <strong>{publicCount}</strong>
-                                    </span>
-                                    <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-semibold border border-amber-200/60 dark:border-amber-800/60">
-                                        แบบร่าง: <strong>{draftCount}</strong>
-                                    </span>
+                <div className="min-h-screen bg-zinc-50 text-zinc-900">
+                    <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/85 backdrop-blur-md">
+                        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
+                            <div className="flex min-w-0 items-center gap-3">
+                                <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-linear-to-br from-rose-500 to-rose-700 text-base font-bold text-white shadow-sm">P</span>
+                                <div className="min-w-0 leading-tight">
+                                    <p className="truncate text-[15px] font-bold">จัดการผลงาน</p>
+                                    <p className="truncate text-xs text-zinc-500">Phakphumi Portfolio</p>
                                 </div>
                             </div>
+                            <Link
+                                href="/"
+                                className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                                <span className="hidden sm:inline">ดูหน้าเว็บ</span>
+                            </Link>
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
-                        {/* Premium Hero Banner */}
-                        <div className="bg-linear-to-r from-zinc-900 via-zinc-800 to-zinc-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-zinc-800 relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                            <div className="absolute -right-12 -top-12 w-48 h-48 bg-rose-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                            <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                            
-                            <div className="relative z-10 space-y-1.5 max-w-2xl">
-                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
-                                    <span>ระบบจัดการหลังบ้าน</span>
+                    <main className="mx-auto max-w-5xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8">
+                        <div className="flex flex-wrap items-end justify-between gap-4">
+                            <div>
+                                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">ผลงานทั้งหมด</h1>
+                                <div className="mt-2 flex flex-wrap gap-2 text-[13px] font-medium">
+                                    <span className="rounded-full bg-white px-3 py-1 text-zinc-700 ring-1 ring-zinc-200">ทั้งหมด {totalCount}</span>
+                                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 ring-1 ring-emerald-200/70">เผยแพร่ {publicTotal}</span>
+                                    <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700 ring-1 ring-amber-200/70">แบบร่าง {draftTotal}</span>
                                 </div>
-                                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                                    จัดการพอร์ตฟอลิโอและผลงาน
-                                </h1>
-                                <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
-                                    เพิ่ม แก้ไข จัดเรียงลำดับ หรือปรับสถานะการเผยแพร่ผลงานของคุณบนหน้าเว็บไซต์จริง รองรับการใช้งานเต็มรูปแบบทุกขนาดหน้าจอ
-                                </p>
                             </div>
-
-                            <div className="relative z-10 shrink-0">
-                                <AddAchievement />
-                            </div>
+                            <AddAchievement />
                         </div>
 
-                        {/* Interactive Metric Cards (4 Grid) */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-gray-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-md transition-all flex items-center gap-3.5 group">
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform shrink-0">
-                                    <Award className="w-5 h-5 sm:w-6 sm:h-6" />
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white truncate">
-                                        {achievements.length}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        ผลงานทั้งหมด
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-gray-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-md transition-all flex items-center gap-3.5 group">
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
-                                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white truncate">
-                                        {publicCount}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        เผยแพร่แล้ว
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-gray-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-md transition-all flex items-center gap-3.5 group">
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
-                                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white truncate">
-                                        {draftCount}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        แบบร่าง
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-5 border border-gray-200/80 dark:border-zinc-800 shadow-2xs hover:shadow-md transition-all flex items-center gap-3.5 group">
-                                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-violet-50 dark:bg-violet-950/40 border border-violet-200/60 dark:border-violet-800/60 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-105 transition-transform shrink-0">
-                                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white truncate">
-                                        {totalImages} <span className="text-xs font-normal text-gray-400">({categories.length} หมวด)</span>
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
-                                        รูปภาพและหมวดหมู่
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="mt-6 grid grid-cols-1 gap-2.5 rounded-2xl border border-zinc-200/80 bg-white p-2.5 shadow-2xs sm:grid-cols-[1fr_220px_210px]">
+                            <SearchBar />
+                            <CategorySelectFilter />
+                            <StatusFilter />
                         </div>
 
-                        {/* Filters & Search Control Bar */}
-                        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xs border border-gray-200/80 dark:border-zinc-800 p-4 sm:p-5 space-y-3 sm:space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-700 dark:text-gray-300">
-                                        <Filter className="w-4 h-4 text-rose-500" />
-                                    </div>
-                                    <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
-                                        ค้นหาและกรองข้อมูล
-                                    </h3>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                <SearchBar />
-                                <CategorySelectFilter />
-                                <StatusFilter />
-                            </div>
+                        <div className="mt-6">
+                            <AdminDashboard achievements={achievements} filtered={filtered} />
                         </div>
-
-                        {/* Main Responsive Hybrid Table / Grid Section */}
-                        <AdminAchievementsTable
-                            achievements={achievements}
-                        />
                     </main>
 
                     <AchievementModal defaultSortOrder={nextSortOrder} suggestions={suggestions} />

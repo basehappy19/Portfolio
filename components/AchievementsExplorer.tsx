@@ -116,10 +116,51 @@ export default function AchievementsExplorer({ locale, pageSize, initial, catego
         }
     }, [loading, hasMore, switching, fetchBatch, category, offset]);
 
+    // Jumping through the list to another section (navbar / #links) must not trigger
+    // auto-loading, or new cards push the target section down mid-scroll.
+    const jumping = useRef(false);
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const done = () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => (jumping.current = false), 150);
+        };
+        const onClick = (e: MouseEvent) => {
+            const a = (e.target as HTMLElement | null)?.closest?.("a[href*='#']");
+            if (!a) return;
+            jumping.current = true;
+            clearTimeout(timer);
+            timer = setTimeout(() => (jumping.current = false), 1500); // fallback when scrollend is unsupported
+        };
+        document.addEventListener("click", onClick, true);
+        const onHash = () => (jumping.current = true);
+        window.addEventListener("hashchange", onHash);
+        window.addEventListener("scrollend", done);
+        return () => {
+            document.removeEventListener("click", onClick, true);
+            window.removeEventListener("scrollend", done);
+            window.removeEventListener("hashchange", onHash);
+            clearTimeout(timer);
+        };
+    }, []);
+
+    // Load more automatically only while the reader is still inside this section and
+    // only for a couple of batches; after that the button is used, so the contact
+    // section below always stays reachable.
+    const autoLoads = useRef(0);
     useEffect(() => {
         const el = sentinel.current;
         if (!el || !hasMore) return;
-        const io = new IntersectionObserver(([entry]) => entry.isIntersecting && loadMore(), { rootMargin: "600px" });
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting || jumping.current || autoLoads.current >= 2) return;
+                const section = el.closest("section");
+                if (section && section.getBoundingClientRect().bottom < window.innerHeight * 0.5) return;
+                autoLoads.current += 1;
+                loadMore();
+            },
+            { rootMargin: "300px" },
+        );
         io.observe(el);
         return () => io.disconnect();
     }, [hasMore, loadMore]);
