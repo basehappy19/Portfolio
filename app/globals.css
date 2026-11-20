@@ -383,11 +383,6 @@ input[type="number"] {
             animation-range: entry 0% entry 90%;
         }
 
-        .scroll-progress {
-            animation: sd-progress linear both;
-            animation-timeline: scroll(root);
-        }
-
         /* phones: keep the cheap transform/opacity effects, drop the paint-heavy ones */
         @media (max-width: 767px) {
             .sd-words span { animation: none; color: inherit; }
@@ -426,10 +421,6 @@ input[type="number"] {
     from { clip-path: inset(0 5% round 56px); }
     to { clip-path: inset(0 0 round 0); }
 }
-@keyframes sd-progress {
-    to { transform: scaleX(1); }
-}
-
 /* =====================================================================
    Decorative looping animations: start only after the page has settled,
    pause while their section is off screen, and stay still on phones.
@@ -476,7 +467,7 @@ html.lite dialog.sheet::backdrop { background: rgba(24, 24, 27, 0.55); -webkit-b
 html.lite .anim-blob { display: none; }
 html.lite :is(.anim-spin-slow, .anim-float) { animation: none; }
 /* scroll-linked effects: show the end state, keep only the light fade-up of cards and titles */
-html.lite :is(.sd-hero-out, .sd-hero-photo, .sd-expand, .scroll-progress) { animation: none; }
+html.lite :is(.sd-hero-out, .sd-hero-photo, .sd-expand) { animation: none; }
 html.lite .scroll-progress { display: none; }
 html.lite .sd-words span { animation: none; color: inherit; }
 html.lite .sd-title[data-reveal] { animation-name: sd-up; }

@@ -1,3 +1,4 @@
+import ScrollProgress from "@/components/ScrollProgress";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Navbar from "@/components/Layout/Navbar";
@@ -118,13 +119,7 @@ export default async function IndexPage({ params }: Params) {
     return (
         <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-            <a
-                href="#main"
-                className="sr-only z-[100] rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-            >
-                {t("Nav.SkipToContent")}
-            </a>
-            <div aria-hidden="true" className="scroll-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-rose-500 via-accent to-indigo-500" />
+            <ScrollProgress />
             <Navbar labels={navLabels} brand="Phakphumi Portfolio" menuLabel={t("Nav.Menu")} languageLabel={t("Nav.Language")} />
 
             <main id="main" className="overflow-x-clip">
