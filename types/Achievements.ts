@@ -48,6 +48,7 @@ export type Achievement = {
 
     sortOrder: number;
     receivedAt: Date | null;
+    icon?: string | null;
     status: Status;
 
     categories: AchievementsOnCategories[];

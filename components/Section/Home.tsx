@@ -1,82 +1,95 @@
-import { getTranslations } from 'next-intl/server';
-import { Sparkles, FileText } from 'lucide-react';
-import AnimatedRole from '../AnimatedRole';
-import WrapToAchievement from '../WrapToAchievement';
-import HeroProfileSection from '../HeroProfileSection';
+import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+import { ArrowDown, FileText } from "lucide-react";
+import AnimatedRole from "../AnimatedRole";
+import { RESUME_URL } from "@/lib/site";
 
-const Home = async () => {
-  const t = await getTranslations('Index');
+export default async function Home() {
+    const t = await getTranslations("Index");
+    const roles = t.raw("Home.Roles") as string[];
+    const rolePrefix = t.has("Home.RolePrefix") ? t("Home.RolePrefix") : "";
+    const [firstName, ...rest] = t("Home.Name").split(" ");
+    const lastName = rest.join(" ");
+    const firstStat = (t.raw("About.data.statuses") as { number: string; label: string }[])[0];
 
-  const viewAchievementsText = await t('Home.Buttons.ViewAchievements');
-  const roles = t.raw('Home.Roles') as string[];
-  const rolePrefix = t.has('Home.RolePrefix') ? t('Home.RolePrefix') : '';
+    return (
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-24 sm:px-8 md:pt-32 lg:grid-cols-12 lg:gap-10 lg:pb-24">
+            <div className="sd-hero-out lg:col-span-7">
+                <p className="anim-fade-rise inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/70 px-4 py-1.5 text-sm font-semibold text-accent">
+                    <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                    </span>
+                    {t("Home.Welcome")}
+                </p>
 
-  return (
-    <div className="w-full relative py-8 md:py-16">
-      <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        
-        {/* Left Column: Name & Info */}
-        <div className="lg:col-span-7 flex flex-col items-start text-left relative z-10 order-2 lg:order-1">
-          
-          {/* Subtle Welcome Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-slate-700 shadow-2xs mb-6">
-            <Sparkles className="w-4 h-4 text-rose-600" />
-            <span className="text-xs md:text-sm font-semibold tracking-wide">
-              {t('Home.Welcome')}
-            </span>
-          </div>
+                <p className="anim-fade-rise delay-1 mt-6 text-lg font-medium text-zinc-600 sm:text-xl">{t("Home.Greeting")}</p>
+                <h1 className="anim-rise delay-1 mt-1 text-[clamp(3.25rem,10vw,7rem)] font-bold leading-[1.02] tracking-tight text-zinc-900">
+                    {firstName}
+                    {/* surname kept for screen readers and search engines, hidden visually */}
+                    {lastName && <span className="sr-only"> {lastName}</span>}
+                </h1>
 
-          {/* Greeting */}
-          <h2 className="text-lg sm:text-xl font-medium text-slate-500 mb-2">
-            {t('Home.Greeting')}
-          </h2>
+                <div className="anim-fade-rise delay-2 mt-5">
+                    <AnimatedRole roles={roles} prefix={rolePrefix} />
+                </div>
 
-          {/* Name */}
-          <h1 className="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight sm:leading-none">
-            {t('Home.Name')}
-          </h1>
+                <p className="anim-fade-rise delay-3 mt-6 max-w-xl text-lg leading-relaxed text-zinc-700 sm:text-xl">
+                    {t("Home.Description")}
+                </p>
+                <p className="anim-fade-rise delay-3 mt-2 max-w-xl text-base leading-relaxed text-zinc-600">
+                    {t("Home.Description_2")}
+                </p>
 
-          {/* Animated Role Component */}
-          <div className="mb-6 w-full flex justify-start">
-            <AnimatedRole roles={roles} prefix={rolePrefix} />
-          </div>
+                <div className="anim-fade-rise delay-4 mt-9 flex flex-col gap-3 sm:flex-row">
+                    <a
+                        href="#Achievements"
+                        className="group inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-7 font-semibold text-white shadow-[0_14px_30px_-12px_rgba(24,24,27,0.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-zinc-800"
+                    >
+                        {t("Home.Buttons.ViewAchievements")}
+                        <ArrowDown aria-hidden="true" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+                    </a>
+                    <a
+                        href={RESUME_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl border border-zinc-300 bg-white/70 px-7 font-semibold text-zinc-900 transition-all duration-300 hover:-translate-y-0.5 hover:border-zinc-400"
+                    >
+                        <FileText aria-hidden="true" className="h-4 w-4 text-accent" />
+                        {t("Home.Buttons.Resume")}
+                    </a>
+                </div>
+            </div>
 
-          {/* Description */}
-          <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl leading-relaxed mb-3">
-            {t('Home.Description')}
-          </p>
-
-          <p className="text-xs sm:text-sm lg:text-base text-slate-500 max-w-xl leading-relaxed mb-8">
-            {t('Home.Description_2')}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
-            <div>
-              <WrapToAchievement text={viewAchievementsText} />
+            <div className="sd-hero-photo relative mx-auto w-full max-w-[420px] lg:col-span-5 lg:max-w-none">
+                <div aria-hidden="true" className="anim-spin-slow absolute -inset-6 rounded-full border-2 border-dashed border-rose-300/60" />
+                <div className="anim-rise-scale relative aspect-[4/5] overflow-hidden rounded-[36px] bg-gradient-to-b from-zinc-100 to-rose-50">
+                    <Image
+                        src="/profiles/me.png"
+                        alt={t("Home.Name")}
+                        fill
+                        preload
+                        fetchPriority="high"
+                        sizes="(max-width: 480px) 92vw, 440px"
+                        quality={70}
+                        className="object-cover object-top"
+                    />
+                </div>
+                <div className="glass anim-float absolute -left-4 bottom-10 rounded-2xl px-4 py-3 sm:-left-8">
+                    <p className="text-xl font-bold text-zinc-900">{firstStat.number}</p>
+                    <p className="text-xs font-medium text-zinc-600">{firstStat.label}</p>
+                </div>
             </div>
 
             <a
-              href="https://drive.google.com/file/d/1OgnztJxGqy76u6Za3BI1nZAgVOe71vcP/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 shadow-2xs transition-all duration-200 hover:border-slate-400"
+                href="#About"
+                aria-label={t("About.Heading")}
+                className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 lg:flex"
             >
-              <FileText className="w-4 h-4 text-rose-600" />
-              <span>{t('Home.Buttons.Resume')}</span>
+                <span className="flex h-11 w-7 items-start justify-center rounded-full border-2 border-zinc-300 p-1.5">
+                    <span className="h-2 w-1 animate-bounce rounded-full bg-zinc-500" />
+                </span>
             </a>
-          </div>
-
         </div>
-
-        {/* Right Column: Prominent Interactive Profile Photo */}
-        <div className="lg:col-span-5 flex justify-center lg:justify-end relative z-10 order-1 lg:order-2 pb-6 lg:pb-0">
-          <HeroProfileSection />
-        </div>
-
-      </div>
-    </div>
-  );
-};
-
-export default Home;
+    );
+}

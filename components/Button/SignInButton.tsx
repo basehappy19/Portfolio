@@ -24,9 +24,9 @@ export const SignInButton = () => {
             if (res.error) {
                 toast.error(res.error.message || (locale === 'th' ? 'เข้าสู่ระบบไม่สำเร็จ หรือถูกจำกัดจำนวนครั้ง กรุณาลองใหม่ในอีกสักครู่' : 'Sign in failed or rate limited. Please try again soon.'));
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
-            toast.error(e?.message || (locale === 'th' ? 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' : 'An error occurred while signing in.'));
+            toast.error((e instanceof Error && e.message) || (locale === 'th' ? 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' : 'An error occurred while signing in.'));
         }
 
         setIsLoading(false);
@@ -36,18 +36,9 @@ export const SignInButton = () => {
         <button
             onClick={handleLoginWithGoogle}
             disabled={isLoading}
-            className="
-                cursor-pointer group relative overflow-hidden rounded-lg px-8 py-3 font-medium
-                bg-linear-to-r from-red-600 to-red-700 text-white
-                shadow-lg hover:shadow-red-500/50
-                transition-all duration-300
-                disabled:cursor-not-allowed disabled:opacity-60
-            "
+            className="inline-flex min-h-11 cursor-pointer items-center rounded-full border border-white/15 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-white/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
-            <span className="relative z-10">
-                {isLoading ? text.loading : text.signIn}
-            </span>
-            <div className="absolute inset-0 bg-linear-to-r from-red-500 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {isLoading ? text.loading : text.signIn}
         </button>
     );
 };

@@ -28,6 +28,8 @@ model Achievement {
   given_by_en    String?
 
   receivedAt DateTime?
+  /// optional icon key from /public/icons/works (null = pick automatically)
+  icon       String?
   sortOrder  Int                        @default(0)
   categories AchievementsOnCategories[]
   images     AchievementImage[]

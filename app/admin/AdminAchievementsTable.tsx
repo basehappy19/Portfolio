@@ -13,9 +13,7 @@ import {
     ExternalLink,
     Eye,
     EyeOff,
-    FileText,
     ImagePlus,
-    Layers,
     Link2,
     MapPin,
     Trash2,
@@ -272,9 +270,12 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
     const minSortOrder = Math.min(...localAchievements.map(a => a.sortOrder));
     const maxSortOrder = Math.max(...localAchievements.map(a => a.sortOrder));
 
-    useEffect(() => {
+    // keep local copy in sync when the server sends a new list (adjust state during render)
+    const [prevAchievements, setPrevAchievements] = useState(achievements);
+    if (achievements !== prevAchievements) {
+        setPrevAchievements(achievements);
         setLocalAchievements(achievements);
-    }, [achievements]);
+    }
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -290,14 +291,16 @@ export const AdminAchievementsTable = ({ achievements }: Props) => {
         }
     }, [localAchievements, open]);
 
-    useEffect(() => {
+    const [prevLocal, setPrevLocal] = useState<typeof localAchievements | null>(null);
+    if (localAchievements !== prevLocal) {
+        setPrevLocal(localAchievements);
         setSortInputValues(
             localAchievements.reduce((acc, a) => {
                 acc[a.id] = String(a.sortOrder);
                 return acc;
             }, {} as Record<string, string>)
         );
-    }, [localAchievements]);
+    }
 
     const handleSetSortOrder = (id: string, targetSortOrder: number) => {
         if (localAchievements.length <= 1) return;

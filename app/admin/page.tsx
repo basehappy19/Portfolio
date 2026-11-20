@@ -152,9 +152,11 @@ export default async function AdminPage(props: {
                 given_by_th: true,
                 given_by_en: true,
                 receivedAt: true,
+                icon: true,
                 status: true,
                 sortOrder: true,
                 categories: {
+                    orderBy: { sortOrder: "asc" },
                     select: {
                         category: {
                             select: {
@@ -213,11 +215,22 @@ export default async function AdminPage(props: {
         })
     ]);
 
-    const publicCount = achievements.filter((a: any) => a.status === 'PUBLIC').length;
-    const draftCount = achievements.filter((a: any) => a.status === 'DRAFT').length;
+    const publicCount = achievements.filter((a) => a.status === 'PUBLIC').length;
+    const draftCount = achievements.filter((a) => a.status === 'DRAFT').length;
 
-    const totalImages = achievements.reduce((sum: number, a: any) => sum + a.images.length, 0);
+    const totalImages = achievements.reduce((sum: number, a) => sum + a.images.length, 0);
     const nextSortOrder = (sortOrderAgg._max.sortOrder ?? 0) + 1;
+
+    // Previously used organizers / locations, for autocomplete in the editor
+    const uniquePairs = (pairs: Array<[string | null, string | null]>) => {
+        const map = new Map<string, string>();
+        for (const [th, en] of pairs) if (th && th.trim() && !map.has(th.trim())) map.set(th.trim(), (en ?? "").trim());
+        return Array.from(map, ([th, en]) => ({ th, en }));
+    };
+    const suggestions = {
+        givenBy: uniquePairs(achievements.map((a) => [a.given_by_th, a.given_by_en])),
+        location: uniquePairs(achievements.map((a) => [a.location_th, a.location_en])),
+    };
 
 
     return (
@@ -377,9 +390,9 @@ export default async function AdminPage(props: {
                         />
                     </main>
 
-                    <AchievementModal defaultSortOrder={nextSortOrder} />
+                    <AchievementModal defaultSortOrder={nextSortOrder} suggestions={suggestions} />
                 </div>
             </AchievementModalProvider>
         </CategoriesProvider>
     );
-}
+}

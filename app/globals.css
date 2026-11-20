@@ -1,81 +1,303 @@
 @import "tailwindcss";
-@import "./fonts.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-* {
-    box-sizing: border-box;
-    font-family: "Prompt", sans-serif;
+@theme {
+    --font-sans: var(--font-anuphan), "Anuphan", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --color-accent: #be123c;
+    --color-accent-strong: #881337;
+    --color-ink: #18181b;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 html,
 body {
-    height: 100%;
     margin: 0;
-    overflow-x: hidden;
-    color: #1e293b;
+    overflow-x: clip;
 }
 
-.dark body {
-    color: #f1f5f9;
-}
 body {
-    height: auto;
-    overflow: visible;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
+::selection {
+    background: var(--color-accent);
+    color: #ffffff;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+}
+
+/* ---------- Liquid glass ---------- */
+.glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42));
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+        0 10px 40px -12px rgba(24, 24, 27, 0.22);
+}
+
+.glass-strong {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.62));
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(24px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        0 18px 50px -18px rgba(24, 24, 27, 0.35);
+}
+
+.glass-dark {
+    background: linear-gradient(135deg, rgba(24, 24, 27, 0.55), rgba(24, 24, 27, 0.3));
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(255, 255, 255, 0.94); }
+    .glass-strong { background: rgba(255, 255, 255, 0.97); }
+    .glass-dark { background: rgba(24, 24, 27, 0.82); }
+}
+
+/* ---------- Entrance animations (hero) ---------- */
+@keyframes rise {
+    from { transform: translateY(28px); }
+    to { transform: translateY(0); }
+}
+
+@keyframes fade-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: scale(0.92) translateY(16px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* transform-only, so the LCP image counts as painted from the first frame */
+@keyframes rise-scale {
+    from { transform: scale(0.94) translateY(18px); }
+    to { transform: scale(1) translateY(0); }
+}
+
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes spin-slow {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.08); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+.anim-rise { animation: rise 0.9s var(--ease-out-expo) both; }
+.anim-fade-rise { animation: fade-rise 0.8s var(--ease-out-expo) both; }
+.anim-pop { animation: pop-in 0.9s var(--ease-out-expo) both; }
+.anim-rise-scale { animation: rise-scale 1s var(--ease-out-expo) both; }
+.anim-float { animation: float-y 6s ease-in-out infinite; }
+.anim-spin-slow { animation: spin-slow 28s linear infinite; }
+.anim-blob { animation: blob 18s ease-in-out infinite; }
+
+.delay-1 { animation-delay: 80ms; }
+.delay-2 { animation-delay: 160ms; }
+.delay-3 { animation-delay: 240ms; }
+.delay-4 { animation-delay: 320ms; }
+.delay-5 { animation-delay: 400ms; }
+
+/* ---------- Reveal on scroll (enabled only when JS adds .reveal-ready) ---------- */
+.reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+        opacity 0.8s var(--ease-out-expo),
+        transform 0.8s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-ready [data-reveal="scale"] {
+    transform: scale(0.94) translateY(16px);
+}
+
+.reveal-ready [data-reveal="left"] {
+    transform: translateX(-32px);
+}
+
+.reveal-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* ---------- Marquee ---------- */
+.marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 60s) linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+}
+
+.marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ---------- Card interactions ---------- */
+.card-lift {
+    transition:
+        transform 0.5s var(--ease-out-expo),
+        box-shadow 0.5s var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+    .card-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 30px 60px -24px rgba(24, 24, 27, 0.4);
     }
-    to {
-        opacity: 1;
+
+    .card-lift:hover .card-zoom {
+        transform: scale(1.07);
     }
 }
 
+.card-zoom {
+    transition: transform 1.2s var(--ease-out-expo);
+}
+
+/* ---------- Bottom sheet (native <dialog>) ---------- */
+dialog.sheet {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+}
+
+dialog.sheet::backdrop {
+    background: rgba(24, 24, 27, 0.4);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    animation: backdrop-in 0.45s ease-out both;
+}
+
+dialog.sheet[data-closing]::backdrop {
+    animation: backdrop-out 0.28s ease both;
+}
+
+/* iOS-like sheet curve: quick start, long soft landing, no overshoot */
+.sheet-panel {
+    animation: sheet-up 0.62s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+dialog.sheet[data-closing] .sheet-panel {
+    animation: sheet-down 0.34s cubic-bezier(0.32, 0, 0.67, 0) both;
+}
+
+@keyframes sheet-up {
+    from { transform: translateY(104%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes sheet-down {
+    from { transform: translateY(var(--drag-y, 0px)); }
+    to { transform: translateY(100%); }
+}
+
+@keyframes backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes backdrop-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* placeholder while a photo loads; opacity pulse runs on the compositor (no repaint per frame) */
+.img-skeleton {
+    background: #f4f4f5;
+    animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+
+.no-scrollbar {
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.rich-text p { margin: 0 0 0.9em; }
+.rich-text ul { list-style: disc; padding-left: 1.25em; margin: 0 0 0.9em; }
+.rich-text ol { list-style: decimal; padding-left: 1.25em; margin: 0 0 0.9em; }
+.rich-text li { margin: 0.3em 0; padding-left: 0.15em; }
+.rich-text li::marker { color: #a1a1aa; }
+.rich-text h2 { font-size: 1.25em; font-weight: 700; margin: 1em 0 0.5em; }
+.rich-text h3 { font-size: 1.1em; font-weight: 600; margin: 1em 0 0.5em; }
+.rich-text a { color: var(--color-accent); text-decoration: underline; }
+.rich-text strong, .rich-text b { color: #18181b; font-weight: 600; }
+
+/* ---------- Legacy keyframes used by admin ---------- */
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalFadeOut { from { opacity: 1; } to { opacity: 0; } }
 @keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
-
-@keyframes modalFadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
 @keyframes modalSlideOut {
-    from {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-    }
+    from { opacity: 1; transform: scale(1) translateY(0); }
+    to { opacity: 0; transform: scale(0.95) translateY(20px); }
 }
-
 @keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
+@keyframes drawerSlideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes drawerSlideOutRight { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+.scrollbar-hide { scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -87,20 +309,139 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-@keyframes drawerSlideInRight {
-    from {
-        transform: translateX(100%);
+/* ---------- Respect reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
-    to {
-        transform: translateX(0);
+    .reveal-ready [data-reveal] { opacity: 1; transform: none; }
+    .marquee-track { animation: none; }
+}
+
+/* =====================================================================
+   Apple-style scroll-linked animations (CSS scroll timelines).
+   Runs off the main thread where supported (Chrome, Edge, Safari 26+);
+   other browsers keep the IntersectionObserver reveal above.
+   ===================================================================== */
+.scroll-progress { transform: scaleX(0); }
+
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        /* hand the reveal over from JS to the scroll timeline */
+        .reveal-ready [data-reveal] {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        [data-reveal] {
+            animation: sd-up linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 85%;
+        }
+        [data-reveal="scale"] { animation-name: sd-scale; animation-range: entry 0% cover 30%; }
+        [data-reveal="left"] { animation-name: sd-left; }
+
+        /* section titles zoom in from a soft blur */
+        .sd-title[data-reveal] {
+            animation-name: sd-title;
+            animation-range: entry 5% cover 35%;
+        }
+
+        /* hero drifts away as you scroll past it */
+        .sd-hero-out {
+            animation: sd-hero-out linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 85vh;
+        }
+        .sd-hero-photo {
+            animation: sd-hero-photo linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 90vh;
+        }
+
+        /* words light up one by one (tablet/desktop only — many animated spans are heavy on phones) */
+        .sd-words span {
+            /* starts mid-grey (still >= 3:1 contrast for large text), then turns black */
+            color: #84848d;
+            animation: sd-word linear both;
+            animation-timeline: view();
+            animation-range: cover 10% cover 45%;
+        }
+
+        /* dark/grey bands grow from a rounded card to full width */
+        .sd-expand {
+            animation: sd-expand linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 90%;
+        }
+
+        .scroll-progress {
+            animation: sd-progress linear both;
+            animation-timeline: scroll(root);
+        }
+
+        /* phones: keep the cheap transform/opacity effects, drop the paint-heavy ones */
+        @media (max-width: 767px) {
+            .sd-words span { animation: none; color: inherit; }
+            .sd-title[data-reveal] { animation-name: sd-up; }
+            .sd-expand { animation: none; }
+        }
     }
 }
 
-@keyframes drawerSlideOutRight {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(100%);
+@keyframes sd-up {
+    from { opacity: 0; transform: translateY(72px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes sd-scale {
+    from { opacity: 0; transform: translateY(110px) scale(0.86); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes sd-left {
+    from { opacity: 0; transform: translateX(-48px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes sd-title {
+    from { opacity: 0; transform: translateY(60px) scale(0.8); filter: blur(14px); }
+    to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes sd-hero-out {
+    to { transform: translateY(-14vh) scale(0.94); opacity: 0.15; }
+}
+@keyframes sd-hero-photo {
+    to { transform: translateY(10vh) scale(0.84) rotate(-3deg); opacity: 0.35; }
+}
+@keyframes sd-word {
+    to { color: #18181b; }
+}
+@keyframes sd-expand {
+    from { clip-path: inset(0 5% round 56px); }
+    to { clip-path: inset(0 0 round 0); }
+}
+@keyframes sd-progress {
+    to { transform: scaleX(1); }
+}
+
+/* =====================================================================
+   Decorative looping animations: start only after the page has settled,
+   pause while their section is off screen, and stay still on phones.
+   ===================================================================== */
+html:not(.motion-ready) :is(.anim-blob, .anim-spin-slow, .anim-float, .marquee-track, .animate-ping, .animate-bounce),
+[data-offscreen] .img-skeleton,
+[data-offscreen] :is(.anim-blob, .anim-spin-slow, .anim-float, .marquee-track, .animate-ping, .animate-bounce) {
+    animation-play-state: paused;
+}
+
+@media (max-width: 767px) {
+    .anim-blob,
+    .anim-spin-slow,
+    .anim-float {
+        animation: none;
     }
 }

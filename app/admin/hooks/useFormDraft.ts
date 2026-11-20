@@ -8,7 +8,10 @@ export interface DraftPackage<TForm, TLinks> {
   timestamp: string;
 }
 
-function isDraftPackageEmpty(pkg: any): boolean {
+type LooseDraft = { formData?: Record<string, unknown>; links?: unknown } | null | undefined;
+
+function isDraftPackageEmpty(raw: unknown): boolean {
+  const pkg = raw as LooseDraft;
   if (!pkg || !pkg.formData) return true;
   const f = pkg.formData;
   const hasContent = Boolean(
@@ -21,7 +24,8 @@ function isDraftPackageEmpty(pkg: any): boolean {
   return !hasContent;
 }
 
-function getDraftPreviewText(pkg: any): string {
+function getDraftPreviewText(raw: unknown): string {
+  const pkg = raw as LooseDraft;
   if (!pkg || !pkg.formData) return '';
   const f = pkg.formData;
   if (typeof f.title_th === 'string' && f.title_th.trim()) return f.title_th.trim();
@@ -43,7 +47,8 @@ export function useFormDraft<TForm, TLinks>(
   const [draftTime, setDraftTime] = useState<string | null>(null);
   const [draftPreview, setDraftPreview] = useState<string | null>(null);
 
-  // Check draft on mount or key change
+  // Check draft on mount or key change (reads localStorage, an external store)
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -74,7 +79,10 @@ export function useFormDraft<TForm, TLinks>(
       setHasDraft(false);
       setDraftPreview(null);
     }
+  // initialComparisonData is a snapshot taken when the editor opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const saveDraftNow = useCallback(() => {
     if (!enabled || typeof window === 'undefined') return;
@@ -102,6 +110,8 @@ export function useFormDraft<TForm, TLinks>(
     } catch {
       // ignore
     }
+  // initialComparisonData is a snapshot taken when the editor opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, formData, links, enabled]);
 
   // Auto save draft on form change with debounce
@@ -136,6 +146,8 @@ export function useFormDraft<TForm, TLinks>(
     }, 600);
 
     return () => clearTimeout(timer);
+  // initialComparisonData is a snapshot taken when the editor opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, formData, links, enabled, hasDraft]);
 
   const restoreDraft = useCallback((): {
@@ -164,6 +176,8 @@ export function useFormDraft<TForm, TLinks>(
     } catch {
       return null;
     }
+  // initialComparisonData is a snapshot taken when the editor opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const clearDraft = useCallback(() => {

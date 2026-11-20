@@ -1,28 +1,32 @@
-const compressImage = async (file: File, quality = 0.9): Promise<File> => {
-    const imageBitmap = await createImageBitmap(file);
+/** Resize to max 1600px and encode as WebP (falls back to JPEG) so photos are small and load fast. */
+const compressImage = async (file: File, quality = 0.82): Promise<File> => {
+    if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") return file;
+    const bitmap = await createImageBitmap(file);
+    const maxSide = 1600;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
 
-    const maxWidth = 1920;
-    const scale = Math.min(1, maxWidth / imageBitmap.width);
-
-    canvas.width = imageBitmap.width * scale;
-    canvas.height = imageBitmap.height * scale;
-
-    ctx?.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-
-    const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => resolve(b as Blob), "image/jpeg", quality);
-    });
-
-    return new File([blob], `compressed_${Date.now()}.jpg`, { type: "image/jpeg" });
+    const toBlob = (type: string) =>
+        new Promise<Blob | null>((resolve) => canvas.toBlob((b) => resolve(b), type, quality));
+    let blob = await toBlob("image/webp");
+    let ext = "webp";
+    if (!blob || blob.type !== "image/webp") {
+        blob = await toBlob("image/jpeg");
+        ext = "jpg";
+    }
+    if (!blob || blob.size >= file.size) return file; // never upload something bigger than the original
+    return new File([blob], `photo_${Date.now()}.${ext}`, { type: blob.type });
 };
 
 export const uploadAchievementImageDirect = async (
     file: File,
     achievementId: string | null
 ) => {
-    const compressedFile = await compressImage(file, 0.9);
+    const compressedFile = await compressImage(file);
 
     const formData = new FormData();
     formData.append("file", compressedFile);

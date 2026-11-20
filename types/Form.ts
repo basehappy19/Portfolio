@@ -28,6 +28,7 @@ export type FormState = {
     given_by_th: string;
     given_by_en: string;
     receivedAt?: string;
+    icon?: string;
     categorySlugs: string[];
     sortOrder: number;
     isPublished: boolean;

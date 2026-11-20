@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { cache } from "react";
+import { categoryRank } from "./category-style";
 
 type GetAchievementsParams = {
     category?: string;
@@ -29,6 +30,7 @@ export const getAchievements = cache(async function getAchievements({
         status: true,
         sortOrder: true,
         receivedAt: true,
+        icon: true,
         createdAt: true,
         updatedAt: true,
     };
@@ -63,6 +65,7 @@ export const getAchievements = cache(async function getAchievements({
                     },
                 },
                 categories: {
+                    orderBy: { sortOrder: "asc" },
                     select: {
                         category: {
                             select: {
@@ -93,4 +96,37 @@ export const getAchievements = cache(async function getAchievements({
         hasMore: offset + achievements.length < total,
         nextOffset: offset + achievements.length,
     };
-});
+});
+export const getAchievementCategories = cache(async function getAchievementCategories() {
+    const [categories, total] = await Promise.all([
+        prisma.category.findMany({
+            select: {
+                id: true,
+                name_th: true,
+                name_en: true,
+                slug: true,
+                _count: {
+                    select: {
+                        achievements: { where: { achievement: { status: "PUBLIC" } } },
+                    },
+                },
+            },
+            orderBy: { id: "asc" },
+        }),
+        prisma.achievement.count({ where: { status: "PUBLIC" } }),
+    ]);
+
+    return {
+        total,
+        categories: categories
+            .map((c) => ({
+                id: c.id,
+                slug: c.slug,
+                name_th: c.name_th,
+                name_en: c.name_en,
+                count: c._count.achievements,
+            }))
+            .filter((c) => c.count > 0)
+            .sort((a, b) => categoryRank(a.slug) - categoryRank(b.slug)),
+    };
+});

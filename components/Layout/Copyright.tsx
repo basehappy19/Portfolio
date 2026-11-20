@@ -8,7 +8,7 @@ const Copyright = ({copyright_text}: {copyright_text : string}) => {
     const yearToDisplay = locale === "th" ? yearAD + 543 : yearAD;
 
     return (
-        <p className="text-gray-500 text-sm">
+        <p className="text-sm text-zinc-400">
             © {yearToDisplay} {copyright_text}
         </p>
     )

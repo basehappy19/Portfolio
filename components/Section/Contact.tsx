@@ -1,137 +1,81 @@
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Facebook,
-  Github,
-  Instagram,
-  LucideIcon,
-} from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
-import FormContact from '../FormContact';
-import Link from 'next/link';
+import { Mail, Phone, MapPin, Facebook, Github, Instagram, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import FormContact from "../FormContact";
+import SectionLabel from "../SectionLabel";
 
-const Contact = async () => {
-  const t = await getTranslations('Index.Contact');
-  const iconMap: Record<string, LucideIcon> = {
-    Mail,
-    Phone,
-    MapPin,
-    Facebook,
-    Github,
-    Instagram,
-  };
+const ICONS: Record<string, LucideIcon> = { Mail, Phone, MapPin, Facebook, Github, Instagram };
 
-  const contactInfo = t.raw('ContactInfos') as Array<{
-    icon: string;
-    label: string;
-    value: string;
-    href: string | null;
-    gradient: string;
-    type: string;
-  }>;
+type Info = { icon: string; label: string; value: string; href: string | null };
+type Social = { name: string; icon: string; href: string };
 
-  const socialLinks = t.raw('SocialLinks') as Array<{
-    name: string;
-    icon: string;
-    href: string;
-    color: string;
-    hoverColor: string;
-  }>;
+export default async function Contact() {
+    const t = await getTranslations("Index.Contact");
+    const infos = t.raw("ContactInfos") as Info[];
+    const socials = t.raw("SocialLinks") as Social[];
 
-  return (
-    <div className="w-full text-slate-800 py-2">
-      <div className="w-full relative z-10">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-2.5 text-slate-900 tracking-tight">
-            {t('Heading')}
-          </h2>
+    return (
+        <div className="relative mx-auto grid max-w-6xl gap-14 px-5 py-20 sm:px-8 md:py-28 lg:grid-cols-12">
+            <div className="lg:col-span-6">
+                <SectionLabel dark>{t("Eyebrow")}</SectionLabel>
+                <h2 data-reveal className="sd-title mt-3 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+                    {t("Heading")}
+                </h2>
+                <p data-reveal className="mt-5 max-w-md text-lg leading-relaxed text-zinc-300">
+                    {t("Description")}
+                </p>
 
-          <p className="text-sm md:text-base max-w-xl mx-auto text-slate-600">
-            {t('Description')}
-          </p>
-        </div>
+                <ul data-reveal className="mt-10 space-y-3">
+                    {infos.map((info) => {
+                        const Icon = ICONS[info.icon] ?? Mail;
+                        const body = (
+                            <>
+                                <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-rose-300">
+                                    <Icon aria-hidden="true" className="h-5 w-5" />
+                                </span>
+                                <span className="min-w-0">
+                                    <span className="block text-xs text-zinc-400">{info.label}</span>
+                                    <span className="block break-all text-lg font-semibold text-white">{info.value}</span>
+                                </span>
+                            </>
+                        );
+                        return (
+                            <li key={info.label}>
+                                {info.href ? (
+                                    <a href={info.href} className="group flex items-center gap-4 rounded-2xl p-1 transition-transform duration-300 hover:translate-x-1">
+                                        {body}
+                                    </a>
+                                ) : (
+                                    <div className="flex items-center gap-4 p-1">{body}</div>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
 
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          {/* Contact Info Cards */}
-          <div className="lg:col-span-5 space-y-6">
-            <h3 className="text-xl font-bold mb-3 text-slate-900">
-              {t('ContactInfo')}
-            </h3>
-
-            <div className="space-y-3">
-              {contactInfo.map((info, index) => {
-                const Icon = iconMap[info.icon] || Mail;
-
-                return (
-                  <div
-                    key={index}
-                    className="rounded-lg p-4 transition-all duration-200 bg-white border border-slate-200 hover:border-slate-300 shadow-2xs"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <div className="p-3 rounded-md bg-slate-100 text-rose-600 shrink-0">
-                        <Icon className="w-5 h-5" />
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-500">
-                          {info.label}
-                        </p>
-                        {info.href ? (
-                          <a
-                            href={info.href}
-                            className="text-sm sm:text-base font-semibold text-slate-900 hover:text-rose-600 transition-colors break-all block"
-                          >
-                            {info.value}
-                          </a>
-                        ) : (
-                          <p className="text-sm sm:text-base font-semibold text-slate-900 break-all">
-                            {info.value}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                <h3 className="sr-only">{t("SocialLink")}</h3>
+                <ul data-reveal className="mt-8 flex flex-wrap gap-2">
+                    {socials.map((s) => {
+                        const Icon = ICONS[s.icon] ?? ArrowUpRight;
+                        return (
+                            <li key={s.name}>
+                                <a
+                                    href={s.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer me"
+                                    className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/20 px-5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/5"
+                                >
+                                    <Icon aria-hidden="true" className="h-4 w-4" />
+                                    {s.name}
+                                </a>
+                            </li>
+                        );
+                    })}
+                </ul>
             </div>
 
-            {/* Social Links */}
-            <div className="pt-2">
-              <h3 className="text-lg font-bold mb-3 text-slate-900">
-                {t('SocialLink')}
-              </h3>
-              <div className="grid grid-cols-3 gap-2.5">
-                {socialLinks.map((social, index) => {
-                  const Icon = iconMap[social.icon] || Mail;
-
-                  return (
-                    <Link
-                      key={index}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group p-3 rounded-lg transition-all duration-200 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 hover:text-slate-900 flex flex-col items-center justify-center shadow-2xs"
-                    >
-                      <Icon className="w-5 h-5 mx-auto mb-1.5 text-rose-600 group-hover:scale-105 transition-transform" />
-                      <p className="text-xs font-semibold text-center truncate w-full">
-                        {social.name}
-                      </p>
-                    </Link>
-                  );
-                })}
-              </div>
+            <div data-reveal="scale" className="lg:col-span-6">
+                <FormContact />
             </div>
-          </div>
-
-          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-lg border border-slate-200 shadow-2xs">
-            <FormContact />
-          </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-export default Contact;
+    );
+}

@@ -1,815 +1,956 @@
 'use client';
+
+import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent } from 'react';
 import {
-    useState,
-    useMemo,
-    DragEvent,
-    useEffect,
-} from 'react';
-import { X, AlertCircle, Save, Loader2, Grid3x3, CheckCircle2, Info, Image as ImageIcon } from 'lucide-react';
+    ArrowLeft, ArrowRight, Check, ChevronDown, Eye, EyeOff, ImagePlus, Languages, Link2, Loader2,
+    Plus, Save, Star, Trash2, Upload, X,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { useCategories } from '@/app/contexts/CategoriesContext';
 import { useAchievementModal } from '@/app/contexts/AchievementModalContext';
-import { EditData } from '@/types/Achievements';
-import { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
+import type { Achievement, EditData } from '@/types/Achievements';
+import type { FormState, ImagePreview, LinkForm, SubmitData } from '@/types/Form';
 import { uploadAchievementImageDirect } from '../services/uploadAchievementImage';
-import { useAchievementFormHandlers } from '../hooks/useAchievementFormHandlers';
-import { useImageHandlers } from '../hooks/useImageHandlers';
-import { AchievementLinksSection } from '../AchievementLinksSection';
-import { AchievementImagesSection } from '../AchievementImagesSection';
-import { TouchedState, ValidationErrors } from '../types/achievementValidation';
-import { AchievementTextField } from '../AchievementTextField';
-import { useRouter } from 'next/navigation';
 import { createAchievement, deleteAchievement, updateAchievement } from '../services/achievements';
-import toast from 'react-hot-toast';
 import { AchievementRichText } from '../AchievementRichText';
 import { useFormDraft } from '../hooks/useFormDraft';
+import { AWARD_PRESETS, LEVEL_SUFFIXES, labelFromUrl, stripHtml, thaiDate, translateText, type Pair } from '../editor-helpers';
+import { getAchievementIcon, getAwardIcon, iconSrc, ICON_OPTIONS } from '@/lib/achievement-icon';
+import { getAwardTier, TIER_STYLE } from '@/lib/award-tier';
 
-type Tab = 'general' | 'details' | 'media';
+export type EditorSuggestions = { givenBy: Pair[]; location: Pair[] };
 
-export const AchievementModal = ({ defaultSortOrder }: { defaultSortOrder: number }) => {
+type TextKey = 'title' | 'given_by' | 'awardLevel' | 'location';
+
+export const AchievementModal = ({
+    defaultSortOrder,
+    suggestions = { givenBy: [], location: [] },
+}: {
+    defaultSortOrder: number;
+    suggestions?: EditorSuggestions;
+}) => {
     const { isOpen, close, editData, isAnimating } = useAchievementModal();
-
     if (!isOpen) return null;
-
     return (
-        <AchievementModalInner
+        <Editor
             key={editData?.id ?? 'new'}
             editData={editData ?? null}
             close={close}
             isAnimating={isAnimating}
             defaultSortOrder={defaultSortOrder}
+            suggestions={suggestions}
         />
     );
 };
 
-const AchievementModalInner = ({
-    editData,
-    close,
-    isAnimating,
-    defaultSortOrder
-}: {
-    editData: EditData | null;
-    close: () => void;
-    isAnimating: boolean;
-    defaultSortOrder: number;
-}) => {
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
-
-    const createInitialFormState = (
-        editData: EditData | null,
-        defaultSortOrder: number
-    ): FormState => {
-        const receivedAt =
-            editData?.receivedAt instanceof Date
-                ? editData.receivedAt.toISOString().slice(0, 10)
-                : editData?.receivedAt ?? "";
-
-        return {
-            title_th: editData?.title_th ?? "",
-            title_en: editData?.title_en ?? "",
-            description_th: editData?.description_th ?? "",
-            description_en: editData?.description_en ?? "",
-            awardLevel_th: editData?.awardLevel_th ?? "",
-            awardLevel_en: editData?.awardLevel_en ?? "",
-            location_th: editData?.location_th ?? "",
-            location_en: editData?.location_en ?? "",
-            given_by_th: editData?.given_by_th ?? "",
-            given_by_en: editData?.given_by_en ?? "",
-            receivedAt,
-            categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
-            sortOrder: Number(
-                editData?.sortOrder != null ? editData.sortOrder : defaultSortOrder
-            ),
-            isPublished: editData ? editData.status === "PUBLIC" : true,
-        };
+const initialForm = (editData: EditData | null, defaultSortOrder: number): FormState => {
+    const r = editData?.receivedAt as Date | string | null | undefined;
+    const receivedAt = r ? new Date(r).toISOString().slice(0, 10) : '';
+    return {
+        title_th: editData?.title_th ?? '',
+        title_en: editData?.title_en ?? '',
+        description_th: editData?.description_th ?? '',
+        description_en: editData?.description_en ?? '',
+        awardLevel_th: editData?.awardLevel_th ?? '',
+        awardLevel_en: editData?.awardLevel_en ?? '',
+        location_th: editData?.location_th ?? '',
+        location_en: editData?.location_en ?? '',
+        given_by_th: editData?.given_by_th ?? '',
+        given_by_en: editData?.given_by_en ?? '',
+        receivedAt,
+        icon: editData?.icon ?? '',
+        categorySlugs: editData?.categories?.map((c) => c.category.slug) ?? [],
+        sortOrder: Number(editData?.sortOrder ?? defaultSortOrder),
+        isPublished: editData ? editData.status === 'PUBLIC' : true,
     };
+};
 
-    const router = useRouter();
-    const categories = useCategories();
-
-    const [formData, setFormData] = useState<FormState>(() =>
-        createInitialFormState(editData, defaultSortOrder)
-    );
-
-    const [activeTab, setActiveTab] = useState<Tab>('general');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<ValidationErrors>({});
-    const [touched, setTouched] = useState<TouchedState>({
-        title_th: false,
-        title_en: false,
-        categorySlugs: false,
-    });
-
-    const isFormValid =
-        formData.title_th.trim() !== '' &&
-        formData.title_en.trim() !== '' &&
-        formData.categorySlugs.length > 0;
-
-    const {
-        handleBlur,
-        handleInputChange,
-        handleCategoryChange,
-        validateForm,
-    } = useAchievementFormHandlers({
-        formData,
-        setFormData,
-        setErrors,
-        setTouched,
-    });
-
-    const toggleCategorySlug = (slug: string) => {
-        setFormData((prev) => {
-            const current = prev.categorySlugs || [];
-            const exists = current.includes(slug);
-            const updated = exists
-                ? current.filter((s) => s !== slug)
-                : [...current, slug];
-            return { ...prev, categorySlugs: updated };
-        });
-        setTouched((prev) => ({ ...prev, categorySlugs: true }));
-    };
-
-    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-    const [draggedLinkIndex, setDraggedLinkIndex] = useState<number | null>(null);
-    const [imagePreview, setImagePreview] = useState<ImagePreview[]>(() =>
-    (editData?.images
-        ?.slice()
+const initialImages = (editData: EditData | null): ImagePreview[] =>
+    (editData?.images ?? [])
+        .slice()
         .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
         .map((img, idx) => ({
             id: img.id,
             file: undefined,
             preview: img.url,
-            altText_th: img.altText_th ?? "",
-            altText_en: img.altText_en ?? "",
+            altText_th: img.altText_th ?? '',
+            altText_en: img.altText_en ?? '',
             sortOrder: idx + 1,
             clientId: img.id ?? crypto.randomUUID(),
-        })) ?? [])
+        }));
+
+const initialLinks = (editData: EditData | null): LinkForm[] =>
+    (editData?.links ?? []).map((l, idx) => ({
+        id: l.id,
+        label_th: l.label_th ?? '',
+        label_en: l.label_en ?? '',
+        url: l.url ?? '',
+        sortOrder: l.sortOrder ?? idx + 1,
+    }));
+
+const inputCls =
+    'w-full rounded-xl border border-zinc-200 bg-white px-4 text-[15px] text-zinc-900 placeholder-zinc-400 transition focus:border-rose-400 focus:outline-none focus:ring-4 focus:ring-rose-500/10';
+
+function Editor({
+    editData,
+    close,
+    isAnimating,
+    defaultSortOrder,
+    suggestions,
+}: {
+    editData: EditData | null;
+    close: () => void;
+    isAnimating: boolean;
+    defaultSortOrder: number;
+    suggestions: EditorSuggestions;
+}) {
+    const router = useRouter();
+    const categories = useCategories();
+    const isEdit = Boolean(editData);
+
+    const [form, setForm] = useState<FormState>(() => initialForm(editData, defaultSortOrder));
+    const [images, setImages] = useState<ImagePreview[]>(() => initialImages(editData));
+    const [links, setLinks] = useState<LinkForm[]>(() => initialLinks(editData));
+    const [saving, setSaving] = useState<null | string>(null);
+    const [translating, setTranslating] = useState<Record<string, boolean>>({});
+    const [showErrors, setShowErrors] = useState(false);
+    const [dragOver, setDragOver] = useState(false);
+    const [dragIndex, setDragIndex] = useState<number | null>(null);
+    const [resetKey, setResetKey] = useState(0);
+    const [showPreview, setShowPreview] = useState(false);
+    const fileRef = useRef<HTMLInputElement>(null);
+    const titleRef = useRef<HTMLInputElement>(null);
+    const dirtyEN = useRef<Record<string, boolean>>({});
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        const t = setTimeout(() => titleRef.current?.focus(), 250);
+        return () => {
+            document.body.style.overflow = '';
+            clearTimeout(t);
+        };
+    }, []);
+
+    // ---------- draft (localStorage) ----------
+    const initialComparison = useMemo(
+        () => ({ formData: initialForm(editData, defaultSortOrder), links: initialLinks(editData) }),
+        [editData, defaultSortOrder]
     );
-
-    const {
-        handleImageUpload,
-        handleReplaceImage,
-        handleImageAltChange,
-        handleRemoveImage,
-        handleDragStart,
-        handleDragOver,
-        handleDragEnd,
-        handleMoveImage,
-    } = useImageHandlers({
-        imagePreview,
-        setImagePreview,
-        draggedIndex,
-        setDraggedIndex,
-    });
-
-
-    const initialComparisonData = useMemo(() => ({
-        formData: createInitialFormState(editData, defaultSortOrder),
-        links: editData?.links?.map((link, idx) => ({
-            id: link.id,
-            label_th: link.label_th ?? '',
-            label_en: link.label_en ?? '',
-            url: link.url ?? '',
-            sortOrder: link.sortOrder ?? idx + 1,
-        })) ?? []
-    }), [editData, defaultSortOrder]);
-
-    const [links, setLinks] = useState<LinkForm[]>(() => initialComparisonData.links);
-
-    const isDirty = editData ? (
-        JSON.stringify(formData) !== JSON.stringify(initialComparisonData.formData) ||
-        JSON.stringify(links) !== JSON.stringify(initialComparisonData.links)
-    ) : Boolean(
-        formData.title_th.trim() ||
-        formData.title_en.trim() ||
-        formData.description_th.trim() ||
-        formData.description_en.trim() ||
-        links.length > 0 ||
-        imagePreview.length > 0
-    );
-
+    const isDirty = isEdit
+        ? JSON.stringify(form) !== JSON.stringify(initialComparison.formData) ||
+          JSON.stringify(links) !== JSON.stringify(initialComparison.links) ||
+          images.some((i) => i.file) ||
+          images.length !== (editData?.images?.length ?? 0)
+        : Boolean(form.title_th.trim() || form.description_th.trim() || links.length || images.length);
     const draftKey = editData ? `achievement_draft_${editData.id}` : 'achievement_draft_new';
     const { hasDraft, draftTime, draftPreview, restoreDraft, saveDraftNow, clearDraft } = useFormDraft(
         draftKey,
-        formData,
+        form,
         links,
         isDirty,
-        initialComparisonData
+        initialComparison
     );
 
-    const handleRestoreDraft = () => {
-        const recovered = restoreDraft();
-        if (recovered && recovered.formData) {
-            setFormData(prev => ({
-                ...prev,
-                ...recovered.formData,
-            }));
-            if (Array.isArray(recovered.links)) {
-                setLinks(recovered.links);
+    const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((p) => ({ ...p, [key]: value }));
+
+    // ---------- translation ----------
+    const translateField = useCallback(
+        async (key: TextKey | 'description', force = false) => {
+            const thKey = `${key}_th` as keyof FormState;
+            const enKey = `${key}_en` as keyof FormState;
+            const th = String(form[thKey] ?? '');
+            const en = String(form[enKey] ?? '');
+            if (!th.trim() || (!force && en.trim())) return;
+            setTranslating((t) => ({ ...t, [key]: true }));
+            const out = await translateText(th, key === 'description');
+            setTranslating((t) => ({ ...t, [key]: false }));
+            if (out === null) {
+                if (force) toast.error('แปลอัตโนมัติไม่ได้ตอนนี้ พิมพ์ภาษาอังกฤษเองได้เลย');
+                return;
             }
-            toast.success('กู้คืนข้อมูลที่พิมพ์ค้างไว้เรียบร้อยแล้ว');
-        } else {
-            toast.error('ไม่พบข้อมูลร่างหรือข้อมูลร่างว่างเปล่า');
+            setForm((p) => (force || !String(p[enKey] ?? '').trim() ? { ...p, [enKey]: out } : p));
+        },
+        [form]
+    );
+
+    const translateAll = async () => {
+        await Promise.all((['title', 'given_by', 'awardLevel', 'location', 'description'] as const).map((k) => translateField(k, true)));
+    };
+
+    // ---------- images ----------
+    const addFiles = useCallback((files: FileList | File[]) => {
+        const list = Array.from(files).filter((f) => f.type.startsWith('image/'));
+        if (!list.length) return;
+        setImages((prev) => [
+            ...prev,
+            ...list.map((file, i) => ({
+                file,
+                preview: URL.createObjectURL(file),
+                altText_th: '',
+                altText_en: '',
+                clientId: crypto.randomUUID(),
+                sortOrder: prev.length + i + 1,
+            })),
+        ]);
+        toast.success(`เพิ่มรูป ${list.length} รูป`);
+    }, []);
+
+    const moveImage = (from: number, to: number) =>
+        setImages((prev) => {
+            if (to < 0 || to >= prev.length) return prev;
+            const next = [...prev];
+            const [it] = next.splice(from, 1);
+            next.splice(to, 0, it);
+            return next.map((img, i) => ({ ...img, sortOrder: i + 1 }));
+        });
+
+    const removeImage = (idx: number) =>
+        setImages((prev) => prev.filter((_, i) => i !== idx).map((img, i) => ({ ...img, sortOrder: i + 1 })));
+
+    const onPaste = (e: ClipboardEvent) => {
+        const files = Array.from(e.clipboardData?.files ?? []).filter((f) => f.type.startsWith('image/'));
+        if (files.length) {
+            e.preventDefault();
+            addFiles(files);
         }
     };
 
-    const handleSafeClose = () => {
-        if (isDirty) {
-            saveDraftNow();
-        }
+    const onDrop = (e: DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+        if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
+    };
+
+    // ---------- links ----------
+    const updateLink = (idx: number, patch: Partial<LinkForm>) =>
+        setLinks((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
+
+    const onLinkUrl = (idx: number, url: string) => {
+        setLinks((prev) =>
+            prev.map((l, i) => {
+                if (i !== idx) return l;
+                const guess = !l.label_th.trim() ? labelFromUrl(url) : null;
+                return { ...l, url, ...(guess ? { label_th: guess.th, label_en: guess.en } : {}) };
+            })
+        );
+    };
+
+    // ---------- validation ----------
+    const missing: string[] = [];
+    if (!form.title_th.trim()) missing.push('ชื่อผลงาน');
+    if (!form.categorySlugs.length) missing.push('หมวดหมู่');
+
+    // ---------- save ----------
+    const save = useCallback(
+        async (addAnother = false) => {
+            if (saving) return;
+            if (missing.length) {
+                setShowErrors(true);
+                toast.error(`ยังขาด: ${missing.join(', ')}`);
+                return;
+            }
+            setSaving('กำลังเตรียมข้อมูล…');
+
+            // Fill any empty English field: translate if possible, else reuse the Thai text.
+            const filled = { ...form };
+            const pairs: Array<[keyof FormState, keyof FormState, boolean]> = [
+                ['title_th', 'title_en', false],
+                ['given_by_th', 'given_by_en', false],
+                ['awardLevel_th', 'awardLevel_en', false],
+                ['location_th', 'location_en', false],
+                ['description_th', 'description_en', true],
+            ];
+            const todo = pairs.filter(([th, en]) => String(filled[th] ?? '').trim() && !String(filled[en] ?? '').trim());
+            if (todo.length) {
+                setSaving('กำลังแปลภาษาอังกฤษ…');
+                const results = await Promise.all(todo.map(([th, , rich]) => translateText(String(filled[th]), rich)));
+                todo.forEach(([th, en], i) => {
+                    (filled as Record<string, unknown>)[en] = results[i] ?? filled[th];
+                });
+                setForm(filled);
+            }
+
+            const normalizedLinks = links
+                .filter((l) => l.url.trim())
+                .map((l, i) => ({
+                    ...l,
+                    label_th: l.label_th.trim() || labelFromUrl(l.url)?.th || 'ลิงก์',
+                    label_en: l.label_en.trim() || labelFromUrl(l.url)?.en || 'Link',
+                    sortOrder: i + 1,
+                }));
+
+            let id: string | null = editData?.id ?? null;
+            const base: SubmitData = {
+                ...filled,
+                images: [],
+                links: normalizedLinks,
+                status: filled.isPublished ? 'PUBLIC' : 'DRAFT',
+                id: id ?? undefined,
+                receivedAt: filled.receivedAt ? new Date(filled.receivedAt).toISOString() : undefined,
+            };
+
+            const isCreate = !id;
+            try {
+                if (isCreate) {
+                    setSaving('กำลังสร้างผลงาน…');
+                    id = (await createAchievement(base)).id;
+                }
+
+                const newCount = images.filter((i) => i.file).length;
+                let done = 0;
+                let uploaded: ImagePreview[];
+                try {
+                    uploaded = await Promise.all(
+                        images.map(async (img, idx) => {
+                            if (img.file instanceof File && id) {
+                                const { url } = await uploadAchievementImageDirect(img.file, id);
+                                done += 1;
+                                setSaving(`กำลังอัปโหลดรูป ${done}/${newCount}…`);
+                                return { ...img, preview: url, file: undefined, sortOrder: idx + 1 };
+                            }
+                            return { ...img, sortOrder: idx + 1 };
+                        })
+                    );
+                } catch (err) {
+                    console.error(err);
+                    toast.error('อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง');
+                    if (isCreate && id) await deleteAchievement(id).catch(() => undefined);
+                    return;
+                }
+
+                setSaving('กำลังบันทึก…');
+                await updateAchievement(id!, { ...base, id: id!, images: uploaded });
+                clearDraft();
+                toast.success(isCreate ? 'เพิ่มผลงานแล้ว' : 'บันทึกการแก้ไขแล้ว');
+                router.refresh();
+
+                if (addAnother) {
+                    setForm({ ...initialForm(null, filled.sortOrder + 1), categorySlugs: filled.categorySlugs });
+                    setImages([]);
+                    setLinks([]);
+                    setShowErrors(false);
+                    setResetKey((k) => k + 1);
+                    titleRef.current?.focus();
+                } else {
+                    close();
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('บันทึกไม่สำเร็จ กรุณาลองใหม่');
+            } finally {
+                setSaving(null);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [form, images, links, saving, missing.length]
+    );
+
+    const safeClose = () => {
+        if (isDirty) saveDraftNow();
         close();
     };
 
-    const handleLinkDragStart = (e: DragEvent<HTMLElement>, index: number) => {
-        setDraggedLinkIndex(index);
-        e.dataTransfer.effectAllowed = 'move';
-    };
-
-    const handleLinkDragOver = (e: DragEvent<HTMLElement>, index: number) => {
-        e.preventDefault();
-        if (draggedLinkIndex === null || draggedLinkIndex === index) return;
-
-        setLinks(prev => {
-            const newLinks = [...prev];
-            const draggedItem = newLinks[draggedLinkIndex];
-            newLinks.splice(draggedLinkIndex, 1);
-            newLinks.splice(index, 0, draggedItem);
-            return newLinks;
-        });
-
-        setDraggedLinkIndex(index);
-    };
-
-    const handleLinkDragEnd = () => {
-        setDraggedLinkIndex(null);
-        setLinks(prev =>
-            prev.map((link, idx) => ({
-                ...link,
-                sortOrder: idx + 1,
-            }))
-        );
-    };
-
-    const handleLinkChange = (
-        index: number,
-        field: keyof Omit<LinkForm, 'id' | 'sortOrder'>,
-        value: string
-    ) => {
-        setLinks(prev => {
-            const updated = [...prev];
-            updated[index] = { ...updated[index], [field]: value };
-            return updated;
-        });
-    };
-
-    const addLink = () => {
-        setLinks(prev => [
-            ...prev,
-            {
-                label_th: '',
-                label_en: '',
-                url: '',
-                sortOrder: prev.length + 1,
-            },
-        ]);
-    };
-
-    const removeLink = (index: number) => {
-        setLinks(prev =>
-            prev
-                .filter((_, i) => i !== index)
-                .map((link, idx) => ({
-                    ...link,
-                    sortOrder: idx + 1,
-                }))
-        );
-    };
-
-    const handleSubmit = async () => {
-        if (isSubmitting) return;
-        if (!validateForm()) {
-            toast.error("กรุณากรอกข้อมูลให้ครบถ้วน");
-
-            const firstError = document.querySelector('.error-field');
-            firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            return;
-        }
-
-        setIsSubmitting(true);
-
-        const normalizedLinks = links.map((link, idx) => ({
-            ...link,
-            sortOrder: idx + 1,
-        }));
-
-        let achievementId: string | null = editData?.id ?? null;
-
-        const basePayload: SubmitData = {
-            ...formData,
-            images: [],
-            links: normalizedLinks,
-            status: formData.isPublished ? 'PUBLIC' : 'DRAFT',
-            id: achievementId ?? undefined,
-            receivedAt: formData.receivedAt
-                ? new Date(formData.receivedAt).toISOString()
-                : undefined,
+    // keyboard shortcuts: Ctrl/Cmd+S save, Esc close
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                save(false);
+            } else if (e.key === 'Escape' && !saving) {
+                safeClose();
+            }
         };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    });
 
-        try {
-            const isCreate = !achievementId;
+    // ---------- preview data ----------
+    const previewAchievement = {
+        title_th: form.title_th,
+        title_en: form.title_en,
+        icon: form.icon || null,
+        categories: categories
+            .filter((c) => form.categorySlugs.includes(c.slug))
+            .map((c) => ({ category: c })),
+    } as unknown as Achievement;
+    const icon = getAchievementIcon(previewAchievement);
+    const autoIcon = getAchievementIcon({ ...previewAchievement, icon: null } as Achievement);
+    const tier = getAwardTier(form.awardLevel_th, form.awardLevel_en);
+    const awardIcon = getAwardIcon(tier, form.awardLevel_th);
+    const cover = images[0]?.preview;
+    const firstCategory = categories.find((c) => form.categorySlugs.includes(c.slug));
 
-            if (isCreate) {
-                const created = await createAchievement(basePayload);
-                achievementId = created.id;
-            }
+    const enRow = (k: TextKey, placeholder: string) => (
+        <div className="mt-2 flex items-center gap-2">
+            <span className="w-8 shrink-0 text-center text-[11px] font-bold text-zinc-400">EN</span>
+            <input
+                className={`${inputCls} min-h-10 bg-zinc-50 text-[14px]`}
+                value={String(form[`${k}_en` as keyof FormState] ?? '')}
+                onChange={(e) => {
+                    dirtyEN.current[k] = true;
+                    set(`${k}_en` as keyof FormState, e.target.value as never);
+                }}
+                placeholder={placeholder}
+            />
+            <button
+                type="button"
+                onClick={() => translateField(k, true)}
+                title="แปลจากภาษาไทย"
+                className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-600 hover:border-rose-300 hover:text-rose-600"
+            >
+                {translating[k] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
+            </button>
+        </div>
+    );
 
-            let uploadedImages: ImagePreview[] = [];
-
-            try {
-                uploadedImages = await Promise.all(
-                    imagePreview.map(async (img, idx) => {
-                        if (img.file instanceof File && achievementId) {
-                            const { url } = await uploadAchievementImageDirect(
-                                img.file,
-                                achievementId
-                            );
-
-                            return {
-                                ...img,
-                                preview: url,
-                                sortOrder: idx + 1,
-                            };
-                        }
-
-                        return {
-                            ...img,
-                            sortOrder: idx + 1,
-                        };
-                    })
-                );
-            } catch (uploadErr) {
-                console.error(uploadErr);
-                toast.error("อัพโหลดรูปภาพไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
-
-                if (isCreate && achievementId) {
-                    try {
-                        await deleteAchievement(achievementId);
-                    } catch (rollbackErr) {
-                        console.error("ไม่สามารถลบ achievement ที่สร้างค้างไว้ได้", rollbackErr);
-                    }
-                }
-
-                return;
-            }
-
-            const finalPayload: SubmitData = {
-                ...basePayload,
-                id: achievementId ?? undefined,
-                images: uploadedImages,
-            };
-
-            await updateAchievement(achievementId!, finalPayload);
-
-            toast.success(editData ? "แก้ไขผลงานเรียบร้อย" : "เพิ่มผลงานเรียบร้อย");
-            clearDraft();
-            router.refresh();
-
-            if (!editData) {
-                const nextSortOrder = formData.sortOrder + 1;
-                setFormData(createInitialFormState(null, nextSortOrder));
-                setImagePreview([]);
-                setLinks([]);
-                setErrors({});
-                setTouched({
-                    title_th: false,
-                    title_en: false,
-                    categorySlugs: false,
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleRichChange = (name: string, value: string) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const mediaCount = imagePreview.length + links.length;
+    const section = (n: number, title: string, hint: string, children: React.ReactNode) => (
+        <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.03)] sm:p-7">
+            <div className="mb-5 flex items-start gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">{n}</span>
+                <div>
+                    <h3 className="text-lg font-bold text-zinc-900">{title}</h3>
+                    {hint && <p className="text-sm text-zinc-500">{hint}</p>}
+                </div>
+            </div>
+            {children}
+        </section>
+    );
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            {/* Backdrop */}
-            <div
-                className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-                    isAnimating ? 'opacity-100' : 'opacity-0'
-                }`}
-                onClick={handleSafeClose}
-            />
-
-            {/* Modal Panel */}
-            <div
-                className={`relative w-full sm:max-w-3xl bg-white dark:bg-zinc-900 shadow-2xl flex flex-col
-                    rounded-t-2xl sm:rounded-2xl border border-gray-200 dark:border-zinc-800
-                    transform transition-all duration-300 ease-out
-                    max-h-[95dvh] sm:max-h-[90dvh]
-                    ${isAnimating
-                        ? 'translate-y-0 opacity-100 scale-100'
-                        : 'translate-y-8 opacity-0 scale-[0.98]'
+        <div
+            className={`fixed inset-0 z-50 flex flex-col bg-zinc-100 transition-all duration-300 ${
+                isAnimating ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
+            onPaste={onPaste}
+        >
+            {/* top bar */}
+            <header className="flex shrink-0 items-center gap-3 border-b border-zinc-200 bg-white/90 px-3 py-2.5 backdrop-blur sm:px-6">
+                <button
+                    type="button"
+                    onClick={safeClose}
+                    className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full hover:bg-zinc-100"
+                    aria-label="ปิด"
+                    title="ปิด (Esc) — ข้อมูลที่พิมพ์ค้างจะถูกเก็บเป็นร่าง"
+                >
+                    <X className="h-5 w-5" />
+                </button>
+                <div className="min-w-0 flex-1">
+                    <h2 className="truncate text-base font-bold sm:text-lg">{isEdit ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}</h2>
+                    <p className="truncate text-xs text-zinc-500">
+                        {saving ?? (isDirty ? 'มีการแก้ไขที่ยังไม่บันทึก · กด Ctrl+S เพื่อบันทึก' : 'กด Ctrl+V เพื่อวางรูปได้ทุกที่')}
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => set('isPublished', !form.isPublished)}
+                    className={`hidden min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold sm:inline-flex ${
+                        form.isPublished ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600'
                     }`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-zinc-800 shrink-0">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                        <h2 className="text-base font-bold text-gray-900 dark:text-white truncate">
-                            {editData ? 'แก้ไขผลงาน' : 'เพิ่มผลงานใหม่'}
-                        </h2>
-                        {isDirty && (
-                            <span
-                                className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse"
-                                title="มีการแก้ไขที่ยังไม่ได้บันทึก"
-                            />
-                        )}
-                    </div>
+                    title="สลับการแสดงบนเว็บ"
+                >
+                    {form.isPublished ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    {form.isPublished ? 'แสดงบนเว็บ' : 'ซ่อน (ร่าง)'}
+                </button>
+                {!isEdit && (
                     <button
-                        onClick={handleSafeClose}
                         type="button"
-                        className="cursor-pointer p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 dark:hover:text-gray-300 transition shrink-0"
-                        title="ปิดหน้าต่าง"
+                        disabled={!!saving}
+                        onClick={() => save(true)}
+                        className="hidden min-h-11 cursor-pointer items-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold hover:border-zinc-400 disabled:opacity-50 md:inline-flex"
                     >
-                        <X size={18} />
+                        <Plus className="h-4 w-4" />
+                        บันทึกแล้วเพิ่มต่อ
                     </button>
-                </div>
-
-                {/* Draft Banner */}
-                {hasDraft && (
-                    <div className="mx-4 mt-3 px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200 shrink-0">
-                        <div className="flex items-center gap-2 font-semibold min-w-0">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse" />
-                            <span className="truncate">พบข้อมูลร่างล่าสุดเมื่อ {draftTime}</span>
-                            {draftPreview && (
-                                <span className="hidden sm:inline px-2 py-0.5 rounded-md bg-amber-100/90 dark:bg-amber-900/60 border border-amber-300/60 font-bold truncate max-w-[180px]">
-                                    &ldquo;{draftPreview}&rdquo;
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                            <button
-                                type="button"
-                                onClick={handleRestoreDraft}
-                                className="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-xs transition cursor-pointer"
-                            >
-                                กู้คืน
-                            </button>
-                            <button
-                                type="button"
-                                onClick={clearDraft}
-                                className="px-2.5 py-1 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-bold rounded-lg text-xs transition cursor-pointer"
-                            >
-                                ลบร่าง
-                            </button>
-                        </div>
-                    </div>
                 )}
+                <button
+                    type="button"
+                    disabled={!!saving}
+                    onClick={() => save(false)}
+                    className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-rose-600 px-5 text-sm font-bold text-white shadow-sm hover:bg-rose-700 disabled:opacity-60"
+                >
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                    บันทึก
+                </button>
+            </header>
 
-                {/* Tab Bar */}
-                <div className="flex items-center gap-0.5 px-4 pt-3 pb-0 border-b border-gray-100 dark:border-zinc-800 shrink-0">
-                    {([
-                        {
-                            id: 'general' as Tab,
-                            label: 'ทั่วไป',
-                            icon: <Grid3x3 size={13} />,
-                            badge: (!formData.title_th || !formData.title_en || formData.categorySlugs.length === 0) ? '!' : null,
-                        },
-                        {
-                            id: 'details' as Tab,
-                            label: 'รายละเอียด',
-                            icon: <Info size={13} />,
-                            badge: null,
-                        },
-                        {
-                            id: 'media' as Tab,
-                            label: 'รูปภาพ & ลิงก์',
-                            icon: <ImageIcon size={13} />,
-                            badge: mediaCount > 0 ? mediaCount : null,
-                        },
-                    ]).map((tab) => (
-                        <button
-                            key={tab.id}
-                            type="button"
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`cursor-pointer flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
-                                activeTab === tab.id
-                                    ? 'border-rose-500 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/20'
-                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-zinc-600'
-                            }`}
-                        >
-                            {tab.icon}
-                            <span>{tab.label}</span>
-                            {tab.badge !== null && (
-                                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold leading-none ${
-                                    tab.badge === '!'
-                                        ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
-                                        : 'bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300'
-                                }`}>
-                                    {tab.badge}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="mx-auto grid max-w-6xl gap-6 px-3 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+                    <div className="space-y-5">
+                        {hasDraft && (
+                            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                                <span>
+                                    พบข้อมูลที่พิมพ์ค้างไว้เมื่อ {draftTime}
+                                    {draftPreview && <strong className="ml-1">“{draftPreview}”</strong>}
                                 </span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Scrollable Tab Content */}
-                <div className="flex-1 overflow-y-auto overscroll-contain">
-
-                    {/* TAB 1: ทั่วไป */}
-                    {activeTab === 'general' && (
-                        <div className="px-5 py-5 space-y-5">
-                            {/* ชื่อผลงาน */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <AchievementTextField
-                                    label="ชื่อผลงาน (ไทย)"
-                                    name="title_th"
-                                    value={formData.title_th}
-                                    onChange={handleInputChange}
-                                    onBlur={() => handleBlur("title_th")}
-                                    placeholder="ชื่อผลงานภาษาไทย"
-                                    required
-                                    size="lg"
-                                    error={errors.title_th}
-                                    touched={touched.title_th}
-                                />
-                                <AchievementTextField
-                                    label="ชื่อผลงาน (English)"
-                                    name="title_en"
-                                    value={formData.title_en}
-                                    onChange={handleInputChange}
-                                    onBlur={() => handleBlur('title_en')}
-                                    placeholder="Achievement Title"
-                                    required
-                                    size="lg"
-                                    error={errors.title_en}
-                                    touched={touched.title_en}
-                                />
-                            </div>
-
-                            {/* มอบโดย */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <AchievementTextField
-                                    label="มอบโดย (ไทย)"
-                                    name="given_by_th"
-                                    value={formData.given_by_th}
-                                    onChange={handleInputChange}
-                                    placeholder="ชื่อองค์กร / สถาบัน"
-                                    size="md"
-                                />
-                                <AchievementTextField
-                                    label="มอบโดย (English)"
-                                    name="given_by_en"
-                                    value={formData.given_by_en}
-                                    onChange={handleInputChange}
-                                    placeholder="Organization / Institution"
-                                    size="md"
-                                />
-                            </div>
-
-                            <hr className="border-gray-100 dark:border-zinc-800" />
-
-                            {/* หมวดหมู่ + สถานะ */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                                {/* Category */}
-                                <div className="lg:col-span-2 space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200">
-                                            <Grid3x3 className="w-3.5 h-3.5 text-rose-500" />
-                                            <span>หมวดหมู่</span>
-                                            <span className="text-rose-500">*</span>
-                                        </label>
-                                        {formData.categorySlugs.length > 0 && (
-                                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold text-[10px] flex items-center gap-1">
-                                                <CheckCircle2 size={11} />
-                                                {formData.categorySlugs.length} หมวด
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                        {categories.map((cat) => {
-                                            const isSelected = formData.categorySlugs.includes(cat.slug);
-                                            return (
-                                                <button
-                                                    key={cat.id}
-                                                    type="button"
-                                                    onClick={() => toggleCategorySlug(cat.slug)}
-                                                    className={`cursor-pointer px-3 py-2 rounded-lg border text-left text-xs font-semibold transition-all flex items-center justify-between gap-1.5 select-none ${
-                                                        isSelected
-                                                            ? 'bg-rose-500 text-white border-rose-600 shadow-sm ring-2 ring-rose-500/20'
-                                                            : 'bg-white dark:bg-zinc-800/80 text-gray-700 dark:text-gray-200 border-gray-200/80 dark:border-zinc-700 hover:border-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
-                                                    }`}
-                                                >
-                                                    <span className="truncate">{cat.name_th}</span>
-                                                    {isSelected && <CheckCircle2 size={13} className="shrink-0 stroke-[2.5]" />}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    {errors.categorySlugs && touched.categorySlugs && (
-                                        <div className="flex items-center gap-1.5 mt-1 text-xs font-semibold text-red-600 dark:text-red-400">
-                                            <AlertCircle size={13} className="shrink-0" />
-                                            <span>{errors.categorySlugs}</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Publish Toggle */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-gray-700 dark:text-gray-200 block">
-                                        สถานะการเผยแพร่
-                                    </label>
+                                <span className="flex gap-2">
                                     <button
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, isPublished: !prev.isPublished }))}
-                                        className={`w-full cursor-pointer p-3.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 shadow-xs select-none ${
-                                            formData.isPublished
-                                                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-600/60'
-                                                : 'bg-gray-50 dark:bg-zinc-800/60 border-gray-200 dark:border-zinc-700'
+                                        className="cursor-pointer rounded-lg bg-amber-500 px-3 py-1.5 font-semibold text-white"
+                                        onClick={() => {
+                                            const r = restoreDraft();
+                                            if (r?.formData) {
+                                                setForm((p) => ({ ...p, ...r.formData }));
+                                                if (Array.isArray(r.links)) setLinks(r.links);
+                                                setResetKey((k) => k + 1);
+                                                toast.success('กู้คืนแล้ว');
+                                            }
+                                        }}
+                                    >
+                                        กู้คืน
+                                    </button>
+                                    <button type="button" className="cursor-pointer rounded-lg px-3 py-1.5 font-semibold hover:bg-amber-100" onClick={clearDraft}>
+                                        ทิ้ง
+                                    </button>
+                                </span>
+                            </div>
+                        )}
+
+                        {section(1, "ผลงานนี้คืออะไร", "พิมพ์ภาษาไทยอย่างเดียวก็พอ ภาษาอังกฤษจะแปลให้อัตโนมัติตอนบันทึก", <>
+                            <label className="mb-1.5 block text-sm font-semibold text-zinc-700">
+                                ชื่อผลงาน <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                ref={titleRef}
+                                className={`${inputCls} min-h-14 text-lg font-semibold ${showErrors && !form.title_th.trim() ? 'border-rose-400 ring-4 ring-rose-500/10' : ''}`}
+                                value={form.title_th}
+                                onChange={(e) => set('title_th', e.target.value)}
+                                onBlur={() => translateField('title')}
+                                placeholder="เช่น ระบบรับสมัครนักเรียนออนไลน์ โรงเรียนภูเขียว"
+                            />
+                            {enRow("title", "English title (แปลให้อัตโนมัติ)")}
+
+                            <p className="mb-2 mt-6 text-sm font-semibold text-zinc-700">
+                                หมวดหมู่ <span className="text-rose-500">*</span>
+                                <span className="ml-2 font-normal text-zinc-500">เลือกได้หลายหมวด</span>
+                            </p>
+                            <div className={`flex flex-wrap gap-2 rounded-2xl ${showErrors && !form.categorySlugs.length ? 'ring-4 ring-rose-500/15' : ''}`}>
+                                {categories.map((c) => {
+                                    const on = form.categorySlugs.includes(c.slug);
+                                    return (
+                                        <button
+                                            key={c.id}
+                                            type="button"
+                                            aria-pressed={on}
+                                            onClick={() =>
+                                                set('categorySlugs', on ? form.categorySlugs.filter((s) => s !== c.slug) : [...form.categorySlugs, c.slug])
+                                            }
+                                            className={`inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition ${
+                                                on ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
+                                            }`}
+                                        >
+                                            {on && <Check className="h-4 w-4" />}
+                                            {c.name_th}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <p className="mb-2 mt-6 text-sm font-semibold text-zinc-700">
+                                ไอคอนผลงาน
+                                <span className="ml-2 font-normal text-zinc-500">ไม่เลือกก็ได้ ระบบจะเลือกจากชื่อผลงานให้</span>
+                            </p>
+                            <div className="flex flex-wrap gap-1.5 rounded-2xl border border-zinc-200 bg-zinc-50 p-2">
+                                <button
+                                    type="button"
+                                    onClick={() => set('icon', '')}
+                                    aria-pressed={!form.icon}
+                                    title="เลือกอัตโนมัติ"
+                                    className={`flex h-16 w-[4.5rem] cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold ${
+                                        !form.icon ? 'bg-white text-zinc-900 ring-2 ring-rose-500' : 'text-zinc-600 hover:bg-white'
+                                    }`}
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={iconSrc(autoIcon)} alt="" className="h-8 w-8 opacity-80" />
+                                    อัตโนมัติ
+                                </button>
+                                {ICON_OPTIONS.map((o) => (
+                                    <button
+                                        key={o.key}
+                                        type="button"
+                                        onClick={() => set('icon', o.key)}
+                                        aria-pressed={form.icon === o.key}
+                                        title={o.label}
+                                        className={`flex h-16 w-[4.5rem] cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] ${
+                                            form.icon === o.key ? 'bg-white font-semibold text-zinc-900 ring-2 ring-rose-500' : 'text-zinc-600 hover:bg-white'
                                         }`}
                                     >
-                                        <div className="text-left">
-                                            <div className={`text-xs font-bold ${formData.isPublished ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-600 dark:text-gray-400'}`}>
-                                                {formData.isPublished ? 'เผยแพร่แล้ว' : 'ฉบับร่าง'}
-                                            </div>
-                                            <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">
-                                                {formData.isPublished ? 'แสดงบนเว็บสาธารณะ' : 'ซ่อนจากสาธารณะ'}
-                                            </div>
-                                        </div>
-                                        <div className={`w-10 h-5 rounded-full p-0.5 transition-colors duration-200 flex items-center shrink-0 ${
-                                            formData.isPublished ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'
-                                        }`}>
-                                            <div className={`w-4 h-4 rounded-full bg-white shadow transform transition-transform duration-200 ${
-                                                formData.isPublished ? 'translate-x-5' : 'translate-x-0'
-                                            }`} />
-                                        </div>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={iconSrc(o.key)} alt="" className="h-8 w-8" />
+                                        <span className="max-w-full truncate px-1">{o.label}</span>
                                     </button>
+                                ))}
+                            </div>
+                        </>)}
+
+                        {section(2, "รางวัลและผู้จัด", "กดปุ่มสำเร็จรูปได้เลย ไม่ต้องพิมพ์เอง", <>
+                            <label className="mb-1.5 block text-sm font-semibold text-zinc-700">ระดับรางวัล / ผลที่ได้</label>
+                            <div className="mb-2 flex flex-wrap gap-1.5">
+                                {AWARD_PRESETS.map((p) => (
+                                    <button
+                                        key={p.th}
+                                        type="button"
+                                        onClick={() => setForm((f) => ({ ...f, awardLevel_th: p.th, awardLevel_en: p.en }))}
+                                        className="min-h-9 cursor-pointer rounded-full border border-zinc-200 bg-zinc-50 px-3 text-[13px] font-medium text-zinc-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                                    >
+                                        {p.th}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mb-2 flex flex-wrap gap-1.5">
+                                {LEVEL_SUFFIXES.map((p) => (
+                                    <button
+                                        key={p.th}
+                                        type="button"
+                                        onClick={() =>
+                                            setForm((f) => ({
+                                                ...f,
+                                                awardLevel_th: `${f.awardLevel_th.replace(/\s*ระดับ\S+$/, '')} ${p.th}`.trim(),
+                                                awardLevel_en: `${f.awardLevel_en.replace(/\s*\S+ Level$/, '')} ${p.en}`.trim(),
+                                            }))
+                                        }
+                                        className="min-h-9 cursor-pointer rounded-full border border-dashed border-zinc-300 px-3 text-[13px] text-zinc-600 hover:border-zinc-500"
+                                    >
+                                        + {p.th}
+                                    </button>
+                                ))}
+                            </div>
+                            <input
+                                className={`${inputCls} min-h-12`}
+                                value={form.awardLevel_th}
+                                onChange={(e) => set('awardLevel_th', e.target.value)}
+                                onBlur={() => translateField('awardLevel')}
+                                placeholder="เช่น ผ่านเข้ารอบ 20 ทีมสุดท้าย / ผู้ใช้งานกว่า 1,500 คน"
+                            />
+                            {enRow("awardLevel", "Award (English)")}
+
+                            <label className="mb-1.5 mt-6 block text-sm font-semibold text-zinc-700">ผู้จัด / ผู้มอบรางวัล</label>
+                            <input
+                                list="givenby-suggestions"
+                                className={`${inputCls} min-h-12`}
+                                value={form.given_by_th}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    const known = suggestions.givenBy.find((s) => s.th === v);
+                                    setForm((f) => ({ ...f, given_by_th: v, ...(known && !dirtyEN.current.given_by ? { given_by_en: known.en } : {}) }));
+                                }}
+                                onBlur={() => translateField('given_by')}
+                                placeholder="พิมพ์บางคำ แล้วเลือกจากรายการที่เคยใช้"
+                            />
+                            <datalist id="givenby-suggestions">
+                                {suggestions.givenBy.map((s) => (
+                                    <option key={s.th} value={s.th} />
+                                ))}
+                            </datalist>
+                            {enRow("given_by", "Organizer (English)")}
+
+                            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-semibold text-zinc-700">สถานที่</label>
+                                    <input
+                                        list="location-suggestions"
+                                        className={`${inputCls} min-h-12`}
+                                        value={form.location_th}
+                                        onChange={(e) => {
+                                            const v = e.target.value;
+                                            const known = suggestions.location.find((s) => s.th === v);
+                                            setForm((f) => ({ ...f, location_th: v, ...(known && !dirtyEN.current.location ? { location_en: known.en } : {}) }));
+                                        }}
+                                        onBlur={() => translateField('location')}
+                                        placeholder="เช่น มหาวิทยาลัยมหิดล"
+                                    />
+                                    <datalist id="location-suggestions">
+                                        {suggestions.location.map((s) => (
+                                            <option key={s.th} value={s.th} />
+                                        ))}
+                                    </datalist>
+                                    {enRow("location", "Location (English)")}
+                                </div>
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-semibold text-zinc-700">วันที่ได้รับ</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="date"
+                                            className={`${inputCls} min-h-12`}
+                                            value={form.receivedAt ?? ''}
+                                            onChange={(e) => set('receivedAt', e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => set('receivedAt', new Date().toISOString().slice(0, 10))}
+                                            className="min-h-12 shrink-0 cursor-pointer rounded-xl border border-zinc-200 bg-white px-3 text-sm font-semibold hover:border-zinc-400"
+                                        >
+                                            วันนี้
+                                        </button>
+                                    </div>
+                                    {form.receivedAt && <p className="mt-1.5 text-sm text-zinc-500">{thaiDate(form.receivedAt)}</p>}
+                                </div>
+                            </div>
+                        </>)}
+
+                        {section(3, "เล่ารายละเอียด", "ทำอะไร แก้ปัญหาอะไร ใช้เทคโนโลยีอะไร ได้ผลอย่างไร", <>
+                            <AchievementRichText
+                                key={`th-${resetKey}`}
+                                label="รายละเอียด (ไทย)"
+                                name="description_th"
+                                value={form.description_th}
+                                onChange={(name, value) => set(name as 'description_th', value)}
+                                placeholder="พิมพ์หรือวางข้อความที่นี่…"
+                            />
+                            <details className="group mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-zinc-700">
+                                    <span className="flex items-center gap-2">
+                                        <Languages className="h-4 w-4" />
+                                        ภาษาอังกฤษ {form.description_en.trim() ? '(มีแล้ว)' : '(จะแปลให้ตอนบันทึก)'}
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
+                                </summary>
+                                <div className="mt-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => translateField('description', true)}
+                                        className="mb-3 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 text-sm font-semibold hover:border-rose-300"
+                                    >
+                                        {translating.description ? <Loader2 className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
+                                        แปลจากภาษาไทยตอนนี้
+                                    </button>
+                                    <AchievementRichText
+                                        key={`en-${resetKey}`}
+                                        label="Description (English)"
+                                        name="description_en"
+                                        value={form.description_en}
+                                        onChange={(name, value) => set(name as 'description_en', value)}
+                                        placeholder="Description in English…"
+                                    />
+                                </div>
+                            </details>
+                        </>)}
+
+                        {section(4, "รูปภาพ", "ลากรูปมาวาง กดเลือก หรือกด Ctrl+V วางรูปที่คัดลอกไว้ · รูปแรกคือภาพปก · ระบบย่อรูปให้อัตโนมัติ", <>
+                            <div
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setDragOver(true);
+                                }}
+                                onDragLeave={() => setDragOver(false)}
+                                onDrop={onDrop}
+                                onClick={() => fileRef.current?.click()}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileRef.current?.click()}
+                                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-8 text-center transition ${
+                                    dragOver ? 'border-rose-400 bg-rose-50' : 'border-zinc-300 bg-zinc-50 hover:border-zinc-400'
+                                }`}
+                            >
+                                <Upload className="h-7 w-7 text-zinc-500" />
+                                <p className="font-semibold text-zinc-800">ลากรูปมาวางที่นี่ หรือกดเพื่อเลือกรูป</p>
+                                <p className="text-sm text-zinc-500">เลือกได้หลายรูปพร้อมกัน</p>
+                                <input
+                                    ref={fileRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    hidden
+                                    onChange={(e) => {
+                                        if (e.target.files) addFiles(e.target.files);
+                                        e.target.value = '';
+                                    }}
+                                />
+                            </div>
+
+                            {images.length > 0 && (
+                                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                    {images.map((img, i) => (
+                                        <li
+                                            key={img.clientId}
+                                            draggable
+                                            onDragStart={() => setDragIndex(i)}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                if (dragIndex !== null && dragIndex !== i) {
+                                                    moveImage(dragIndex, i);
+                                                    setDragIndex(i);
+                                                }
+                                            }}
+                                            onDragEnd={() => setDragIndex(null)}
+                                            className={`group relative overflow-hidden rounded-2xl border bg-white ${
+                                                dragIndex === i ? 'border-rose-400 opacity-60' : 'border-zinc-200'
+                                            }`}
+                                        >
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={img.preview} alt="" className="aspect-[4/3] w-full cursor-grab object-cover" />
+                                            {i === 0 && (
+                                                <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-zinc-900/85 px-2.5 py-1 text-xs font-semibold text-white">
+                                                    <Star className="h-3 w-3" /> ภาพปก
+                                                </span>
+                                            )}
+                                            {img.file && (
+                                                <span className="absolute right-2 top-2 rounded-full bg-emerald-600 px-2 py-0.5 text-[11px] font-semibold text-white">ใหม่</span>
+                                            )}
+                                            <div className="flex items-center justify-between gap-1 p-1.5">
+                                                <div className="flex">
+                                                    <button type="button" title="เลื่อนไปซ้าย" onClick={() => moveImage(i, i - 1)} disabled={i === 0} className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg hover:bg-zinc-100 disabled:opacity-30">
+                                                        <ArrowLeft className="h-4 w-4" />
+                                                    </button>
+                                                    <button type="button" title="เลื่อนไปขวา" onClick={() => moveImage(i, i + 1)} disabled={i === images.length - 1} className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg hover:bg-zinc-100 disabled:opacity-30">
+                                                        <ArrowRight className="h-4 w-4" />
+                                                    </button>
+                                                    {i !== 0 && (
+                                                        <button type="button" title="ตั้งเป็นภาพปก" onClick={() => moveImage(i, 0)} className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg hover:bg-zinc-100">
+                                                            <Star className="h-4 w-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <button type="button" title="ลบรูป" onClick={() => removeImage(i)} className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-rose-600 hover:bg-rose-50">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                    <li>
+                                        <button
+                                            type="button"
+                                            onClick={() => fileRef.current?.click()}
+                                            className="flex aspect-[4/3] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-zinc-300 text-sm font-semibold text-zinc-600 hover:border-zinc-400"
+                                        >
+                                            <ImagePlus className="h-6 w-6" />
+                                            เพิ่มรูป
+                                        </button>
+                                    </li>
+                                </ul>
+                            )}
+                        </>)}
+
+                        {section(5, "ลิงก์ที่เกี่ยวข้อง", "วางลิงก์ แล้วระบบตั้งชื่อปุ่มให้เอง (แก้ได้)", <>
+                            <div className="space-y-3">
+                                {links.map((l, i) => (
+                                    <div key={i} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
+                                        <div className="flex gap-2">
+                                            <input
+                                                className={`${inputCls} min-h-11`}
+                                                value={l.url}
+                                                onChange={(e) => onLinkUrl(i, e.target.value)}
+                                                placeholder="https://…"
+                                                inputMode="url"
+                                            />
+                                            <button
+                                                type="button"
+                                                title="ลบลิงก์"
+                                                onClick={() => setLinks((p) => p.filter((_, x) => x !== i))}
+                                                className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-rose-600 hover:bg-rose-50"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                                            <input className={`${inputCls} min-h-10 text-sm`} value={l.label_th} onChange={(e) => updateLink(i, { label_th: e.target.value })} placeholder="ชื่อปุ่ม (ไทย)" />
+                                            <input className={`${inputCls} min-h-10 text-sm`} value={l.label_en} onChange={(e) => updateLink(i, { label_en: e.target.value })} placeholder="Button label (EN)" />
+                                        </div>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setLinks((p) => [...p, { label_th: '', label_en: '', url: '', sortOrder: p.length + 1 }])}
+                                    className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-dashed border-zinc-300 px-4 text-sm font-semibold text-zinc-700 hover:border-zinc-500"
+                                >
+                                    <Link2 className="h-4 w-4" /> เพิ่มลิงก์
+                                </button>
+                            </div>
+                        </>)}
+
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-10">
+                            <button type="button" onClick={translateAll} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-zinc-300 bg-white px-4 text-sm font-semibold hover:border-zinc-400">
+                                <Languages className="h-4 w-4" /> แปลภาษาอังกฤษทั้งหมดใหม่
+                            </button>
+                            <div className="flex gap-2">
+                                {!isEdit && (
+                                    <button type="button" disabled={!!saving} onClick={() => save(true)} className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-full border border-zinc-300 bg-white px-5 font-semibold hover:border-zinc-400 disabled:opacity-50">
+                                        <Plus className="h-4 w-4" /> บันทึกแล้วเพิ่มต่อ
+                                    </button>
+                                )}
+                                <button type="button" disabled={!!saving} onClick={() => save(false)} className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-full bg-rose-600 px-6 font-bold text-white hover:bg-rose-700 disabled:opacity-60">
+                                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                    {saving ?? 'บันทึก'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* live preview */}
+                    <aside className="order-first lg:order-none">
+                        <div className="lg:sticky lg:top-5">
+                            <button
+                                type="button"
+                                onClick={() => setShowPreview((v) => !v)}
+                                className="mb-3 flex w-full cursor-pointer items-center justify-between rounded-2xl bg-white px-4 py-3 text-sm font-semibold lg:hidden"
+                            >
+                                ตัวอย่างการ์ดบนเว็บ
+                                <ChevronDown className={`h-4 w-4 transition ${showPreview ? 'rotate-180' : ''}`} />
+                            </button>
+                            <div className={`${showPreview ? 'block' : 'hidden'} space-y-4 lg:block`}>
+                                <p className="hidden text-sm font-semibold text-zinc-500 lg:block">ตัวอย่างการ์ดบนเว็บ</p>
+                                <div className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-[0_14px_40px_-28px_rgba(24,24,27,0.55)]">
+                                    <div className="relative aspect-[16/10] bg-zinc-100">
+                                        {cover ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={cover} alt="" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-sm text-zinc-400">ยังไม่มีภาพปก</div>
+                                        )}
+                                        {firstCategory && (
+                                            <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-semibold">{firstCategory.name_th}</span>
+                                        )}
+                                    </div>
+                                    <div className="relative px-5 pb-5 pt-10">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={iconSrc(icon)} alt="" className="absolute -top-8 left-4 h-14 w-14 rounded-[18px] bg-white p-0.5 drop-shadow-lg" />
+                                        {form.awardLevel_th && (
+                                            <span
+                                                className="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-xs font-semibold"
+                                                style={{ background: `${TIER_STYLE[tier].bg}14`, color: TIER_STYLE[tier].bg }}
+                                            >
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                {awardIcon && <img src={iconSrc(awardIcon)} alt="" className="h-4 w-4" />}
+                                                {form.awardLevel_th}
+                                            </span>
+                                        )}
+                                        <p className="mt-2 line-clamp-2 text-lg font-bold leading-snug">{form.title_th || 'ชื่อผลงาน'}</p>
+                                        {stripHtml(form.description_th) && (
+                                            <p className="mt-1.5 line-clamp-2 text-sm text-zinc-600">{stripHtml(form.description_th)}</p>
+                                        )}
+                                        {form.given_by_th && <p className="mt-3 border-t border-zinc-100 pt-3 text-sm font-medium">{form.given_by_th}</p>}
+                                        {form.receivedAt && <p className="mt-1 text-xs text-zinc-500">{thaiDate(form.receivedAt)}</p>}
+                                    </div>
+                                </div>
+                                <p className="text-xs text-zinc-500">{form.icon ? 'ไอคอนที่เลือกเอง' : 'ไอคอนเลือกให้อัตโนมัติจากชื่อผลงาน'}</p>
+
+                                <div className="rounded-2xl bg-white p-4 text-sm">
+                                    <p className="mb-2 font-semibold">ตรวจความครบ</p>
+                                    <ul className="space-y-1.5">
+                                        {[
+                                            ['ชื่อผลงาน', !!form.title_th.trim(), true],
+                                            ['หมวดหมู่', form.categorySlugs.length > 0, true],
+                                            ['ภาพปก', images.length > 0, false],
+                                            ['ระดับรางวัล', !!form.awardLevel_th.trim(), false],
+                                            ['ผู้จัด', !!form.given_by_th.trim(), false],
+                                            ['รายละเอียด', !!stripHtml(form.description_th), false],
+                                        ].map(([label, ok, req]) => (
+                                            <li key={String(label)} className="flex items-center gap-2">
+                                                <span className={`flex h-5 w-5 items-center justify-center rounded-full ${ok ? 'bg-emerald-500 text-white' : 'bg-zinc-200 text-zinc-500'}`}>
+                                                    {ok ? <Check className="h-3 w-3" /> : null}
+                                                </span>
+                                                <span className={ok ? 'text-zinc-800' : 'text-zinc-500'}>
+                                                    {label} {req ? <span className="text-rose-500">*</span> : null}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                    )}
-
-                    {/* TAB 2: รายละเอียด */}
-                    {activeTab === 'details' && (
-                        <div className="px-5 py-5 space-y-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <AchievementTextField
-                                    label="ระดับรางวัล (ไทย)"
-                                    name="awardLevel_th"
-                                    value={formData.awardLevel_th}
-                                    onChange={handleInputChange}
-                                    placeholder="เช่น ระดับประเทศ / ระดับภาค"
-                                    size="md"
-                                />
-                                <AchievementTextField
-                                    label="ระดับรางวัล (English)"
-                                    name="awardLevel_en"
-                                    value={formData.awardLevel_en}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g. National / Regional"
-                                    size="md"
-                                />
-                                <AchievementTextField
-                                    label="สถานที่ (ไทย)"
-                                    name="location_th"
-                                    value={formData.location_th}
-                                    onChange={handleInputChange}
-                                    placeholder="สถานที่จัดงาน / เมือง"
-                                    size="md"
-                                />
-                                <AchievementTextField
-                                    label="สถานที่ (English)"
-                                    name="location_en"
-                                    value={formData.location_en}
-                                    onChange={handleInputChange}
-                                    placeholder="Location / City"
-                                    size="md"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1.5">
-                                    วันที่ได้รับ
-                                </label>
-                                <input
-                                    type="date"
-                                    name="receivedAt"
-                                    value={formData.receivedAt}
-                                    onChange={handleInputChange}
-                                    className="px-3.5 py-2.5 rounded-lg border text-sm font-medium bg-white text-gray-900 border-gray-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 dark:bg-zinc-800/80 dark:text-white dark:border-zinc-700"
-                                />
-                            </div>
-
-                            <hr className="border-gray-100 dark:border-zinc-800" />
-
-                            <AchievementRichText
-                                label="รายละเอียด (ไทย)"
-                                name="description_th"
-                                value={formData.description_th}
-                                onChange={handleRichChange}
-                                placeholder="อธิบายรายละเอียดของผลงาน รางวัล หรือโครงการนี้..."
-                            />
-                            <AchievementRichText
-                                label="รายละเอียด (English)"
-                                name="description_en"
-                                value={formData.description_en}
-                                onChange={handleRichChange}
-                                placeholder="Describe the achievement, competition, or project details..."
-                            />
-                        </div>
-                    )}
-
-                    {/* TAB 3: รูปภาพ & ลิงก์ */}
-                    {activeTab === 'media' && (
-                        <div className="px-5 py-5 space-y-6">
-                            <AchievementImagesSection
-                                imagePreview={imagePreview}
-                                draggedIndex={draggedIndex}
-                                handleImageUpload={handleImageUpload}
-                                handleReplaceImage={handleReplaceImage}
-                                handleImageAltChange={handleImageAltChange}
-                                handleRemoveImage={handleRemoveImage}
-                                handleDragStart={handleDragStart}
-                                handleDragOver={handleDragOver}
-                                handleDragEnd={handleDragEnd}
-                                handleMoveImage={handleMoveImage}
-                            />
-                            <hr className="border-gray-100 dark:border-zinc-800" />
-                            <AchievementLinksSection
-                                links={links}
-                                draggedLinkIndex={draggedLinkIndex}
-                                addLink={addLink}
-                                removeLink={removeLink}
-                                handleLinkChange={handleLinkChange}
-                                handleLinkDragStart={handleLinkDragStart}
-                                handleLinkDragOver={handleLinkDragOver}
-                                handleLinkDragEnd={handleLinkDragEnd}
-                            />
-                        </div>
-                    )}
-                </div>
-
-                {/* Action Bar */}
-                <div className="px-5 py-3.5 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/80 dark:bg-zinc-900/90 flex items-center justify-between gap-3 shrink-0">
-                    {/* Tab dots indicator */}
-                    <div className="flex items-center gap-1.5">
-                        {(['general', 'details', 'media'] as const).map((tab, i) => (
-                            <button
-                                key={tab}
-                                type="button"
-                                onClick={() => setActiveTab(tab)}
-                                className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                                    activeTab === tab
-                                        ? 'bg-rose-500 w-5'
-                                        : 'bg-gray-300 dark:bg-zinc-600 hover:bg-gray-400 w-1.5'
-                                }`}
-                                aria-label={`Tab ${i + 1}`}
-                            />
-                        ))}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={close}
-                            type="button"
-                            className="cursor-pointer px-4 py-2 rounded-lg font-medium text-xs border border-gray-200 text-gray-600 hover:bg-gray-100 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800 transition"
-                        >
-                            ยกเลิก
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isSubmitting || !isFormValid}
-                            className="cursor-pointer inline-flex items-center gap-2 px-5 py-2 rounded-lg font-semibold text-sm bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>กำลังบันทึก...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="w-4 h-4" />
-                                    <span>{editData ? 'บันทึกการแก้ไข' : 'สร้างผลงานใหม่'}</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    </aside>
                 </div>
             </div>
         </div>
     );
-};
+}

@@ -15,10 +15,10 @@ export default function FooterAuth() {
     }
 
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-3 px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10">
             <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full" />
-                <span className="text-xs font-medium text-slate-700">
+                <span className="text-xs font-medium text-zinc-300">
                     {session.user?.email || "User"}
                 </span>
             </div>

@@ -39,7 +39,11 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabaseServerClient.storage
         .from("achievements")
-        .upload(filePath, file);
+        .upload(filePath, file, {
+            // photos never change at the same path, so let browsers/CDN cache them for a year
+            cacheControl: "31536000",
+            contentType: file.type || undefined,
+        });
 
     if (error) {
         console.error("Supabase upload error:", error);

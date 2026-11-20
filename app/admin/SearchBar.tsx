@@ -18,6 +18,8 @@ export default function SearchBar() {
         else params.delete("search");
 
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        // only react to typing; router/searchParams change as a result of this push
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     return (

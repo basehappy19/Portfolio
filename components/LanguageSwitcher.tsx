@@ -2,63 +2,53 @@
 
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { useSearchParams } from "next/navigation";
 import { useTransition, useState } from "react";
 
-const LanguageSwitcher = () => {
+const LOCALES = [
+    { code: "th", label: "TH", name: "ภาษาไทย" },
+    { code: "en", label: "EN", name: "English" },
+] as const;
+
+export default function LanguageSwitcher({ label = "Language" }: { label?: string }) {
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const [, startTransition] = useTransition();
-    const [optimisticLocale, setOptimisticLocale] = useState<string | null>(null);
+    const [optimistic, setOptimistic] = useState<string | null>(null);
+    const current = optimistic ?? locale;
 
-    const currentLocale = optimisticLocale || locale;
-
-    const switchLanguage = (newLocale: "th" | "en") => {
-        if (newLocale === currentLocale) return;
-
-        setOptimisticLocale(newLocale);
-
-        const queryString = searchParams.toString();
-        const hash = typeof window !== "undefined" ? window.location.hash : "";
-        const basePath = queryString ? `${pathname}?${queryString}` : pathname;
-        const fullPathWithHash = hash ? `${basePath}${hash}` : basePath;
-
+    const switchTo = (next: "th" | "en") => {
+        if (next === current) return;
+        setOptimistic(next);
+        const { search, hash } = window.location;
         startTransition(() => {
-            router.replace(fullPathWithHash as any, { locale: newLocale, scroll: false });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            router.replace(`${pathname}${search}${hash}` as any, { locale: next, scroll: false });
         });
     };
 
     return (
-        <div className="inline-flex items-center rounded-xl border p-1 bg-white/40 backdrop-blur-md border-white/60 shadow-2xs">
-            {/* TH Button */}
-            <button
-                type="button"
-                onClick={() => switchLanguage("th")}
-                className={`cursor-pointer px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition-all duration-150 ${
-                    currentLocale === "th"
-                        ? "bg-rose-600 text-white shadow-2xs scale-102"
-                        : "text-slate-600 hover:text-rose-600 hover:bg-white/60"
-                }`}
-            >
-                ไทย
-            </button>
-
-            {/* EN Button */}
-            <button
-                type="button"
-                onClick={() => switchLanguage("en")}
-                className={`cursor-pointer px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition-all duration-150 ${
-                    currentLocale === "en"
-                        ? "bg-rose-600 text-white shadow-2xs scale-102"
-                        : "text-slate-600 hover:text-rose-600 hover:bg-white/60"
-                }`}
-            >
-                English
-            </button>
+        <div role="group" aria-label={label} className="relative inline-grid grid-cols-2 rounded-full bg-zinc-900/5 p-1">
+            <span
+                aria-hidden="true"
+                className="absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-white shadow-sm transition-transform duration-500 ease-[var(--ease-spring)]"
+                style={{ transform: current === "en" ? "translateX(100%)" : "translateX(0)" }}
+            />
+            {LOCALES.map((l) => (
+                <button
+                    key={l.code}
+                    type="button"
+                    lang={l.code}
+                    aria-pressed={current === l.code}
+                    aria-label={`${l.label} – ${l.name}`}
+                    onClick={() => switchTo(l.code)}
+                    className={`relative z-10 min-h-9 min-w-11 cursor-pointer rounded-full px-3 text-[13px] font-semibold transition-colors ${
+                        current === l.code ? "text-zinc-900" : "text-zinc-600 hover:text-zinc-900"
+                    }`}
+                >
+                    {l.label}
+                </button>
+            ))}
         </div>
     );
-};
-
-export default LanguageSwitcher;
+}

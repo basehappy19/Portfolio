@@ -1,3 +1,4 @@
+import { revalidatePortfolio } from "@/lib/revalidate";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { headers } from "next/headers";
@@ -42,6 +43,7 @@ export async function PUT(
             },
         });
 
+        revalidatePortfolio();
         return NextResponse.json(updated, { status: 200 });
     } catch (error) {
         console.error("PUT /api/admin/achievements/[id]/status error", error);

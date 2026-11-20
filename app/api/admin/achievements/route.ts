@@ -1,3 +1,4 @@
+import { revalidatePortfolio } from "@/lib/revalidate";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { ApiLink } from "@/types/Api";
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
             given_by_th,
             given_by_en,
             receivedAt,
+            icon,
             sortOrder = 0,
             status = "DRAFT",
             categorySlugs = [],
@@ -45,6 +47,7 @@ export async function POST(req: NextRequest) {
             given_by_th?: string | null;
             given_by_en?: string | null;
             receivedAt?: string | null;
+            icon?: string | null;
             sortOrder?: number;
             status?: "PUBLIC" | "DRAFT";
             categorySlugs?: string[];
@@ -64,6 +67,8 @@ export async function POST(req: NextRequest) {
                       where: { slug: { in: categorySlugs } },
                   })
                 : [];
+        // keep the order the admin picked (first = primary category)
+        categories.sort((a, b) => categorySlugs.indexOf(a.slug) - categorySlugs.indexOf(b.slug));
 
         const achievement = await prisma.achievement.create({
             data: {
@@ -78,6 +83,7 @@ export async function POST(req: NextRequest) {
                 given_by_th: given_by_th ?? null,
                 given_by_en: given_by_en ?? null,
                 receivedAt: receivedAt ?? null,
+                icon: icon || null,
                 sortOrder,
                 status,
 
@@ -104,6 +110,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        revalidatePortfolio();
         return NextResponse.json(achievement, { status: 201 });
     } catch (error) {
         console.error("POST /api/admin/achievements error", error);

@@ -3,11 +3,15 @@
         "Home": {
             "Welcome": "Welcome To My Portfolio",
             "Greeting": "Hi, I'm",
-            "Name": "Pakpoom Teedindam",
+            "Name": "Phakphumi Thidindam",
             "Description": "\"I want to use my skills and knowledge to make this society better.\"",
             "Description_2": "\"This website is a collection of my work in pursuing higher education.\"",
             "RolePrefix": "",
-            "Roles": ["Full Stack Developer", "Student", "Innovator"],
+            "Roles": [
+                "Full Stack Developer",
+                "Student",
+                "Innovator"
+            ],
             "Buttons": {
                 "ViewAchievements": "Achievements",
                 "Resume": "View Resume"
@@ -15,7 +19,7 @@
         },
         "About": {
             "Heading": "About Me",
-            "Introduce_1": "Hello! My name is Pakpoom Teedindam (Base). I'm passionate about creating practical technology solutions that truly benefit and improve our society.\nI have hands-on experience in developing Fullstack web applications for various organizations, ranging from educational institutions to medical facilities. The systems I have built are currently used by thousands of users.\nI am committed to continuously improving my skills—exploring new technologies and transforming them into meaningful solutions that genuinely help people and can be applied in the real world.",
+            "Introduce_1": "Hello! My name is Phakphumi Thidindam (Base). I'm passionate about creating practical technology solutions that truly benefit and improve our society.\nI have hands-on experience in developing Fullstack web applications for various organizations, ranging from educational institutions to medical facilities. The systems I have built are currently used by thousands of users.\nI am committed to continuously improving my skills—exploring new technologies and transforming them into meaningful solutions that genuinely help people and can be applied in the real world.",
             "Introduce_2": "I am interested in pursuing a degree in Engineering at the university level. I believe this field aligns with both global future needs and my personal aspiration to create innovations, inventions, and technologies that help develop society and support long-term sustainability.",
             "Buttons": {
                 "Contact": "Contact Me",
@@ -27,7 +31,10 @@
                         "number": "15,000 Users+",
                         "label": "Projects Used"
                     },
-                    { "number": "15 Projects", "label": "Completed" },
+                    {
+                        "number": "15 Projects",
+                        "label": "Completed"
+                    },
                     {
                         "number": "10 Activities+",
                         "label": "Hackathons & Competitions"
@@ -37,7 +44,8 @@
                         "label": "Technology Experience"
                     }
                 ]
-            }
+            },
+            "Eyebrow": "01 — About"
         },
         "Skill": {
             "Heading": "Expertise",
@@ -146,7 +154,8 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "Eyebrow": "02 — Skills"
         },
         "Achievement": {
             "Heading": "Achievements",
@@ -154,7 +163,14 @@
             "NoItemsDescription": "Please search again or choose another category!",
             "Buttons": {
                 "AllButtonLabel": "All"
-            }
+            },
+            "Eyebrow": "03 — Achievements",
+            "Title": "Awards & work I'm proud of",
+            "Subtitle": "Tap a card to see the details, photos and links of each piece of work.",
+            "LoadMore": "Load more",
+            "Loading": "Loading…",
+            "ViewDetail": "View details",
+            "Total": "Total achievements"
         },
         "Contact": {
             "Heading": "Contact Me",
@@ -209,13 +225,24 @@
                     "color": "bg-pink-500",
                     "hoverColor": "hover:bg-pink-400"
                 }
-            ]
+            ],
+            "Eyebrow": "04 — Contact"
         },
         "Footer": {
             "Heading": "My Portfolio",
-            "copyright": "Pakpoom Teedindam. All rights reserved.",
+            "copyright": "Phakphumi Thidindam. All rights reserved.",
             "privacy": "Privacy Policy",
             "terms": "Terms of Service"
+        },
+        "Nav": {
+            "Home": "Home",
+            "About": "About",
+            "Skills": "Skills",
+            "Achievements": "Achievements",
+            "Contact": "Contact",
+            "Menu": "Main navigation",
+            "Language": "Choose language",
+            "SkipToContent": "Skip to content"
         }
     }
 }

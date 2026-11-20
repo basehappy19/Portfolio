@@ -14,7 +14,7 @@ export const downloadImage = async (url: string, filename?: string) => {
         a.remove();
 
         URL.revokeObjectURL(objectUrl);
-    } catch (err) {
+    } catch {
         window.open(url, "_blank", "noopener,noreferrer");
     }
 };

@@ -1,7 +1,6 @@
 'use client';
 import { AlertCircle, Loader2, Send } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { saveMessage } from '@/app/actions/message';
@@ -25,7 +24,6 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FormContact = () => {
     const locale = useLocale();
     const isThai = locale === 'th';
-    const router = useRouter();
 
     const [errors, setErrors] = useState<ValidationErrors>({});
     const [touched, setTouched] = useState<TouchedState>({
@@ -146,7 +144,6 @@ const FormContact = () => {
             setErrors({});
             setTouched({ name: false, email: false, message: false });
 
-            router.refresh();
         } catch (error) {
             console.error(error);
             toast.error(
@@ -165,183 +162,107 @@ const FormContact = () => {
         emailRegex.test(formData.email) &&
         formData.message.trim() !== '';
 
-    return (
-        <div
-            className="
-                rounded-lg p-8
-                bg-white border border-gray-200 shadow-xs
-                dark:bg-white/5 dark:border-white/10 dark:backdrop-blur-md
-            "
-        >
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-                {isThai ? 'ส่งข้อความถึงผม' : 'Send Me A Message'}
-            </h2>
+    const field = (name: keyof FormState) =>
+        `w-full rounded-2xl border bg-white/5 px-4 text-white placeholder-zinc-500 transition-all duration-300 focus:border-rose-300 focus:bg-white/10 focus:outline-none focus:ring-4 focus:ring-rose-400/20 ${
+            errors[name] && touched[name] ? "error-field border-rose-400" : "border-white/15"
+        }`;
 
-            <form className="space-y-6">
-                {/* Name */}
+    const errorText = (name: keyof FormState) =>
+        errors[name] && touched[name] ? (
+            <p id={`${name}-error`} className="mt-2 flex items-center gap-2 text-sm text-rose-300">
+                <AlertCircle aria-hidden="true" size={16} />
+                {errors[name]}
+            </p>
+        ) : null;
+
+    return (
+        <div className="glass-dark rounded-[32px] p-6 sm:p-9">
+            <h3 className="text-2xl font-bold text-white">{isThai ? 'ส่งข้อความถึงผม' : 'Send me a message'}</h3>
+
+            <form
+                className="mt-7 space-y-5"
+                noValidate
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                }}
+            >
                 <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
-                        {isThai ? 'ชื่อของคุณ' : 'Your Name'}{' '}
-                        <span className="text-red-500">*</span>
+                    <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-zinc-300">
+                        {isThai ? 'ชื่อของคุณ' : 'Your name'} <span className="text-rose-300">*</span>
                     </label>
                     <input
+                        id="contact-name"
                         type="text"
                         name="name"
+                        autoComplete="name"
                         value={formData.name}
                         onChange={handleInputChange}
                         onBlur={() => handleBlur('name')}
-                        className={`
-                            w-full px-4 py-2.5 rounded-md transition-all
-                            border text-gray-900 placeholder-gray-400
-                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                            dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
-                            ${
-                                errors.name && touched.name
-                                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20 error-field'
-                                    : 'bg-white border-gray-300'
-                            }
-                        `}
-                        placeholder={
-                            isThai ? 'ใส่ชื่อของคุณ' : 'Enter Your Name'
-                        }
+                        aria-invalid={!!(errors.name && touched.name)}
+                        aria-describedby={errors.name && touched.name ? 'name-error' : undefined}
+                        className={`${field('name')} min-h-13`}
+                        placeholder={isThai ? 'ใส่ชื่อของคุณ' : 'Enter your name'}
                     />
-                    {errors.name && touched.name && (
-                        <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
-                            <AlertCircle size={16} />
-                            <span>{errors.name}</span>
-                        </div>
-                    )}
+                    {errorText("name")}
                 </div>
 
-                {/* Email */}
                 <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
-                        {isThai ? 'อีเมล' : 'Email'}{' '}
-                        <span className="text-red-500">*</span>
+                    <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-zinc-300">
+                        {isThai ? 'อีเมล' : 'Email'} <span className="text-rose-300">*</span>
                     </label>
                     <input
+                        id="contact-email"
                         type="email"
                         name="email"
+                        autoComplete="email"
+                        inputMode="email"
                         value={formData.email}
                         onChange={handleInputChange}
                         onBlur={() => handleBlur('email')}
-                        className={`
-                            w-full px-4 py-2.5 rounded-md transition-all
-                            border text-gray-900 placeholder-gray-400
-                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                            dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
-                            ${
-                                errors.email && touched.email
-                                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20 error-field'
-                                    : 'bg-white border-gray-300'
-                            }
-                        `}
+                        aria-invalid={!!(errors.email && touched.email)}
+                        aria-describedby={errors.email && touched.email ? 'email-error' : undefined}
+                        className={`${field('email')} min-h-13`}
                         placeholder="your.email@example.com"
                     />
-                    {errors.email && touched.email && (
-                        <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
-                            <AlertCircle size={16} />
-                            <span>{errors.email}</span>
-                        </div>
-                    )}
+                    {errorText("email")}
                 </div>
 
-                {/* Message */}
                 <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-white/70">
-                        {isThai ? 'ข้อความ' : 'Message'}{' '}
-                        <span className="text-red-500">*</span>
+                    <label htmlFor="contact-message" className="mb-2 block text-sm font-medium text-zinc-300">
+                        {isThai ? 'ข้อความ' : 'Message'} <span className="text-rose-300">*</span>
                     </label>
                     <textarea
+                        id="contact-message"
                         name="message"
+                        rows={5}
                         value={formData.message}
                         onChange={handleInputChange}
                         onBlur={() => handleBlur('message')}
-                        rows={5}
-                        className={`
-                            w-full px-4 py-2.5 rounded-md transition-all resize-none
-                            border text-gray-900 placeholder-gray-400
-                            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                            dark:bg-white/10 dark:border-white/20 dark:text-white dark:placeholder-white/40
-                            ${
-                                errors.message && touched.message
-                                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20 error-field'
-                                    : 'bg-white border-gray-300'
-                            }
-                        `}
-                        placeholder={
-                            isThai
-                                ? 'เขียนข้อความของคุณที่นี่'
-                                : 'Write Your Message Here'
-                        }
+                        aria-invalid={!!(errors.message && touched.message)}
+                        aria-describedby={errors.message && touched.message ? 'message-error' : undefined}
+                        className={`${field('message')} resize-none py-3`}
+                        placeholder={isThai ? 'เขียนข้อความของคุณที่นี่' : 'Write your message here'}
                     />
-                    {errors.message && touched.message && (
-                        <div className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm">
-                            <AlertCircle size={16} />
-                            <span>{errors.message}</span>
-                        </div>
-                    )}
+                    {errorText("message")}
                 </div>
 
-                {/* Submit button */}
                 <button
-                    type="button"
-                    onClick={handleSubmit}
+                    type="submit"
                     disabled={isSubmitting || !isFormValid}
-                    className="
-                        cursor-pointer w-full py-3.5 rounded-md font-semibold
-                        flex items-center justify-center gap-2 group
-                        bg-rose-500 text-white
-                        hover:shadow-lg hover:shadow-rose-500/30
-                        transition-all duration-300
-                        disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none
-                        relative overflow-hidden
-                    "
+                    className="group relative inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-2xl bg-white font-bold text-zinc-900 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(255,255,255,0.6)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
                 >
-                    {isSubmitting && (
-                        <div
-                            className="absolute inset-0 bg-linear-to-r from-red-600 via-red-400 to-red-600"
-                            style={{
-                                backgroundSize: '200% 100%',
-                                animation: 'shimmer 2s infinite linear',
-                            }}
-                        />
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin" />
+                            {isThai ? 'กำลังส่ง…' : 'Sending…'}
+                        </>
+                    ) : (
+                        <>
+                            {isThai ? 'ส่งข้อความ' : 'Send message'}
+                            <Send aria-hidden="true" className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
+                        </>
                     )}
-
-                    <div className="relative z-10 flex items-center gap-2">
-                        {isSubmitting ? (
-                            <>
-                                <div className="relative">
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    <div className="absolute inset-0 w-5 h-5 rounded-full border-2 border-white/30 animate-ping" />
-                                </div>
-                                <span className="animate-pulse">
-                                    {isThai ? 'กำลังส่ง...' : 'Sending...'}
-                                </span>
-                                <div className="flex gap-1">
-                                    <div
-                                        className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                        style={{ animationDelay: '0ms' }}
-                                    />
-                                    <div
-                                        className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                        style={{ animationDelay: '150ms' }}
-                                    />
-                                    <div
-                                        className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"
-                                        style={{ animationDelay: '300ms' }}
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <span>
-                                    {isThai ? 'ส่งข้อความ' : 'Send Message'}
-                                </span>
-                                <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </>
-                        )}
-                    </div>
                 </button>
             </form>
         </div>

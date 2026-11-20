@@ -1,3 +1,4 @@
+import { revalidatePortfolio } from "@/lib/revalidate";
 import { Prisma } from "@/app/generated/prisma/client";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
@@ -34,6 +35,7 @@ export async function PUT(
             awardLevel_th,
             awardLevel_en,
             receivedAt,
+            icon,
             sortOrder,
             status,
             categorySlugs = [],
@@ -51,6 +53,7 @@ export async function PUT(
             awardLevel_th?: string | null;
             awardLevel_en?: string | null;
             receivedAt?: string | null;
+            icon?: string | null;
             sortOrder?: number;
             status?: "PUBLIC" | "DRAFT";
             categorySlugs?: string[];
@@ -79,6 +82,8 @@ export async function PUT(
                       where: { slug: { in: categorySlugs } },
                   })
                 : [];
+        // keep the order the admin picked (first = primary category)
+        categories.sort((a, b) => categorySlugs.indexOf(a.slug) - categorySlugs.indexOf(b.slug));
 
         await prisma.achievementsOnCategories.deleteMany({
             where: { achievementId },
@@ -247,6 +252,7 @@ export async function PUT(
             updateData.awardLevel_en = awardLevel_en ?? null;
         if (receivedAt !== undefined)
             updateData.receivedAt = receivedAt ?? null;
+        if (icon !== undefined) updateData.icon = icon || null;
         if (sortOrder !== undefined) updateData.sortOrder = sortOrder;
         if (status !== undefined) updateData.status = status;
 
@@ -283,6 +289,7 @@ export async function PUT(
             },
         });
 
+        revalidatePortfolio();
         return NextResponse.json(updated, { status: 200 });
     } catch (error) {
         console.error("PUT /api/admin/achievements/[id] error", error);
@@ -378,6 +385,7 @@ export async function DELETE(
             where: { id: achievementId },
         });
 
+        revalidatePortfolio();
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {
         console.error("DELETE /api/admin/achievements/[id] error", error);

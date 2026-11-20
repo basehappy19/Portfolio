@@ -1,219 +1,168 @@
-import AchievementCarousel from '@/components/AchievementCarousel';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-import Footer from '@/components/Layout/Footer';
-import Navbar from '@/components/Layout/Navbar';
-import ScrollToAnchor from '@/components/ScrollToAnchor';
-import About from '@/components/Section/About';
-import Achievement from '@/components/Section/Achievement';
-import Contact from '@/components/Section/Contact';
-import Home from '@/components/Section/Home';
-import { getAchievementFirstImages } from '@/lib/achievement-carousel';
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import Navbar from "@/components/Layout/Navbar";
+import Footer from "@/components/Layout/Footer";
+import Home from "@/components/Section/Home";
+import Stats from "@/components/Section/Stats";
+import About from "@/components/Section/About";
+import Skills from "@/components/Section/Skills";
+import Achievement from "@/components/Section/Achievement";
+import Contact from "@/components/Section/Contact";
+import { getAchievements } from "@/lib/achievements";
+import { getAwardTier } from "@/lib/award-tier";
+import { SITE_URL, SOCIAL_LINKS, NAV_SECTIONS, type NavSection } from "@/lib/site";
 
-import { getLocale } from "next-intl/server";
+// Static page, refreshed in the background every hour and on every admin change.
+export const revalidate = 3600;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-  const isTH = locale === "th";
+type Params = { params: Promise<{ locale: string }> };
 
-  const baseUrl = "https://portfolio.basehappy19.site";
-  const url = `${baseUrl}/${locale}`;
-  const image = `${baseUrl}/profiles/me.png`;
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+    const { locale } = await params;
+    const isTH = locale === "th";
+    const url = `${SITE_URL}/${locale}`;
+    const image = `${SITE_URL}/og/og-${isTH ? "th" : "en"}.jpg`;
 
-  const title = isTH
-    ? "ผลงาน & โปรไฟล์ | พอร์ตฟอลิโอของผม (Portfolio & Achievements)"
-    : "Portfolio & Works | Professional Developer & Innovator Profile";
+    // Title & description are English on both language versions; keywords stay bilingual.
+    const title = "Phakphumi Thidindam | Portfolio, Projects & Awards";
+    const description =
+        "Portfolio of Phakphumi Thidindam — full-stack developer, student and innovator from Thailand. Real-world systems used by 15,000+ people, national competitions, hackathons and awards.";
 
-  const description = isTH
-    ? "ยินดีต้อนรับสู่พอร์ตฟอลิโออย่างเป็นทางการ แสดงผลงาน รางวัลนวัตกรรม ทักษะการพัฒนาซอฟต์แวร์ และประสบการณ์การทำงานระดับมืออาชีพ"
-    : "Welcome to my official portfolio showcasing innovative projects, prestigious awards, software engineering skills, and professional achievements.";
-
-  return {
-    title,
-    description,
-    keywords: isTH
-      ? [
-        "พอร์ตฟอลิโอ",
-        "Portfolio",
-        "ผลงาน",
-        "นักพัฒนา",
-        "เว็บแอปพลิเคชัน",
-        "นวัตกร",
-        "ซอฟต์แวร์",
-        "เรซูเม่",
-        "สมัครงาน"
-      ]
-      : [
-        "Portfolio",
-        "Full-Stack Developer",
-        "Software Engineer",
-        "Web Development",
-        "Projects",
-        "Awards",
-        "Innovator",
-        "Resume"
-      ],
-    authors: [{ name: "Pakpoom TD", url: baseUrl }],
-    creator: "Pakpoom TD",
-    publisher: "Pakpoom TD",
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
-    },
-
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: isTH ? "พอร์ตฟอลิโอของผม" : "My Professional Portfolio",
-      images: [
-        {
-          url: image,
-          width: 1200,
-          height: 630,
-          alt: isTH ? "ภาพโปรไฟล์และผลงานของผม" : "Personal Portfolio & Achievements Profile Image"
-        }
-      ],
-      locale: isTH ? "th_TH" : "en_US",
-      type: "website",
-    },
-
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-    },
-
-    alternates: {
-      canonical: url,
-      languages: {
-        en: `${baseUrl}/en`,
-        th: `${baseUrl}/th`,
-      },
-    },
-  };
+    return {
+        title,
+        description,
+        keywords: [
+            "Phakphumi Thidindam",
+            "ภาคภูมิ ทีดินดำ",
+            "Portfolio",
+            "พอร์ตฟอลิโอ",
+            "แฟ้มสะสมผลงาน",
+            "Full-stack developer",
+            "นักพัฒนาเว็บ",
+            "Hackathon",
+            "แฮกกาธอน",
+            "Awards",
+            "ผลงาน รางวัล",
+            "TCAS",
+            "Digital Science and Technology",
+            "ICT Mahidol",
+            "Thailand",
+        ],
+        authors: [{ name: "Phakphumi Thidindam", url: SITE_URL }],
+        creator: "Phakphumi Thidindam",
+        alternates: {
+            canonical: url,
+            languages: { th: `${SITE_URL}/th`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/th` },
+        },
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+        },
+        openGraph: {
+            type: "profile",
+            url,
+            title,
+            description,
+            siteName: "Phakphumi Portfolio",
+            locale: isTH ? "th_TH" : "en_US",
+            alternateLocale: isTH ? ["en_US"] : ["th_TH"],
+            firstName: "Phakphumi",
+            lastName: "Thidindam",
+            images: [{ url: image, width: 1200, height: 630, alt: title }],
+        },
+        twitter: { card: "summary_large_image", title, description, images: [image] },
+    };
 }
 
-export default async function IndexPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const searchParams = await props.searchParams;
-  const locale = await getLocale();
+export default async function IndexPage({ params }: Params) {
+    const { locale } = await params;
+    setRequestLocale(locale);
+    const t = await getTranslations("Index");
+    const isTH = locale === "th";
 
-  const categorySlug =
-    typeof searchParams.category === "string"
-      ? searchParams.category
-      : undefined;
+    const { achievements } = await getAchievements({ offset: 0, limit: 60 });
+    const awards = achievements
+        .filter((a) => ["gold", "silver", "finalist", "impact"].includes(getAwardTier(a.awardLevel_th, a.awardLevel_en)))
+        .map((a) => `${isTH ? a.awardLevel_th : a.awardLevel_en || a.awardLevel_th} — ${isTH ? a.title_th : a.title_en || a.title_th}`)
+        .slice(0, 25);
+    const skills = (t.raw("Skill.Expertise") as { Skills: { name: string }[] }[]).flatMap((g) => g.Skills.map((s) => s.name));
 
-  const images = await getAchievementFirstImages();
-  function shuffleArray<T>(array: T[]): T[] {
-    const arr = [...array];
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "@id": `${SITE_URL}/${locale}#profile`,
+        url: `${SITE_URL}/${locale}`,
+        inLanguage: locale,
+        dateModified: new Date().toISOString(),
+        mainEntity: {
+            "@type": "Person",
+            "@id": `${SITE_URL}/#person`,
+            name: t("Home.Name"),
+            alternateName: isTH ? ["Phakphumi Thidindam", "เบส"] : ["ภาคภูมิ ทีดินดำ", "Base"],
+            url: SITE_URL,
+            image: `${SITE_URL}/profiles/me.png`,
+            jobTitle: isTH ? "นักพัฒนาเว็บ Full-stack" : "Full-stack Developer",
+            description: t("Home.Description").replace(/"/g, ""),
+            email: "mailto:pakpoom.td@gmail.com",
+            nationality: { "@type": "Country", name: "Thailand" },
+            affiliation: { "@type": "EducationalOrganization", name: isTH ? "โรงเรียนภูเขียว" : "Phukhieo School" },
+            knowsAbout: skills,
+            award: awards,
+            sameAs: SOCIAL_LINKS,
+        },
+    };
 
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
+    const navLabels = Object.fromEntries(NAV_SECTIONS.map((id) => [id, t(`Nav.${id}`)])) as Record<NavSection, string>;
 
-    return arr;
-  }
+    return (
+        <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+            <a
+                href="#main"
+                className="sr-only z-[100] rounded-xl bg-zinc-900 px-4 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+            >
+                {t("Nav.SkipToContent")}
+            </a>
+            <div aria-hidden="true" className="scroll-progress fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-rose-500 via-accent to-indigo-500" />
+            <Navbar labels={navLabels} brand="Phakphumi Portfolio" menuLabel={t("Nav.Menu")} languageLabel={t("Nav.Language")} />
 
-  const mappedImages = shuffleArray(images).map((image) => ({
-    id: image.id,
-    url: image.url,
-    alt:
-      locale === "th"
-        ? image.alt_th || undefined
-        : image.alt_en || undefined,
-  }));
+            <main id="main" className="overflow-x-clip">
+                <section id="Home" aria-label={t("Home.Name")} className="relative isolate overflow-hidden">
+                    {/* soft animated colour fields behind the hero */}
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+                        <div className="anim-blob absolute -right-40 -top-10 h-[640px] w-[640px] rounded-full bg-[radial-gradient(closest-side,rgba(254,205,211,0.75),rgba(254,205,211,0))]" />
+                        <div className="anim-blob absolute -bottom-24 -left-48 h-[560px] w-[560px] rounded-full bg-[radial-gradient(closest-side,rgba(186,230,253,0.6),rgba(186,230,253,0))] [animation-delay:-6s]" />
+                    </div>
+                    <Home />
+                </section>
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    "mainEntity": {
-      "@type": "Person",
-      "name": locale === "th" ? "พอร์ตฟอลิโอของผม (Pakpoom TD)" : "Pakpoom TD - Full Stack Developer Portfolio",
-      "description": locale === "th" ? "พอร์ตฟอลิโอแสดงทักษะ ความสามารถ ผลงานรางวัลนวัตกรรม และประสบการณ์ในการทำงานของผม" : "Professional Software Engineer & Innovator Portfolio showcasing creative achievements and modern web development skills.",
-      "url": "https://portfolio.basehappy19.site",
-      "image": "https://portfolio.basehappy19.site/profiles/me.png",
-      "jobTitle": "Full Stack Developer",
-      "sameAs": []
-    }
-  };
+                <section aria-label={isTH ? "ตัวเลขสำคัญ" : "Highlights"} className="relative border-y border-zinc-200 bg-white">
+                    <Stats />
+                </section>
 
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <ScrollToAnchor />
-      
-      {/* WRAPPER WITH CLEAN MINIMALIST LIGHT THEME */}
-      <main className="min-h-screen font-sans bg-slate-50/60 text-slate-800 selection:bg-rose-600 selection:text-white">
+                <section id="About" className="relative scroll-mt-24 bg-white">
+                    <About />
+                </section>
 
-        {/* SECTION 1: HOME & HERO */}
-        <section id="Home" className="w-full relative bg-white border-b border-slate-200/80 pt-6 pb-14 md:py-16 transition-colors">
-          <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20">
-            <div className="md:hidden fixed top-0 left-0 w-full z-50 flex items-center justify-center pt-4 pointer-events-none">
-              <div className="pointer-events-auto shadow-sm">
-                <LanguageSwitcher />
-              </div>
-            </div>
-            <Home />
-            <Navbar />
-          </div>
-        </section>
+                <section id="Skills" className="sd-expand scroll-mt-24 bg-zinc-100/70">
+                    <Skills />
+                </section>
 
-        {/* SECTION 2: ABOUT */}
-        <section id="About" className="w-full bg-slate-50/60 scroll-mt-20 border-b border-slate-200/80 transition-colors">
-          <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 py-12 md:py-16">
-            <About />
-          </div>
-        </section>
+                <section id="Achievements" className="scroll-mt-24">
+                    <Achievement />
+                </section>
 
+                <section id="Contact" className="sd-expand relative isolate scroll-mt-24 overflow-hidden bg-zinc-950">
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+                        <div className="anim-blob absolute -right-48 -top-32 h-[680px] w-[680px] rounded-full bg-[radial-gradient(closest-side,rgba(225,29,72,0.32),rgba(225,29,72,0))]" />
+                        <div className="anim-blob absolute -bottom-40 -left-40 h-[620px] w-[620px] rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.28),rgba(99,102,241,0))] [animation-delay:-8s]" />
+                    </div>
+                    <Contact />
+                </section>
+            </main>
 
-        {/* SECTION 4: ACHIEVEMENTS */}
-        <section id="Achievements" className="w-full relative overflow-hidden bg-gradient-to-b from-slate-50/90 via-white to-slate-50/90 dark:from-zinc-950 dark:via-zinc-900/60 dark:to-zinc-950 scroll-mt-20 border-b border-slate-200/80 dark:border-zinc-800 transition-colors">
-          {/* Decorative Background Elements & Glowing Blobs (z-0 so clearly visible above section background) */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-            {/* Top Right Glowing Rose Blob */}
-            <div className="absolute -top-[10%] -right-[5%] w-[600px] h-[600px] rounded-full bg-radial from-rose-500/25 via-pink-500/10 to-transparent blur-3xl opacity-100" />
-            {/* Bottom Left Glowing Amber/Indigo Blob */}
-            <div className="absolute -bottom-[10%] -left-[5%] w-[600px] h-[600px] rounded-full bg-radial from-blue-500/25 via-indigo-500/10 to-transparent blur-3xl opacity-100" />
-            {/* Modern Subtle Grid Pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_90%_90%_at_50%_50%,#000_70%,transparent_100%)]" />
-          </div>
-
-          <div className="relative z-10">
-            <AchievementCarousel
-              images={mappedImages}
-              locale={locale}
-            />
-          </div>
-          <div className="max-w-[1536px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 py-14 md:py-20 relative z-10">
-            <Achievement slug={categorySlug} />
-          </div>
-        </section>
-
-        {/* SECTION 5: CONTACT */}
-        <section id="Contact" className="w-full bg-white scroll-mt-20 transition-colors">
-          <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 lg:px-14 xl:px-20 py-12 md:py-16">
-            <Contact />
-          </div>
-        </section>
-
-      </main>
-
-      <Footer />
-    </>
-  );
+            <Footer />
+        </>
+    );
 }
-
