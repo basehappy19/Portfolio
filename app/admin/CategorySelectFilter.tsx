@@ -1,7 +1,10 @@
 "use client"
 
 import { useCategories } from '@/app/contexts/CategoriesContext';
+import { categoryRank, categoryStyle } from '@/lib/category-style';
+import { Tag } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import Select from './ui/Select';
 
 export default function CategorySelectFilter() {
     const categories = useCategories();
@@ -19,21 +22,21 @@ export default function CategorySelectFilter() {
     };
 
     const current = searchParams.get("category") ?? "";
+    const options = [
+        { value: "", label: "ทุกหมวดหมู่", color: "" },
+        ...[...categories]
+            .sort((a, b) => categoryRank(a.slug) - categoryRank(b.slug))
+            .map((cat) => ({ value: cat.slug, label: cat.name_th, color: categoryStyle(cat.slug).bg })),
+    ];
 
     return (
-        <select
+        <Select
             value={current}
-            onChange={(e) => handleChange(e.target.value)}
-            className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/70 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all shadow-2xs cursor-pointer"
-        >
-            <option value="">ทุกหมวดหมู่</option>
-
-            {categories.map(cat => (
-                <option key={cat.id} value={cat.slug}>
-                    {cat.name_th}
-                </option>
-            ))}
-        </select>
-
+            options={options}
+            onChange={handleChange}
+            label="หมวด"
+            ariaLabel="กรองตามหมวดหมู่"
+            icon={<Tag className="h-4 w-4" />}
+        />
     );
 }

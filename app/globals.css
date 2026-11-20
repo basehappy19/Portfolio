@@ -42,6 +42,8 @@ body {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
 }
+/* the custom select shows focus with its highlighted option instead */
+[role="listbox"]:focus-visible { outline: none; }
 
 /* ---------- Liquid glass ---------- */
 .glass {
@@ -445,3 +447,11 @@ html:not(.motion-ready) :is(.anim-blob, .anim-spin-slow, .anim-float, .marquee-t
         animation: none;
     }
 }
+
+/* admin custom select dropdown */
+.select-pop { animation: select-pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both; transform-origin: top center; }
+@keyframes select-pop {
+    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .select-pop { animation: none; } }

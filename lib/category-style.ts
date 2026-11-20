@@ -6,7 +6,7 @@ const STYLES: Record<string, { bg: string; icon: LucideIcon }> = {
     project: { bg: "#0369a1", icon: Monitor },
     competition: { bg: "#b45309", icon: Trophy },
     hackathon: { bg: "#6d28d9", icon: Zap },
-    business: { bg: "#c2410c", icon: Briefcase },
+    business: { bg: "#c026d3", icon: Briefcase },
     self_development: { bg: "#047857", icon: GraduationCap },
     activity: { bg: "#be123c", icon: HeartHandshake },
     leadership: { bg: "#334155", icon: Flag },
