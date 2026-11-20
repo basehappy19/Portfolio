@@ -468,7 +468,6 @@ html.lite .anim-blob { display: none; }
 html.lite :is(.anim-spin-slow, .anim-float) { animation: none; }
 /* scroll-linked effects: show the end state, keep only the light fade-up of cards and titles */
 html.lite :is(.sd-hero-out, .sd-hero-photo, .sd-expand) { animation: none; }
-html.lite .scroll-progress { display: none; }
 html.lite .sd-words span { animation: none; color: inherit; }
 html.lite .sd-title[data-reveal] { animation-name: sd-up; }
 html.lite .card-lift, html.lite .card-lift:hover { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px -16px rgba(0, 0, 0, 0.3); }
